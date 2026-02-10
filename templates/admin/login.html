@@ -1,0 +1,19 @@
+{% extends "admin/login.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-auth-wrapper">
+    <div class="admin-auth-card">
+        <div class="admin-auth-header">
+            <div class="admin-auth-title">ورود مدیر</div>
+            <div class="admin-auth-subtitle">به پنل مدیریت آریو شاپ خوش آمدید</div>
+        </div>
+        {{ block.super }}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'shared/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}ورود / ثبت نام | آریو شاپ{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'assets/css/auth-modern.css' %}">
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="#">صفحات</a></li>
+            <li class="breadcrumb-item active" aria-current="page">ورود / ثبت نام</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="auth-page-modern login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17"
+     style="background-image: url('{% static 'assets/images/backgrounds/login-bg.jpg' %}')">
+    <div class="container">
+        <div class="form-box">
+            <div class="form-tab">
+                <ul class="nav nav-pills nav-fill" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link {% if not active_tab or active_tab == 'login' %}active{% endif %}"
+                           id="signin-tab-2" data-toggle="tab" href="#signin-2" role="tab"
+                           aria-controls="signin-2" aria-selected="{% if not active_tab or active_tab == 'login' %}true{% else %}false{% endif %}">ورود</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_tab == 'register' %}active{% endif %}"
+                           id="register-tab-2" data-toggle="tab" href="#register-2" role="tab"
+                           aria-controls="register-2" aria-selected="{% if active_tab == 'register' %}true{% else %}false{% endif %}">ثبت نام</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <!-- تب ورود -->
+                    <div class="tab-pane fade {% if not active_tab or active_tab == 'login' %}show active{% endif %}"
+                         id="signin-2" role="tabpanel" aria-labelledby="signin-tab-2">
+                        <form action="{% url 'accounts:login_register' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="login" value="1">
+                            {% if login_form.non_field_errors %}
+                                <div class="alert alert-danger">{{ login_form.non_field_errors }}</div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="singin-email-2">نام کاربری یا آدرس ایمیل *</label>
+                                {{ login_form.username }}
+                                {% if login_form.username.errors %}
+                                    <div class="text-danger small">{{ login_form.username.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="singin-password-2">رمز عبور *</label>
+                                {{ login_form.password }}
+                                {% if login_form.password.errors %}
+                                    <div class="text-danger small">{{ login_form.password.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-footer">
+                                <button type="submit" class="btn btn-outline-primary-2">
+                                    <span>ورود</span>
+                                    <i class="icon-long-arrow-left"></i>
+                                </button>
+                                <div class="custom-control custom-checkbox">
+                                    {{ login_form.remember_me }}
+                                    <label class="custom-control-label" for="signin-remember-2">مرا به خاطر بسپار</label>
+                                </div>
+                                <a href="{% url 'accounts:forget_password' %}" class="forgot-link">رمز عبور خود را فراموش کرده‌اید؟</a>
+                            </div>
+                        </form>
+                        <div class="form-choice">
+                            <p class="text-center">یا ورود با</p>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <a href="#" class="btn btn-login btn-g"><i class="icon-google"></i>حساب کاربری گوگل</a>
+                                </div>
+                                <div class="col-sm-6">
+                                    <a href="#" class="btn btn-login btn-f"><i class="icon-facebook-f"></i>حساب کاربری فیسبوک</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تب ثبت نام -->
+                    <div class="tab-pane fade {% if active_tab == 'register' %}show active{% endif %}"
+                         id="register-2" role="tabpanel" aria-labelledby="register-tab-2">
+                        <form action="{% url 'accounts:login_register' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="register" value="1">
+                            <div class="form-group">
+                                <label for="register-email-2">آدرس ایمیل شما *</label>
+                                {{ register_form.email }}
+                                {% if register_form.email.errors %}
+                                    <div class="text-danger small">{{ register_form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password-2">رمز عبور *</label>
+                                {{ register_form.password1 }}
+                                {% if register_form.password1.errors %}
+                                    <div class="text-danger small">{{ register_form.password1.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password2-2">تکرار رمز عبور *</label>
+                                {{ register_form.password2 }}
+                                {% if register_form.password2.errors %}
+                                    <div class="text-danger small">{{ register_form.password2.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-footer">
+                                <button type="submit" class="btn btn-outline-primary-2">
+                                    <span>ثبت نام</span>
+                                    <i class="icon-long-arrow-left"></i>
+                                </button>
+                                <div class="custom-control custom-checkbox">
+                                    {{ register_form.accept_terms }}
+                                    <label class="custom-control-label" for="register-policy-2">من با <a href="#">قوانین و مقررات</a> موافقم *</label>
+                                </div>
+                                {% if register_form.accept_terms.errors %}
+                                    <div class="text-danger small w-100 mt-1">{{ register_form.accept_terms.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </form>
+                        <div class="form-choice">
+                            <p class="text-center">یا ورود با</p>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <a href="#" class="btn btn-login btn-g"><i class="icon-google"></i>حساب کاربری گوگل</a>
+                                </div>
+                                <div class="col-sm-6">
+                                    <a href="#" class="btn btn-login btn-f"><i class="icon-facebook-f"></i>حساب کاربری فیسبوک</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'assets/js/auth-modern.js' %}"></script>
+{% endblock %}

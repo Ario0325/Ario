@@ -1,0 +1,140 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+{% load math_filters %}
+
+{% block title %}سبد خرید - فروشگاه{% endblock %}
+
+{% block content %}
+<div class="page-header text-center" style="background-image: url('/static/assets/images/page-header-bg.jpg')">
+    <div class="container">
+        <h1 class="page-title">سبد خرید<span>فروشگاه</span></h1>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:list' %}">فروشگاه</a></li>
+            <li class="breadcrumb-item active" aria-current="page">سبد خرید</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="page-content">
+    <div class="cart">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-9">
+                    <form action="{% url 'cart:update' %}" method="post">
+                        {% csrf_token %}
+                        <table class="table table-cart table-mobile">
+                            <thead>
+                                <tr>
+                                    <th>محصول</th>
+                                    <th>قیمت</th>
+                                    <th>تعداد</th>
+                                    <th>مجموع</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td class="product-col">
+                                        <div class="product">
+                                            <figure class="product-media">
+                                                <a href="{{ item.product.get_absolute_url }}">
+                                                    {% with item.product.images.all.0 as img %}
+                                                    {% if img %}
+                                                    <img src="{{ img.image.url }}" alt="{{ item.product.name }}">
+                                                    {% else %}
+                                                    <img src="{% static 'assets/images/products/product-1.jpg' %}" alt="{{ item.product.name }}">
+                                                    {% endif %}
+                                                    {% endwith %}
+                                                </a>
+                                            </figure>
+                                            <h3 class="product-title">
+                                                <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                                            </h3>
+                                        </div>
+                                    </td>
+                                    <td class="price-col">{{ item.price|floatformat:0 }}</td>
+                                    <td class="quantity-col">
+                                        <div class="cart-product-quantity">
+                                            <input type="number" name="qty_{{ item.product.id }}" class="form-control" value="{{ item.quantity }}" min="1" max="{% if item.product.stock %}{{ item.product.stock }}{% else %}99{% endif %}" step="1" data-decimals="0" required>
+                                        </div>
+                                    </td>
+                                    <td class="total-col">{{ item.total|floatformat:0 }}</td>
+                                    <td class="remove-col">
+                                        <form action="{% url 'cart:remove' item.product.id %}" method="post" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{{ request.path }}">
+                                            <button type="submit" class="btn-remove" title="حذف محصول"><i class="icon-close"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <div class="cart-bottom">
+                            <div class="cart-discount">
+                                <form action="#" method="post">
+                                    {% csrf_token %}
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="کد تخفیف" name="coupon" disabled>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-primary-2" type="button" disabled><i class="icon-long-arrow-left"></i></button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <button type="submit" class="btn btn-outline-dark-2"><span>به روز رسانی سبد خرید</span><i class="icon-refresh"></i></button>
+                        </div>
+                    </form>
+                </div>
+
+                <aside class="col-lg-3">
+                    <div class="summary summary-cart">
+                        <h3 class="summary-title">جمع سبد خرید</h3>
+                        <table class="table table-summary">
+                            <tbody>
+                                <tr class="summary-subtotal">
+                                    <td>جمع کل سبد خرید :</td>
+                                    <td class="text-left">{{ cart_total|floatformat:0 }} تومان</td>
+                                </tr>
+                                <tr class="summary-shipping">
+                                    <td>شیوه ارسال :</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                <tr class="summary-shipping-row">
+                                    <td>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="free-shipping" name="shipping" class="custom-control-input" checked>
+                                            <label class="custom-control-label" for="free-shipping">ارسال رایگان</label>
+                                        </div>
+                                    </td>
+                                    <td class="text-left">0 تومان</td>
+                                </tr>
+                                {% if user.is_authenticated %}
+                                <tr class="summary-shipping-estimate">
+                                    <td>آدرس<br><a href="{% url 'accounts:dashboard' %}">تغییر آدرس</a></td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                {% endif %}
+                                <tr class="summary-total">
+                                    <td>مبلغ قابل پرداخت :</td>
+                                    <td class="text-left">{{ total_payable|floatformat:0 }} تومان</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <a href="{% url 'cart:checkout' %}" class="btn btn-outline-primary-2 btn-order btn-block">رفتن به صفحه پرداخت</a>
+                    </div>
+                    <a href="{% url 'products:list' %}" class="btn btn-outline-dark-2 btn-block mb-3"><span>ادامه خرید</span><i class="icon-refresh"></i></a>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

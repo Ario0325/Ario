@@ -1,0 +1,102 @@
+/**
+ * هدر یکپارچه و مدرن - رفع باگ فاصله، ناپدید شدن و بهم ریختگی در صفحات
+ * استایل ثابت برای همه صفحات با پس‌زمینه مشخص و فاصله یکسان محتوا
+ */
+
+/* ---- فاصله یکسان بین هدر و محتوا در همه صفحات ---- */
+.main {
+  padding-top: 10rem;
+}
+@media (max-width: 991px) {
+  .main {
+    padding-top: 8rem;
+  }
+}
+@media (max-width: 575px) {
+  .main {
+    padding-top: 7rem;
+  }
+}
+
+/* ---- هدر همیشه قابل مشاهده با پس‌زمینه ثابت ---- */
+.header.header-9 {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 1040;
+  background: linear-gradient(180deg, rgba(51, 51, 51, 0.98) 0%, rgba(40, 40, 40, 0.97) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.header.header-9 .header-middle {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.header.header-9 .sticky-header {
+  background: transparent;
+}
+.header.header-9 .sticky-header.fixed {
+  background: rgba(51, 51, 51, 0.98);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ---- منو و لینک‌ها ---- */
+.header.header-9 .menu > li > a {
+  transition: color 0.2s ease;
+}
+.header.header-9 .menu > li > a::before {
+  background-color: #cc9966;
+}
+.header.header-9 .menu li:hover > a,
+.header.header-9 .menu li.show > a,
+.header.header-9 .menu li.active > a {
+  color: #fff;
+}
+
+/* ---- لوگو و آیکون‌ها ---- */
+.header.header-9 .logo {
+  transition: opacity 0.2s ease;
+}
+.header.header-9 .logo:hover {
+  opacity: 0.9;
+}
+
+/* ---- جستجو ---- */
+.header.header-9 .header-search .header-search-wrapper {
+  border-color: rgba(255, 255, 255, 0.3);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.header.header-9 .header-search .header-search-wrapper.show,
+.header.header-9 .header-search .header-search-wrapper:focus-within {
+  border-color: #cc9966;
+  box-shadow: 0 0 0 2px rgba(204, 153, 102, 0.2);
+}
+
+/* ---- سبد خرید و حساب کاربری ---- */
+.header.header-9 .cart-dropdown .dropdown-toggle .cart-txt,
+.header.header-9 .account-link .account-txt,
+.header.header-9 .account-dropdown .dropdown-toggle .account-txt {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ---- ریسپانسیو منو ---- */
+@media (max-width: 991px) {
+  .header.header-9 .main-nav,
+  .header.header-9 .modern-nav {
+    display: none;
+  }
+  .header.header-9 .logo,
+  .header.header-9 .logo-modern {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .header.header-9 .modern-search-wrapper {
+    left: auto;
+    right: 0;
+    transform: none;
+    width: 320px;
+  }
+}

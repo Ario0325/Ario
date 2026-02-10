@@ -1,0 +1,357 @@
+{% load menu_tags %}
+{% load static %}
+
+<!-- Modern Responsive Navbar - Ario Shop -->
+<header class="ario-modern-header" id="mainHeader">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-content">
+                <div class="top-bar-left">
+                    <span class="top-bar-text">
+                        <i class="icon-phone"></i>
+                        تلفن پشتیبانی: 021-12345678
+                    </span>
+                </div>
+                <div class="top-bar-right">
+                    <span class="top-bar-text">
+                        <i class="icon-shipping"></i>
+                        ارسال رایگان برای سفارش‌های بالای 500,000 تومان
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <div class="main-header" id="stickyHeader">
+        <div class="container">
+            <div class="header-wrapper">
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="منو">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+
+                <!-- Logo -->
+                <div class="header-logo">
+                    <a href="{% url 'index' %}" class="logo-link">
+                        <img src="{% static 'assets/images/logo.png' %}" alt="آریو شاپ" class="logo-img">
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="desktop-nav" id="desktopNav">
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="{% url 'index' %}" class="nav-link">
+                                <span>خانه</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'products:list' %}" class="nav-link">
+                                <span>فروشگاه</span>
+                            </a>
+                        </li>
+                        {% for item in main_menu_items %}
+                        <li class="nav-item {% if item.has_children %}has-dropdown{% endif %}">
+                            <a href="{{ item.resolved_url }}" class="nav-link">
+                                <span>{{ item.title }}</span>
+                                {% if item.has_children %}
+                                <i class="icon-angle-down"></i>
+                                {% endif %}
+                            </a>
+                            {% if item.has_children %}
+                            <ul class="dropdown-menu">
+                                {% for child in item.get_children %}
+                                <li class="dropdown-item {% if child.has_children %}has-submenu{% endif %}">
+                                    <a href="{{ child.resolved_url }}" class="dropdown-link">
+                                        {{ child.title }}
+                                        {% if child.has_children %}
+                                        <i class="icon-angle-left"></i>
+                                        {% endif %}
+                                    </a>
+                                    {% if child.has_children %}
+                                    <ul class="submenu">
+                                        {% for subchild in child.get_children %}
+                                        <li class="submenu-item">
+                                            <a href="{{ subchild.resolved_url }}" class="submenu-link">
+                                                {{ subchild.title }}
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                        <li class="nav-item">
+                            <a href="{% url 'AboutUs_Module:about' %}" class="nav-link">
+                                <span>درباره ما</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'contact' %}" class="nav-link">
+                                <span>تماس با ما</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <!-- Search -->
+                    <div class="header-action search-action">
+                        <button class="action-btn search-btn" id="searchBtn" aria-label="جستجو">
+                            <i class="icon-search"></i>
+                        </button>
+                    </div>
+
+                    <!-- Account -->
+                    <div class="header-action account-action">
+                        {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="action-btn dropdown-toggle" data-toggle="dropdown" aria-label="حساب کاربری">
+                                <i class="icon-user"></i>
+                                <span class="action-text d-none d-lg-inline">حساب من</span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-left">
+                                <a href="{% url 'accounts:dashboard' %}" class="dropdown-item">
+                                    <i class="icon-dashboard"></i> داشبورد
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{% url 'accounts:logout' %}" class="dropdown-item">
+                                    <i class="icon-sign-out"></i> خروج
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'accounts:login_register' %}" class="action-btn" aria-label="ورود">
+                            <i class="icon-user"></i>
+                            <span class="action-text d-none d-lg-inline">ورود</span>
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Wishlist -->
+                    <div class="header-action wishlist-action">
+                        <a href="#" class="action-btn" aria-label="علاقه‌مندی‌ها">
+                            <i class="icon-heart-o"></i>
+                            <span class="action-badge">0</span>
+                        </a>
+                    </div>
+
+                    <!-- Cart -->
+                    <div class="header-action cart-action">
+                        <div class="dropdown cart-dropdown">
+                            <a href="{% url 'cart:detail' %}" class="action-btn dropdown-toggle" data-toggle="dropdown" aria-label="سبد خرید">
+                                <i class="icon-shopping-cart"></i>
+                                <span class="action-badge {% if cart_count > 0 %}has-items{% endif %}">{{ cart_count|default:0 }}</span>
+                                <span class="action-text d-none d-xl-inline">
+                                    {% if cart_total %}{{ cart_total|floatformat:0 }} تومان{% else %}0 تومان{% endif %}
+                                </span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-left cart-dropdown-menu">
+                                <div class="dropdown-cart-products">
+                                    {% for item in cart_items_preview %}
+                                    <div class="product">
+                                        <div class="product-cart-details">
+                                            <h4 class="product-title">
+                                                <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                                            </h4>
+                                            <span class="cart-product-info">
+                                                <span class="cart-product-qty">{{ item.quantity }}</span>
+                                                × {{ item.price|floatformat:0 }} تومان
+                                            </span>
+                                        </div>
+                                        <figure class="product-image-container">
+                                            <a href="{{ item.product.get_absolute_url }}" class="product-image">
+                                                {% with item.product.images.all.0 as img %}
+                                                {% if img %}
+                                                <img src="{{ img.image.url }}" alt="{{ item.product.name }}">
+                                                {% else %}
+                                                <img src="{% static 'assets/images/products/product-1.jpg' %}" alt="{{ item.product.name }}">
+                                                {% endif %}
+                                                {% endwith %}
+                                            </a>
+                                        </figure>
+                                        <form action="{% url 'cart:remove' item.product.id %}" method="post" class="btn-remove-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-remove" title="حذف">
+                                                <i class="icon-close"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% empty %}
+                                    <div class="empty-cart">
+                                        <i class="icon-shopping-cart"></i>
+                                        <p>سبد خرید خالی است</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                {% if cart_items_preview %}
+                                <div class="dropdown-cart-total">
+                                    <span>مجموع:</span>
+                                    <span class="cart-total-price">{{ cart_total|floatformat:0 }} تومان</span>
+                                </div>
+
+                                <div class="dropdown-cart-action">
+                                    <a href="{% url 'cart:detail' %}" class="btn btn-outline-primary-2 btn-block">
+                                        مشاهده سبد خرید
+                                    </a>
+                                    <a href="{% url 'cart:checkout' %}" class="btn btn-primary btn-block">
+                                        پرداخت
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Panel -->
+    <div class="search-panel" id="searchPanel">
+        <div class="container">
+            <div class="search-panel-content">
+                <form action="{% url 'products:search' %}" method="get" class="search-form">
+                    <input type="search" name="q" class="search-input" placeholder="جستجوی محصولات..." autocomplete="off" autofocus>
+                    <button type="submit" class="search-submit">
+                        <i class="icon-search"></i>
+                    </button>
+                </form>
+                <button class="search-close" id="searchClose" aria-label="بستن">
+                    <i class="icon-close"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+<div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+        <div class="mobile-menu-logo">
+            <img src="{% static 'assets/images/logo.png' %}" alt="آریو شاپ">
+        </div>
+        <button class="mobile-menu-close" id="mobileMenuClose">
+            <i class="icon-close"></i>
+        </button>
+    </div>
+
+    <div class="mobile-menu-body">
+        <!-- Mobile Search -->
+        <div class="mobile-search">
+            <form action="{% url 'products:search' %}" method="get">
+                <input type="search" name="q" class="mobile-search-input" placeholder="جستجو...">
+                <button type="submit" class="mobile-search-btn">
+                    <i class="icon-search"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Mobile User Info -->
+        {% if user.is_authenticated %}
+        <div class="mobile-user-info">
+            <div class="mobile-user-avatar">
+                {{ user.first_name|slice:":1"|default:"U" }}
+            </div>
+            <div class="mobile-user-details">
+                <span class="mobile-user-name">{{ user.get_full_name|default:"کاربر" }}</span>
+                <a href="{% url 'accounts:dashboard' %}" class="mobile-user-link">مشاهده پروفایل</a>
+            </div>
+        </div>
+        {% else %}
+        <a href="{% url 'accounts:login_register' %}" class="mobile-login-btn">
+            <i class="icon-user"></i>
+            <span>ورود / ثبت‌نام</span>
+        </a>
+        {% endif %}
+
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav">
+            <ul class="mobile-menu-list">
+                <li class="mobile-menu-item">
+                    <a href="{% url 'index' %}" class="mobile-menu-link">
+                        <i class="icon-home"></i>
+                        <span>خانه</span>
+                    </a>
+                </li>
+                <li class="mobile-menu-item">
+                    <a href="{% url 'products:list' %}" class="mobile-menu-link">
+                        <i class="icon-shopping-bag"></i>
+                        <span>فروشگاه</span>
+                    </a>
+                </li>
+                {% for item in main_menu_items %}
+                <li class="mobile-menu-item {% if item.has_children %}has-children{% endif %}">
+                    <a href="{{ item.resolved_url }}" class="mobile-menu-link">
+                        <span>{{ item.title }}</span>
+                        {% if item.has_children %}
+                        <button class="submenu-toggle">
+                            <i class="icon-angle-down"></i>
+                        </button>
+                        {% endif %}
+                    </a>
+                    {% if item.has_children %}
+                    <ul class="mobile-submenu">
+                        {% for child in item.get_children %}
+                        <li class="mobile-submenu-item">
+                            <a href="{{ child.resolved_url }}" class="mobile-submenu-link">
+                                {{ child.title }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+                <li class="mobile-menu-item">
+                    <a href="{% url 'AboutUs_Module:about' %}" class="mobile-menu-link">
+                        <i class="icon-info-circle"></i>
+                        <span>درباره ما</span>
+                    </a>
+                </li>
+                <li class="mobile-menu-item">
+                    <a href="{% url 'contact' %}" class="mobile-menu-link">
+                        <i class="icon-envelope"></i>
+                        <span>تماس با ما</span>
+                    </a>
+                </li>
+                <li class="mobile-menu-item">
+                    <a href="{% url 'cart:detail' %}" class="mobile-menu-link">
+                        <i class="icon-shopping-cart"></i>
+                        <span>سبد خرید</span>
+                        {% if cart_count > 0 %}
+                        <span class="badge">{{ cart_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="mobile-menu-item">
+                    <a href="{% url 'accounts:logout' %}" class="mobile-menu-link">
+                        <i class="icon-sign-out"></i>
+                        <span>خروج</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    <div class="mobile-menu-footer">
+        <div class="mobile-contact">
+            <p><i class="icon-phone"></i> 021-12345678</p>
+            <p><i class="icon-envelope"></i> support@arioshop.com</p>
+        </div>
+    </div>
+</div>

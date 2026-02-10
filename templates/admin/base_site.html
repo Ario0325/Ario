@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}پنل مدیریت | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name" class="admin-brand">
+    <a href="{% url 'admin:index' %}">آریو شاپ</a>
+    <span class="admin-brand__badge">پنل مدیریت</span>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

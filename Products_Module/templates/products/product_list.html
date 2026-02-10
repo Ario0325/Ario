@@ -1,0 +1,378 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block title %}{% if query %}نتایج جستجو: {{ query }}{% elif selected_category %}{{ selected_category.name }}{% else %}فروشگاه{% endif %} - محصولات{% endblock %}
+
+{% block content %}
+<div class="page-header text-center" style="background-image: url('{% static 'assets/images/page-header-bg.jpg' %}')">
+    <div class="container">
+        <h1 class="page-title">
+            {% if query %}
+                نتایج جستجو: {{ query }}
+            {% elif selected_category %}
+                {{ selected_category.name }}
+            {% else %}
+                فروشگاه
+            {% endif %}
+            <span>محصولات</span>
+        </h1>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:list' %}">فروشگاه</a></li>
+            {% if query %}
+            <li class="breadcrumb-item active" aria-current="page">نتایج جستجو</li>
+            {% elif selected_category %}
+            <li class="breadcrumb-item active" aria-current="page">{{ selected_category.name }}</li>
+            {% else %}
+            <li class="breadcrumb-item active" aria-current="page">همه محصولات</li>
+            {% endif %}
+        </ol>
+    </div>
+</nav>
+
+<div class="page-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="toolbox">
+                    <div class="toolbox-left">
+                        <div class="toolbox-info">
+                            نمایش <span>{{ page_obj.start_index|default:0 }} - {{ page_obj.end_index|default:0 }} از {{ total_products }}</span> محصول
+                        </div>
+                    </div>
+
+                    <div class="toolbox-right">
+                        <div class="toolbox-sort">
+                            <label for="sortby">مرتب سازی براساس : </label>
+                            <div class="select-custom">
+                                <select name="sortby" id="sortby" class="form-control" onchange="var u=new URL(window.location.href); u.searchParams.set('sort',this.value); u.searchParams.delete('page'); window.location=u.toString()">
+                                    <option value="popularity" {% if current_sort == 'popularity' %}selected{% endif %}>بیشترین بازدید</option>
+                                    <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>بیشترین امتیاز</option>
+                                    <option value="date" {% if current_sort == 'date' %}selected{% endif %}>جدیدترین</option>
+                                    <option value="price_low" {% if current_sort == 'price_low' %}selected{% endif %}>ارزان‌ترین</option>
+                                    <option value="price_high" {% if current_sort == 'price_high' %}selected{% endif %}>گران‌ترین</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="toolbox-layout">
+                            <a href="{% url 'products:list' %}" class="btn-layout">
+                                <svg width="16" height="10">
+                                    <rect x="0" y="0" width="4" height="4" />
+                                    <rect x="6" y="0" width="10" height="4" />
+                                    <rect x="0" y="6" width="4" height="4" />
+                                    <rect x="6" y="6" width="10" height="4" />
+                                </svg>
+                            </a>
+
+                            <a href="{% url 'products:list' %}" class="btn-layout">
+                                <svg width="10" height="10">
+                                    <rect x="0" y="0" width="4" height="4" />
+                                    <rect x="6" y="0" width="4" height="4" />
+                                    <rect x="0" y="6" width="4" height="4" />
+                                    <rect x="6" y="6" width="4" height="4" />
+                                </svg>
+                            </a>
+
+                            <a href="{% url 'products:list' %}" class="btn-layout">
+                                <svg width="16" height="10">
+                                    <rect x="0" y="0" width="4" height="4" />
+                                    <rect x="6" y="0" width="4" height="4" />
+                                    <rect x="12" y="0" width="4" height="4" />
+                                    <rect x="0" y="6" width="4" height="4" />
+                                    <rect x="6" y="6" width="4" height="4" />
+                                    <rect x="12" y="6" width="4" height="4" />
+                                </svg>
+                            </a>
+
+                            <a href="{% url 'products:list' %}" class="btn-layout active">
+                                <svg width="22" height="10">
+                                    <rect x="0" y="0" width="4" height="4" />
+                                    <rect x="6" y="0" width="4" height="4" />
+                                    <rect x="12" y="0" width="4" height="4" />
+                                    <rect x="18" y="0" width="4" height="4" />
+                                    <rect x="0" y="6" width="4" height="4" />
+                                    <rect x="6" y="6" width="4" height="4" />
+                                    <rect x="12" y="6" width="4" height="4" />
+                                    <rect x="18" y="6" width="4" height="4" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="products mb-3">
+                    <div class="row justify-content-center">
+                        {% for product in products %}
+                        <div class="col-6 col-md-4 col-lg-4 col-xl-3">
+                            <div class="product product-7 text-center">
+                                <figure class="product-media">
+                                    {% if not product.is_available or product.stock <= 0 %}
+                                    <span class="product-label label-out">ناموجود</span>
+                                    {% elif product.label %}
+                                    <span class="product-label label-{{ product.label }}">
+                                        {{ product.get_label_display }}
+                                    </span>
+                                    {% endif %}
+
+                                    <a href="{% url 'products:detail' product.slug %}">
+                                        {% with product.images.all.0 as main_image %}
+                                        {% if main_image %}
+                                            <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="product-image">
+                                        {% else %}
+                                            <img src="{% static 'assets/images/products/product-1.jpg' %}" alt="{{ product.name }}" class="product-image">
+                                        {% endif %}
+                                        {% endwith %}
+                                    </a>
+
+                                    <div class="product-action-vertical">
+                                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>افزودن به لیست علاقه مندی</span></a>
+                                        <a href="{% url 'products:detail' product.slug %}" class="btn-product-icon btn-quickview" title="مشاهده سریع محصول"><span>مشاهده سریع</span></a>
+                                        <a href="#" class="btn-product-icon btn-compare" title="مقایسه"><span>مقایسه</span></a>
+                                    </div>
+
+                                    <div class="product-action">
+                                        {% if product.is_available and product.stock > 0 %}
+                                        <a href="#" class="btn-product btn-cart"><span>افزودن به سبد خرید</span></a>
+                                        {% else %}
+                                        <a href="{% url 'products:detail' product.slug %}" class="btn-product btn-cart"><span>مشاهده محصول</span></a>
+                                        {% endif %}
+                                    </div>
+                                </figure>
+
+                                <div class="product-body">
+                                    <div class="product-cat text-center">
+                                        <a href="{% url 'products:category' product.category.slug %}">{{ product.category.name }}</a>
+                                    </div>
+                                    <h3 class="product-title text-center"><a href="{% url 'products:detail' product.slug %}">{{ product.name }}</a></h3>
+                                    <div class="product-price">
+                                        {% if not product.is_available or product.stock <= 0 %}
+                                            <span class="out-price">{{ product.price|floatformat:0 }} تومان</span>
+                                        {% elif product.old_price %}
+                                            <span class="new-price">{{ product.price|floatformat:0 }} تومان</span>
+                                            <span class="old-price">{{ product.old_price|floatformat:0 }} تومان</span>
+                                        {% else %}
+                                            {{ product.price|floatformat:0 }} تومان
+                                        {% endif %}
+                                    </div>
+                                    <div class="ratings-container">
+                                        <div class="ratings">
+                                            <div class="ratings-val" style="width: {{ product.get_rating_percentage }}%;"></div>
+                                        </div>
+                                        <span class="ratings-text">( {{ product.views_count }} بازدید )</span>
+                                    </div>
+
+                                    {% if product.images.all|length > 1 %}
+                                    <div class="product-nav product-nav-thumbs">
+                                        {% for image in product.images.all|slice:":3" %}
+                                        <a href="#" {% if forloop.first %}class="active"{% endif %}>
+                                            <img src="{{ image.image.url }}" alt="{{ product.name }}">
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                    {% elif product.colors.exists %}
+                                    <div class="product-nav product-nav-dots">
+                                        {% for color in product.colors.all|slice:":3" %}
+                                        <a href="#" {% if forloop.first %}class="active"{% endif %} style="background: {{ color.code }};"><span class="sr-only">{{ color.name }}</span></a>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <p class="text-center">محصولی یافت نشد</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link page-link-prev" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>قبلی
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link page-link-prev" href="#" tabindex="-1" aria-disabled="true">
+                                <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>قبلی
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active" aria-current="page"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item"><a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        <li class="page-item-total">از {{ page_obj.paginator.num_pages }}</li>
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link page-link-next" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next">
+                                بعدی <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link page-link-next" href="#" tabindex="-1" aria-disabled="true">
+                                بعدی <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+
+            <aside class="col-lg-3 order-lg-first">
+                <div class="sidebar sidebar-shop">
+                    <div class="widget widget-clean">
+                        <label>فیلترها : </label>
+                        <a href="{% url 'products:list' %}" class="sidebar-filter-clear">پاک کردن همه</a>
+                    </div>
+
+                    <div class="widget widget-collapsible">
+                        <h3 class="widget-title">
+                            <a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">
+                                دسته بندی
+                            </a>
+                        </h3>
+
+                        <div class="collapse show" id="widget-1">
+                            <div class="widget-body">
+                                <div class="filter-items filter-items-count">
+                                    {% for category in categories %}
+                                    <div class="filter-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="cat-{{ category.id }}">
+                                            <label class="custom-control-label" for="cat-{{ category.id }}">
+                                                <a href="{% url 'products:category' category.slug %}">{{ category.name }}</a>
+                                            </label>
+                                        </div>
+                                        <span class="item-count">{{ category.product_count }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget widget-collapsible">
+                        <h3 class="widget-title">
+                            <a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2">
+                                سایز
+                            </a>
+                        </h3>
+
+                        <div class="collapse show" id="widget-2">
+                            <div class="widget-body">
+                                <div class="filter-items">
+                                    <div class="filter-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="size-xs">
+                                            <label class="custom-control-label" for="size-xs">XS</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="size-s">
+                                            <label class="custom-control-label" for="size-s">S</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="size-m">
+                                            <label class="custom-control-label" for="size-m">M</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="size-l">
+                                            <label class="custom-control-label" for="size-l">L</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="size-xl">
+                                            <label class="custom-control-label" for="size-xl">XL</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="filter-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="size-xxl">
+                                            <label class="custom-control-label" for="size-xxl">XXL</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget widget-collapsible">
+                        <h3 class="widget-title">
+                            <a data-toggle="collapse" href="#widget-4" role="button" aria-expanded="true" aria-controls="widget-4">
+                                برند
+                            </a>
+                        </h3>
+
+                        <div class="collapse show" id="widget-4">
+                            <div class="widget-body">
+                                <div class="filter-items">
+                                    {% for brand in brands %}
+                                    <div class="filter-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="brand-{{ brand.id }}">
+                                            <label class="custom-control-label" for="brand-{{ brand.id }}">{{ brand.name }}</label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget widget-collapsible">
+                        <h3 class="widget-title">
+                            <a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">
+                                قیمت
+                            </a>
+                        </h3>
+
+                        <div class="collapse show" id="widget-5">
+                            <div class="widget-body">
+                                <div class="filter-price">
+                                    <div class="filter-price-text">
+                                        محدوده قیمت :
+                                        <span id="filter-price-range"></span>
+                                    </div>
+
+                                    <div id="price-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+{% endblock %}

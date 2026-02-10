@@ -1,0 +1,470 @@
+/**
+ * UI Animations CSS
+ * 
+ * This file contains all CSS animations and transitions for the UI modernization.
+ * Animations are designed to be performant (using transform and opacity),
+ * accessible (respecting prefers-reduced-motion), and RTL-compatible.
+ * 
+ * @version 1.0.0
+ */
+
+/* ============================================
+   Base Animation Utilities
+   ============================================ */
+
+/* Smooth transitions for all animated elements */
+.ui-animated {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fade animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+/* Slide animations */
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideLeft {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideRight {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Scale animations */
+@keyframes scaleUp {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleDown {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+/* Shake animation for errors */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Pulse animation for badges */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Bounce animation */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.bounce {
+    animation: bounce 0.6s ease-in-out;
+}
+
+/* Spinner/Loading animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Shimmer effect for skeleton screens */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.shimmer {
+    background: linear-gradient(
+        90deg,
+        #e0e0e0 0%,
+        #f5f5f5 50%,
+        #e0e0e0 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* ============================================
+   Accessibility: Reduced Motion Support
+   ============================================ */
+
+/* Disable decorative animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    /* Keep functional animations like loading spinners */
+    .spinner,
+    .loading-spinner,
+    [role="progressbar"] {
+        animation-duration: 1s !important;
+    }
+}
+
+/* ============================================
+   RTL Support
+   ============================================ */
+
+/* Reverse horizontal animations for RTL */
+[dir="rtl"] .slide-left {
+    animation-name: slideRight;
+}
+
+[dir="rtl"] .slide-right {
+    animation-name: slideLeft;
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Hidden state for elements that will animate in */
+.ui-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Visible state */
+.ui-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* GPU acceleration hint */
+.ui-gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+}
+
+/* Disable pointer events during animations */
+.ui-animating {
+    pointer-events: none;
+}
+
+/* Focus indicators (always visible for accessibility) */
+.ui-focus-visible:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* ============================================
+   Component-Specific Styles
+   ============================================ */
+
+/* Scroll-top button: smoother transition and hover feedback */
+#scroll-top {
+    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease, background-color 0.2s ease;
+}
+#scroll-top.show:hover {
+    transform: translateY(0) scale(1.08);
+}
+
+/* Form inputs: modern focus ring (RTL-safe) */
+.form-control:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+textarea:focus {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(204, 153, 102, 0.25);
+}
+
+/* Dropdown menu: subtle open animation */
+.dropdown-menu {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.dropdown.show .dropdown-menu {
+    animation: dropdownIn 0.2s ease forwards;
+}
+@keyframes dropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header search wrapper: smooth expand */
+.header-search-wrapper {
+    transition: opacity 0.25s ease, max-width 0.3s ease;
+}
+.header-search-wrapper.show {
+    animation: searchExpand 0.3s ease forwards;
+}
+@keyframes searchExpand {
+    from {
+        opacity: 0.9;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Product / card hover: subtle lift */
+.product:hover .product-image,
+.card:hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product:hover .product-image {
+    transform: scale(1.02);
+}
+.product:hover {
+    transition: box-shadow 0.3s ease;
+}
+.product:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================
+   Product detail: zoom lens (دنبال‌کننده ماوس)
+   ============================================ */
+.product-main-image {
+    position: relative;
+}
+.zoomContainer {
+    z-index: 10;
+    pointer-events: none;
+}
+.zoomLens {
+    border-radius: 50% !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    cursor: crosshair !important;
+    transition: opacity 0.2s ease;
+}
+.zoomWindow {
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+/* ============================================
+   Scroll Reveal (ظاهر شدن با اسکرول)
+   ============================================ */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.scroll-reveal.scroll-reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   Modern global styles
+   ============================================ */
+/* ظاهر شدن نرم محتوای اصلی در بارگذاری صفحه */
+.main.main-content-animate {
+    animation: pageContentIn 0.45s ease-out;
+}
+.page-content {
+    animation: pageContentIn 0.4s ease-out;
+}
+@keyframes pageContentIn {
+    from {
+        opacity: 0.97;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* عنوان‌های سکشن با خط زیر مدرن */
+.title.text-center {
+    position: relative;
+    padding-bottom: 1rem;
+}
+.title.text-center::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    transform: translateX(50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #cc9966, transparent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+.title.text-center:hover::after {
+    width: 100px;
+}
+
+/* کارت محصول: سایه و گوشه گرد در hover */
+.product.product-7,
+.product.product-2 {
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.product.product-7:hover,
+.product.product-2:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+.product-media {
+    transition: transform 0.4s ease;
+}
+.product:hover .product-media {
+    transform: scale(1.03);
+}
+
+/* دکمه‌های اصلی با گرادیان ظریف */
+.btn-product.btn-cart,
+.btn-primary {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.btn-product.btn-cart:hover,
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(204, 153, 102, 0.35);
+}
+
+/* لینک‌های منو و ناوبری */
+.breadcrumb-item + .breadcrumb-item::before {
+    transition: opacity 0.2s ease;
+}
+.breadcrumb a:hover {
+    color: #cc9966;
+    transition: color 0.2s ease;
+}
+
+/* فرم‌ها و اینپوت‌ها */
+.form-control {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-control:hover {
+    border-color: rgba(204, 153, 102, 0.4);
+}
+
+/* تب‌های محصول */
+.nav-pills .nav-link {
+    transition: color 0.2s ease, background 0.2s ease;
+}
+.nav-pills .nav-link:hover {
+    color: #cc9966;
+}

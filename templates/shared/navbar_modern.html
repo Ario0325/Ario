@@ -1,0 +1,213 @@
+{% load static %}
+{% load menu_tags %}
+
+<div id="az-nav">
+    <!-- Main bar (fixed) -->
+    <div class="az-main" id="azMain">
+        <div class="az-container">
+            <!-- Hamburger (mobile) -->
+            <button class="az-hamburger" id="azHamburger" aria-label="منو">
+                <span></span><span></span><span></span>
+            </button>
+
+            <!-- Logo -->
+            <a href="{% url 'index' %}" class="az-logo">
+                <img src="{% static 'assets/images/demos/demo-12/logo.png' %}" alt="آریو شاپ">
+            </a>
+
+            <!-- Desktop links -->
+            <ul class="az-links" id="azLinks">
+                <li><a href="{% url 'index' %}">خانه</a></li>
+                <li class="{% if categories %}az-has-dd{% endif %}">
+                    <a href="{% url 'products:list' %}">
+                        فروشگاه
+                        {% if categories %}<svg class="az-chevron" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4"/></svg>{% endif %}
+                    </a>
+                    {% if categories %}
+                    <ul class="az-dd">
+                        {% for category in categories %}
+                        <li class="{% if category.children.exists %}az-has-dd{% endif %}">
+                            <a href="{{ category.get_absolute_url }}">
+                                {{ category.name }}
+                                {% if category.children.exists %}<svg class="az-chevron" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4"/></svg>{% endif %}
+                            </a>
+                            {% if category.children.exists %}
+                            <ul class="az-dd az-dd-nested">
+                                {% for child in category.children.all %}
+                                {% if child.is_active %}
+                                <li><a href="{{ child.get_absolute_url }}">{{ child.name }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% for item in main_menu_items %}
+                    {% if item.title != "درباره ما" and item.title != "تماس با ما" %}
+                    <li class="{% if item.has_children %}az-has-dd{% endif %}">
+                        <a href="{{ item.resolved_url }}">
+                            {{ item.title }}
+                            {% if item.has_children %}<svg class="az-chevron" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4"/></svg>{% endif %}
+                        </a>
+                        {% if item.has_children %}
+                        <ul class="az-dd">
+                            {% for child in item.get_children %}
+                            <li class="{% if child.has_children %}az-has-dd{% endif %}">
+                                <a href="{{ child.resolved_url }}">
+                                    {{ child.title }}
+                                    {% if child.has_children %}<svg class="az-chevron" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4"/></svg>{% endif %}
+                                </a>
+                                {% if child.has_children %}
+                                <ul class="az-dd az-dd-nested">
+                                    {% for sub in child.get_children %}
+                                    <li><a href="{{ sub.resolved_url }}">{{ sub.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                <li><a href="{% url 'AboutUs_Module:about' %}">درباره ما</a></li>
+                <li><a href="{% url 'contact' %}">تماس با ما</a></li>
+            </ul>
+
+            <!-- Icons -->
+            <div class="az-icons">
+                <!-- Search toggle + compact dropdown -->
+                <div class="az-search-wrap" id="azSearchWrap">
+                    <button class="az-icon-btn az-search-toggle" id="azSearchToggle" aria-label="جستجو">
+                        <i class="icon-search"></i>
+                    </button>
+                    <div class="az-search-drop" id="azSearchDrop">
+                        <form action="{% url 'products:search' %}" method="get" class="az-isf">
+                            <i class="icon-search az-isf-icon"></i>
+                            <input type="search" name="q" placeholder="جستجوی محصولات ..." autocomplete="off" class="az-isf-input" id="azSearchInput">
+                            <button type="submit" class="az-isf-btn"><i class="icon-search"></i></button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Wishlist -->
+                <a href="#" class="az-icon-btn az-hide-sm" aria-label="علاقه‌مندی">
+                    <i class="icon-heart-o"></i>
+                    <span class="az-badge">0</span>
+                </a>
+
+                <!-- User -->
+                {% if user.is_authenticated %}
+                <div class="az-icon-dd">
+                    <button class="az-icon-btn" aria-label="حساب">
+                        <i class="icon-user"></i>
+                    </button>
+                    <div class="az-popup az-popup-user">
+                        <div class="az-popup-head">{{ user.get_full_name|default:user.username }}</div>
+                        <a href="{% url 'accounts:dashboard' %}"><i class="icon-user"></i> داشبورد</a>
+                        <a href="{% url 'accounts:logout' %}" class="az-logout"><i class="icon-sign-out"></i> خروج</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'accounts:login_register' %}" class="az-icon-btn" aria-label="ورود">
+                    <i class="icon-user"></i>
+                </a>
+                {% endif %}
+
+                <!-- Cart -->
+                <div class="az-icon-dd">
+                    <button type="button" class="az-icon-btn az-cart-trigger" id="azCartTrigger">
+                        <i class="icon-shopping-cart"></i>
+                        <span class="az-badge {% if cart_count > 0 %}az-badge-on{% endif %}">{{ cart_count|default:0 }}</span>
+                    </button>
+                    <div class="az-popup az-popup-cart">
+                        <div class="az-popup-head">سبد خرید</div>
+                        <div class="az-cart-list">
+                            {% for item in cart_items_preview %}
+                            <div class="az-cart-row">
+                                <a href="{{ item.product.get_absolute_url }}" class="az-cart-img">
+                                    {% with item.product.images.all.0 as img %}
+                                    {% if img %}<img src="{{ img.image.url }}" alt="{{ item.product.name }}">{% else %}<img src="{% static 'assets/images/products/product-1.jpg' %}" alt="">{% endif %}
+                                    {% endwith %}
+                                </a>
+                                <div class="az-cart-info">
+                                    <a href="{{ item.product.get_absolute_url }}" class="az-cart-name">{{ item.product.name }}</a>
+                                    <span class="az-cart-meta">{{ item.quantity }} عدد &mdash; {{ item.price|floatformat:0 }} تومان</span>
+                                </div>
+                                <form action="{% url 'cart:remove' item.product.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" class="az-cart-del" aria-label="حذف"><i class="icon-close"></i></button>
+                                </form>
+                            </div>
+                            {% empty %}
+                            <div class="az-cart-empty"><i class="icon-shopping-cart"></i><p>سبد خرید خالی است</p></div>
+                            {% endfor %}
+                        </div>
+                        {% if cart_items_preview %}
+                        <div class="az-cart-foot">
+                            <div class="az-cart-total"><span>مجموع:</span><strong>{% if cart_total %}{{ cart_total|floatformat:0 }}{% else %}0{% endif %} تومان</strong></div>
+                            <div class="az-cart-btns">
+                                <a href="{% url 'cart:detail' %}" class="az-btn az-btn-outline">سبد خرید</a>
+                                <a href="{% url 'cart:checkout' %}" class="az-btn az-btn-fill">پرداخت</a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Spacer to offset fixed header -->
+    <div class="az-spacer" id="azSpacer"></div>
+
+    <!-- Mobile sidebar -->
+    <div class="az-sidebar-overlay" id="azSidebarOverlay"></div>
+    <div class="az-sidebar" id="azSidebar">
+        <div class="az-sidebar-head">
+            <img src="{% static 'assets/images/demos/demo-12/logo.png' %}" alt="آریو شاپ" class="az-sidebar-logo">
+            <button class="az-sidebar-close" id="azSidebarClose" aria-label="بستن"><i class="icon-close"></i></button>
+        </div>
+
+        <!-- Mobile search -->
+        <form action="{% url 'products:search' %}" method="get" class="az-mob-search">
+            <input type="search" name="q" placeholder="جستجو ...">
+            <button type="submit"><i class="icon-search"></i></button>
+        </form>
+
+        <ul class="az-mob-links">
+            <li><a href="{% url 'index' %}"><i class="icon-home"></i> خانه</a></li>
+            <li><a href="{% url 'products:list' %}"><i class="icon-list"></i> فروشگاه</a></li>
+            {% for item in main_menu_items %}
+                {% if item.title != "درباره ما" and item.title != "تماس با ما" %}
+                <li class="{% if item.has_children %}az-mob-has-dd{% endif %}">
+                    <a href="{{ item.resolved_url }}">
+                        {{ item.title }}
+                        {% if item.has_children %}<svg class="az-mob-arrow" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4"/></svg>{% endif %}
+                    </a>
+                    {% if item.has_children %}
+                    <ul class="az-mob-dd">
+                        {% for child in item.get_children %}
+                        <li><a href="{{ child.resolved_url }}">{{ child.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endif %}
+            {% endfor %}
+            <li><a href="{% url 'AboutUs_Module:about' %}"><i class="icon-info-circle"></i> درباره ما</a></li>
+            <li><a href="{% url 'contact' %}"><i class="icon-envelop"></i> تماس با ما</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'accounts:dashboard' %}"><i class="icon-user"></i> داشبورد</a></li>
+            <li><a href="{% url 'accounts:logout' %}"><i class="icon-sign-out"></i> خروج</a></li>
+            {% else %}
+            <li><a href="{% url 'accounts:login_register' %}"><i class="icon-user"></i> ورود / ثبت‌نام</a></li>
+            {% endif %}
+            <li><a href="{% url 'cart:detail' %}"><i class="icon-shopping-cart"></i> سبد خرید</a></li>
+        </ul>
+    </div>
+</div>

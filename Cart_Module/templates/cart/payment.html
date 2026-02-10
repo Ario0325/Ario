@@ -1,0 +1,175 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block title %}پرداخت سفارش {{ order.order_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-hero {
+        background: linear-gradient(120deg, rgba(204,153,102,0.15), rgba(255,255,255,0.9));
+        border-radius: 18px;
+        padding: 28px 30px;
+        box-shadow: 0 20px 45px rgba(17, 17, 17, 0.08);
+    }
+    .payment-card {
+        border: 1px solid rgba(204,153,102,0.2);
+        border-radius: 16px;
+        padding: 24px;
+        background: #fff;
+        box-shadow: 0 18px 35px rgba(17, 17, 17, 0.06);
+    }
+    .payment-summary {
+        background: #f9f6f1;
+        border-radius: 16px;
+        padding: 20px;
+    }
+    .payment-method {
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 14px;
+        padding: 16px 18px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .payment-method:hover {
+        border-color: rgba(204,153,102,0.5);
+        box-shadow: 0 10px 20px rgba(204,153,102,0.15);
+    }
+    .payment-method input {
+        margin-left: 8px;
+    }
+    .payment-footer {
+        border-top: 1px solid rgba(0,0,0,0.08);
+        padding-top: 18px;
+        margin-top: 20px;
+    }
+    .order-items-table th,
+    .order-items-table td {
+        vertical-align: middle;
+    }
+    .secure-badge {
+        background: rgba(204,153,102,0.12);
+        color: #7d5a3c;
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header text-center" style="background-image: url('/static/assets/images/page-header-bg.jpg')">
+    <div class="container">
+        <h1 class="page-title">پرداخت سفارش<span>درگاه امن پرداخت</span></h1>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'cart:detail' %}">سبد خرید</a></li>
+            <li class="breadcrumb-item active" aria-current="page">پرداخت</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="page-content">
+    <div class="container">
+        <div class="payment-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="mb-2">پرداخت امن برای سفارش {{ order.order_number }}</h2>
+                    <p class="mb-0 text-muted">اطلاعات سفارش و روش پرداخت را بررسی کنید و سپس روی دکمه پرداخت کلیک کنید.</p>
+                </div>
+                <div class="col-lg-4 text-lg-left text-right mt-3 mt-lg-0">
+                    <span class="secure-badge"><i class="icon-shield"></i> درگاه پرداخت امن و رمزنگاری شده</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <div class="payment-card">
+                    <h3 class="mb-3">جزئیات سفارش</h3>
+                    <div class="table-responsive">
+                        <table class="table order-items-table">
+                            <thead>
+                                <tr>
+                                    <th>محصول</th>
+                                    <th>تعداد</th>
+                                    <th>قیمت واحد</th>
+                                    <th>جمع</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product_name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.price|floatformat:0 }} تومان</td>
+                                    <td>{{ item.total|floatformat:0 }} تومان</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="payment-footer">
+                        <h4 class="mb-3">انتخاب روش پرداخت</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="payment-method d-flex align-items-center">
+                                    <input type="radio" name="payment_method" checked>
+                                    <span>
+                                        <strong>درگاه بانک ملت</strong>
+                                        <span class="d-block text-muted">پرداخت سریع و ایمن</span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="payment-method d-flex align-items-center">
+                                    <input type="radio" name="payment_method">
+                                    <span>
+                                        <strong>پرداخت با کیف پول</strong>
+                                        <span class="d-block text-muted">از موجودی کیف پول</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="text-muted">در حال حاضر پرداخت شبیه‌سازی می‌شود و تنها برای نمایش صفحه است.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="payment-summary">
+                    <h4 class="mb-3">خلاصه پرداخت</h4>
+                    <ul class="list-unstyled mb-4">
+                        <li class="d-flex justify-content-between mb-2">
+                            <span>جمع سفارش</span>
+                            <span>{{ order.total|floatformat:0 }} تومان</span>
+                        </li>
+                        <li class="d-flex justify-content-between mb-2">
+                            <span>هزینه ارسال</span>
+                            <span>{{ order.shipping_cost|floatformat:0 }} تومان</span>
+                        </li>
+                        <li class="d-flex justify-content-between mb-2">
+                            <span>مالیات</span>
+                            <span>{{ order.tax|floatformat:0 }} تومان</span>
+                        </li>
+                        <li class="d-flex justify-content-between font-weight-bold">
+                            <span>مبلغ قابل پرداخت</span>
+                            <span>{{ order.total|floatformat:0 }} تومان</span>
+                        </li>
+                    </ul>
+                    <form method="post" action="{% url 'cart:payment' order.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-primary-2 btn-block btn-lg">پرداخت و تکمیل سفارش</button>
+                    </form>
+                    <a href="{% url 'cart:detail' %}" class="btn btn-outline-dark-2 btn-block mt-2">بازگشت به سبد خرید</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,259 @@
+/**
+ * صفحه ورود و ثبت‌نام مدرن - هماهنگ با رنگ و استایل قالب (#cc9966)
+ * انیمیشن‌های ظاهر شدن، تب‌ها و فوکوس
+ */
+
+/* ---- پس‌زمینه با لایه تیره ---- */
+.auth-page-modern.login-page.bg-image {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+.auth-page-modern.login-page.bg-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(51, 51, 51, 0.85) 0%, rgba(0, 0, 0, 0.75) 100%);
+  z-index: 0;
+}
+.auth-page-modern .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- کارت فرم با انیمیشن ورود ---- */
+.auth-page-modern .form-box {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  padding: 2.5rem 2rem 3.5rem;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: authCardEnter 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+  opacity: 0;
+  transform: translateY(30px);
+  position: relative;
+  overflow: hidden;
+}
+.auth-page-modern .form-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #cc9966, #b8864a, #cc9966, transparent);
+  background-size: 200% 100%;
+  animation: authShine 3s ease-in-out 0.5s;
+}
+@keyframes authShine {
+  0% { background-position: 100% 0; }
+  50% { background-position: 0 0; }
+  100% { background-position: 100% 0; }
+}
+@keyframes authCardEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- تب‌ها با خط زیر متحرک ---- */
+.auth-page-modern .form-tab .nav.nav-pills {
+  border-bottom: 2px solid #eee;
+  margin-bottom: 0;
+}
+.auth-page-modern .form-tab .nav.nav-pills .nav-item {
+  position: relative;
+}
+.auth-page-modern .form-tab .nav.nav-pills .nav-link {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #666;
+  border: none;
+  padding: 1rem 1.25rem;
+  transition: color 0.3s ease;
+  border-radius: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+.auth-page-modern .form-tab .nav.nav-pills .nav-link:hover {
+  color: #cc9966;
+}
+.auth-page-modern .form-tab .nav.nav-pills .nav-link.active {
+  color: #cc9966;
+  background: transparent;
+  border-bottom-color: #cc9966;
+}
+.auth-page-modern .form-tab .tab-content .tab-pane {
+  padding: 2rem 0 0;
+  animation: authTabFade 0.35s ease;
+}
+@keyframes authTabFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- فیلدها و لیبل ---- */
+.auth-page-modern .form-tab .form-group {
+  margin-bottom: 1.4rem;
+}
+.auth-page-modern .form-tab .form-group label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.45rem;
+  font-size: 0.95rem;
+}
+
+/* ---- اینپوت‌های مدرن با انیمیشن فوکوس ---- */
+.auth-page-modern .form-tab .form-control {
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+.auth-page-modern .form-tab .form-control:hover {
+  border-color: #d0d0d0;
+}
+.auth-page-modern .form-tab .form-control:focus {
+  border-color: #cc9966;
+  box-shadow: 0 0 0 4px rgba(204, 153, 102, 0.2);
+  outline: none;
+}
+
+/* ---- چک‌باکس ---- */
+.auth-page-modern .form-tab .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: #cc9966;
+  border-color: #cc9966;
+}
+.auth-page-modern .form-tab .custom-control-label {
+  color: #555;
+  font-weight: 500;
+}
+
+/* ---- دکمه ارسال با انیمیشن ---- */
+.auth-page-modern .form-tab .form-footer .btn-outline-primary-2 {
+  border: 2px solid #cc9966;
+  color: #cc9966;
+  border-radius: 12px;
+  padding: 0.85rem 1.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 130px;
+}
+.auth-page-modern .form-tab .form-footer .btn-outline-primary-2:hover {
+  background: #cc9966;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(204, 153, 102, 0.35);
+}
+.auth-page-modern .form-tab .form-footer .btn-outline-primary-2:active {
+  transform: translateY(0);
+}
+
+/* ---- لینک فراموشی رمز ---- */
+.auth-page-modern .form-tab .form-footer .forgot-link {
+  color: #666;
+  transition: color 0.2s ease;
+}
+.auth-page-modern .form-tab .form-footer .forgot-link:hover {
+  color: #cc9966;
+}
+
+/* ---- خط جدا و متن «یا ورود با» ---- */
+.auth-page-modern .form-choice {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+.auth-page-modern .form-choice p {
+  margin-bottom: 1rem;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* ---- دکمه‌های شبکه اجتماعی ---- */
+.auth-page-modern .form-choice .btn-login {
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.auth-page-modern .form-choice .btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ---- پیام خطا ---- */
+.auth-page-modern .form-tab .alert-danger {
+  border-radius: 12px;
+  border: none;
+  background: rgba(220, 53, 69, 0.1);
+  color: #c82333;
+}
+.auth-page-modern .form-tab .text-danger {
+  font-size: 0.875rem;
+  margin-top: 0.35rem;
+}
+
+/* ---- Breadcrumb روی پس‌زمینه تیره ---- */
+.auth-page-modern .breadcrumb-nav .breadcrumb-item a,
+.auth-page-modern .breadcrumb-nav .breadcrumb-item {
+  color: rgba(255, 255, 255, 0.9);
+}
+.auth-page-modern .breadcrumb-nav .breadcrumb-item.active {
+  color: rgba(255, 255, 255, 0.7);
+}
+.auth-page-modern .breadcrumb-nav .breadcrumb-item a:hover {
+  color: #cc9966;
+}
+
+/* ---- ریسپانسیو ---- */
+@media (max-width: 575px) {
+  .auth-page-modern .form-box {
+    padding: 1.75rem 1.25rem 2.5rem;
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+    border-radius: 20px;
+  }
+  .auth-page-modern .form-tab .nav.nav-pills .nav-link {
+    font-size: 1.15rem;
+    padding: 0.8rem 0.75rem;
+  }
+  .auth-page-modern .form-tab .tab-content .tab-pane {
+    padding: 1.5rem 0 0;
+  }
+}
+@media (min-width: 768px) {
+  .auth-page-modern .form-box {
+    padding: 3rem 3.5rem 4rem;
+  }
+}
+
+/* ---- کاهش حرکت (دسترسی) ---- */
+@media (prefers-reduced-motion: reduce) {
+  .auth-page-modern .form-box,
+  .auth-page-modern .form-tab .tab-content .tab-pane {
+    animation: none;
+  }
+  .auth-page-modern .form-box {
+    opacity: 1;
+    transform: none;
+  }
+  .auth-page-modern .form-box::before {
+    animation: none;
+  }
+  .auth-page-modern .form-tab .form-control,
+  .auth-page-modern .form-tab .form-footer .btn-outline-primary-2,
+  .auth-page-modern .form-choice .btn-login {
+    transition: none;
+  }
+}

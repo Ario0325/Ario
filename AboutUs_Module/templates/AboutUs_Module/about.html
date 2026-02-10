@@ -1,0 +1,203 @@
+{% extends 'shared/base.html' %}
+
+{% load static %}
+
+{% block title %}درباره ما{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="#">صفحات</a></li>
+            <li class="breadcrumb-item active" aria-current="page">درباره ما</li>
+        </ol>
+    </div><!-- End .container -->
+</nav><!-- End .breadcrumb-nav -->
+
+<div class="container">
+    <div class="page-header page-header-big text-center"
+        style="background-image: url('{% static 'assets/images/about-header-bg.jpg' %}')">
+        <h1 class="page-title text-white">درباره ما<span class="text-white">درباره فروشگاه ما</span></h1>
+    </div><!-- End .page-header -->
+</div><!-- End .container -->
+
+<div class="page-content pb-0">
+    <div class="container">
+        <div class="row">
+            <!-- بخش دید ما -->
+            <div class="col-lg-6 mb-3 mb-lg-0">
+                <h2 class="title">{{ about_page.vision_title }}</h2><!-- End .title -->
+                <p>{{ about_page.vision_description }}</p>
+            </div><!-- End .col-lg-6 -->
+
+            <!-- بخش ماموریت ما -->
+            <div class="col-lg-6">
+                <h2 class="title">{{ about_page.mission_title }}</h2><!-- End .title -->
+                <p>{{ about_page.mission_description }}</p>
+            </div><!-- End .col-lg-6 -->
+        </div><!-- End .row -->
+
+        <div class="mb-5"></div><!-- End .mb-5 -->
+    </div><!-- End .container -->
+
+    <!-- سکشن "ما چه کسانی هستیم" با تصویر -->
+    <div class="bg-light-2 pt-6 pb-5 mb-6 mb-lg-8">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 mb-3 mb-lg-0">
+                    <h2 class="title">{{ about_page.who_we_are_title }}</h2><!-- End .title -->
+                    <p class="lead text-primary mb-3">{{ about_page.who_we_are_subtitle|linebreaksbr }}</p><!-- End .lead text-primary -->
+                    <p class="mb-2">{{ about_page.who_we_are_description }}</p>
+
+                    <a href="#" class="btn btn-sm btn-minwidth btn-outline-primary-2 float-right">
+                        <span>مشاهده دیگر خبرها</span>
+                        <i class="icon-long-arrow-left"></i>
+                    </a>
+                </div><!-- End .col-lg-5 -->
+
+                <div class="col-lg-6 offset-lg-1">
+                    <div class="about-images">
+                        {% if about_page.who_we_are_image_front %}
+                            <img src="{{ about_page.who_we_are_image_front.url }}" alt="" class="about-img-front">
+                        {% else %}
+                            <img src="{% static 'assets/images/about/img-1.jpg' %}" alt="" class="about-img-front">
+                        {% endif %}
+
+                        {% if about_page.who_we_are_image_back %}
+                            <img src="{{ about_page.who_we_are_image_back.url }}" alt="" class="about-img-back">
+                        {% else %}
+                            <img src="{% static 'assets/images/about/img-2.jpg' %}" alt="" class="about-img-back">
+                        {% endif %}
+                    </div><!-- End .about-images -->
+                </div><!-- End .col-lg-6 -->
+            </div><!-- End .row -->
+        </div><!-- End .container -->
+    </div><!-- End .bg-light-2 pt-6 pb-6 -->
+
+    <!-- سکشن برندها -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5">
+                <div class="brands-text">
+                    <h2 class="title">{{ about_page.brands_title }}</h2><!-- End .title -->
+                    <p>{{ about_page.brands_description }}</p>
+                </div><!-- End .brands-text -->
+            </div><!-- End .col-lg-5 -->
+            <div class="col-lg-7">
+                <div class="brands-display">
+                    <div class="row justify-content-center">
+                        {% for brand in brands %}
+                        <div class="col-6 col-sm-4">
+                            <a href="{{ brand.website|default:'#' }}" class="brand" {% if brand.website %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                                {% if brand.logo %}
+                                <img src="{{ brand.logo.url }}" alt="{{ brand.name }}">
+                                {% else %}
+                                <img src="{% static 'assets/images/brands/1.png' %}" alt="{{ brand.name }}">
+                                {% endif %}
+                            </a>
+                        </div><!-- End .col-sm-4 -->
+                        {% empty %}
+                        <!-- اگر هیچ برندی فعال نباشد، چیزی نمایش داده نمی‌شود -->
+                        {% endfor %}
+                    </div><!-- End .row -->
+                </div><!-- End .brands-display -->
+            </div><!-- End .col-lg-7 -->
+        </div><!-- End .row -->
+
+        <hr class="mt-4 mb-6">
+
+        <!-- سکشن تیم -->
+        <h2 class="title text-center mb-4">{{ about_page.team_title }}</h2><!-- End .title text-center -->
+
+        <div class="row">
+            {% for member in team_members %}
+            <div class="col-md-4">
+                <div class="member member-anim text-center">
+                    <figure class="member-media">
+                        {% if member.photo %}
+                        <img src="{{ member.photo.url }}" alt="{{ member.name }}">
+                        {% else %}
+                        <img src="{% static 'assets/images/team/member-1.jpg' %}" alt="{{ member.name }}">
+                        {% endif %}
+
+                        <figcaption class="member-overlay">
+                            <div class="member-overlay-content">
+                                <h3 class="member-title">{{ member.name }}<span>{{ member.position }}</span></h3>
+                                <!-- End .member-title -->
+                                {% if member.bio %}
+                                <p>{{ member.bio }}</p>
+                                {% endif %}
+                                <div class="social-icons social-icons-simple">
+                                    {% if member.facebook_url %}
+                                    <a href="{{ member.facebook_url }}" class="social-icon" title="فیسبوک" target="_blank" rel="noopener noreferrer">
+                                        <i class="icon-facebook-f"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if member.twitter_url %}
+                                    <a href="{{ member.twitter_url }}" class="social-icon" title="توییتر" target="_blank" rel="noopener noreferrer">
+                                        <i class="icon-twitter"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if member.instagram_url %}
+                                    <a href="{{ member.instagram_url }}" class="social-icon" title="اینستاگرام" target="_blank" rel="noopener noreferrer">
+                                        <i class="icon-instagram"></i>
+                                    </a>
+                                    {% endif %}
+                                </div><!-- End .social-icons -->
+                            </div><!-- End .member-overlay-content -->
+                        </figcaption><!-- End .member-overlay -->
+                    </figure><!-- End .member-media -->
+                    <div class="member-content">
+                        <h3 class="member-title">{{ member.name }}<span>{{ member.position }}</span></h3>
+                        <!-- End .member-title -->
+                    </div><!-- End .member-content -->
+                </div><!-- End .member -->
+            </div><!-- End .col-md-4 -->
+            {% empty %}
+            <!-- اگر هیچ عضوی فعال نباشد، چیزی نمایش داده نمی‌شود -->
+            {% endfor %}
+        </div><!-- End .row -->
+    </div><!-- End .container -->
+
+    <div class="mb-2"></div><!-- End .mb-2 -->
+
+    <!-- سکشن نظرات مشتریان -->
+    <div class="about-testimonials bg-light-2 pt-6 pb-6">
+        <div class="container">
+            <h2 class="title text-center mb-3">{{ about_page.testimonials_title }}</h2>
+            <!-- End .title text-center -->
+
+            <div class="owl-carousel owl-simple owl-testimonials-photo" data-toggle="owl" data-owl-options='{
+                    "nav": false,
+                    "dots": true,
+                    "margin": 20,
+                    "loop": false,
+                    "rtl": true,
+                "responsive": {
+                        "1200": {
+                            "nav": true
+                        }
+                    }
+                }'>
+                {% for testimonial in testimonials %}
+                <blockquote class="testimonial text-center">
+                    {% if testimonial.photo %}
+                    <img src="{{ testimonial.photo.url }}" alt="{{ testimonial.customer_name }}">
+                    {% else %}
+                    <img src="{% static 'assets/images/testimonials/user-1.jpg' %}" alt="{{ testimonial.customer_name }}">
+                    {% endif %}
+                    <p>" {{ testimonial.review }} "</p>
+                    <cite>
+                        {{ testimonial.customer_name }}
+                        <span>{{ testimonial.customer_role }}</span>
+                    </cite>
+                </blockquote><!-- End .testimonial -->
+                {% empty %}
+                <!-- اگر هیچ نظری فعال نباشد، چیزی نمایش داده نمی‌شود -->
+                {% endfor %}
+            </div><!-- End .testimonials-slider owl-carousel -->
+        </div><!-- End .container -->
+    </div><!-- End .bg-light-2 pt-5 pb-6 -->
+</div><!-- End .page-content -->
+{% endblock %}

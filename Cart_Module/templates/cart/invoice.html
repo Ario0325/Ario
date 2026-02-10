@@ -1,0 +1,130 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block title %}فاکتور {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<section class="invoice1">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="invoice-popup overflow-auto">
+                    <div>
+                        <div class="row invoice-header">
+                            <div class="col-md-6">
+                                <div class="header-invoice-right">
+                                    <div class="brand-logo">
+                                        <a href="{% url 'index' %}">
+                                            <img src="/static/assets/images/demos/demo-12/logo.png" alt="لوگو">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="header-invoice-left">
+                                    <ul>
+                                        <li><h2>فروشگاه آریو</h2></li>
+                                        <li>فروشگاه اینترنتی - تهران</li>
+                                        <li>تماس با ما : 02155667788</li>
+                                        <li>Support@example.com</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invoice-breadcrumb">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="breadcrumb-right">
+                                        <ul>
+                                            <li>نام مشتری : <span>{{ order.full_name }}</span></li>
+                                            <li>آدرس : <span>{{ order.address }}{% if order.city %}، {{ order.city }}{% endif %}</span></li>
+                                            <li>شماره تماس : <span>{{ order.phone }}</span></li>
+                                            <li>ایمیل : <span>{{ order.email|default:"-" }}</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="breadcrumb-left">
+                                        <ul>
+                                            <li>تاریخ فاکتور : <span>{{ order.created_at|date:"Y/m/d" }}</span></li>
+                                            <li>شماره فاکتور : <span>{{ order.order_number }}</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive-md">
+                            <table class="invoice-table">
+                                <thead>
+                                    <tr>
+                                        <th>شماره</th>
+                                        <th>جزئیات آیتم</th>
+                                        <th>تعداد</th>
+                                        <th>قیمت</th>
+                                        <th>مجموع</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.items.all %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <h3>{{ item.product_name }}</h3>
+                                        </td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>{{ item.price|floatformat:0 }} تومان</td>
+                                        <td>{{ item.total|floatformat:0 }} تومان</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2"></td>
+                                        <td colspan="2">جمع فاکتور</td>
+                                        <td>{{ order.total|floatformat:0 }} تومان</td>
+                                    </tr>
+                                    {% if order.shipping_cost and order.shipping_cost > 0 %}
+                                    <tr>
+                                        <td colspan="2"></td>
+                                        <td colspan="2">هزینه ارسال</td>
+                                        <td>{{ order.shipping_cost|floatformat:0 }} تومان</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if order.tax and order.tax > 0 %}
+                                    <tr>
+                                        <td colspan="2"></td>
+                                        <td colspan="2">مالیات بر ارزش افزوده</td>
+                                        <td>{{ order.tax|floatformat:0 }} تومان</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td colspan="2"></td>
+                                        <td colspan="2">مبلغ نهایی</td>
+                                        <td>{{ order.total|floatformat:0 }} تومان</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <div class="row print-bar justify-content-end">
+                                <div class="col-md-6">
+                                    <div class="printbar-right">
+                                        <button type="button" id="printinvoice" class="btn btn-solid btn-md">چاپ فاکتور</button>
+                                        <a href="{% url 'index' %}" class="btn btn-outline-primary-2 btn-md mr-2">بازگشت به فروشگاه</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('printinvoice').addEventListener('click', function() {
+    window.print();
+});
+</script>
+{% endblock %}

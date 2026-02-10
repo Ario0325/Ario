@@ -1,0 +1,458 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+{% load math_filters %}
+
+{% block title %}{{ product.name }} - جزئیات محصول{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+    <div class="container d-flex align-items-center">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:list' %}">محصولات</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:category' product.category.slug %}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+
+        <nav class="product-pager mr-auto" aria-label="Product">
+            {% if prev_product %}
+            <a class="product-pager-link product-pager-prev" href="{% url 'products:detail' prev_product.slug %}" aria-label="Previous">
+                <i class="icon-angle-right"></i>
+                <span>قبلی</span>
+            </a>
+            {% else %}
+            <span class="product-pager-link product-pager-prev disabled" aria-label="Previous" tabindex="-1">
+                <i class="icon-angle-right"></i>
+                <span>قبلی</span>
+            </span>
+            {% endif %}
+
+            {% if next_product %}
+            <a class="product-pager-link product-pager-next" href="{% url 'products:detail' next_product.slug %}" aria-label="Next">
+                <span>بعدی</span>
+                <i class="icon-angle-left"></i>
+            </a>
+            {% else %}
+            <span class="product-pager-link product-pager-next disabled" aria-label="Next" tabindex="-1">
+                <span>بعدی</span>
+                <i class="icon-angle-left"></i>
+            </span>
+            {% endif %}
+        </nav>
+    </div>
+</nav>
+
+<div class="page-content">
+    <div class="container">
+        <div class="product-details-top mb-2">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="product-gallery product-gallery-vertical">
+                        <div class="row">
+                            <figure class="product-main-image">
+                                {% with product_images.0 as main_image %}
+                                {% if main_image %}
+                                <img id="product-zoom" src="{{ main_image.image.url }}"
+                                     data-zoom-image="{{ main_image.image.url }}"
+                                     alt="{{ product.name }}">
+                                {% else %}
+                                <img id="product-zoom" src="{% static 'assets/images/products/product-1.jpg' %}"
+                                     data-zoom-image="{% static 'assets/images/products/product-1.jpg' %}"
+                                     alt="{{ product.name }}">
+                                {% endif %}
+                                {% endwith %}
+
+                                <a href="#" id="btn-product-gallery" class="btn-product-gallery">
+                                    <i class="icon-arrows"></i>
+                                </a>
+                            </figure>
+
+                            {% if product_images %}
+                            <div id="product-zoom-gallery" class="product-image-gallery">
+                                {% for image in product_images %}
+                                <a class="product-gallery-item {% if forloop.first %}active{% endif %}" href="#"
+                                   data-image="{{ image.image.url }}"
+                                   data-zoom-image="{{ image.image.url }}">
+                                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}">
+                                </a>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="product-details product-details-centered">
+                        <h1 class="product-title text-center">{{ product.name }}</h1>
+
+                        <div class="ratings-container">
+                            <div class="ratings">
+                                <div class="ratings-val" style="width: {{ product.get_rating_percentage }}%;"></div>
+                            </div>
+                            <a class="ratings-text" href="#product-review-link" id="review-link">( {{ reviews.count }} نظر )</a>
+                        </div>
+
+                        <div class="product-price text-center">
+                            {% if not product.is_available or product.stock <= 0 %}
+                                <span class="out-price">{{ product.price|floatformat:0 }} تومان</span>
+                            {% elif product.old_price %}
+                                <span class="new-price">{{ product.price|floatformat:0 }} تومان</span>
+                                <span class="old-price">{{ product.old_price|floatformat:0 }} تومان</span>
+                            {% else %}
+                                {{ product.price|floatformat:0 }} تومان
+                            {% endif %}
+                        </div>
+
+                        <div class="product-content">
+                            <p class="text-center">{{ product.description }}</p>
+                        </div>
+
+                        {% if product_colors.exists %}
+                        <div class="details-filter-row details-row-size">
+                            <label>رنگ : </label>
+
+                            <div class="product-nav product-nav-dots">
+                                {% for color in product_colors %}
+                                <a href="#" {% if forloop.first %}class="active"{% endif %} style="background: {{ color.code }};"><span class="sr-only">{{ color.name }}</span></a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if product_sizes.exists %}
+                        <div class="details-filter-row details-row-size">
+                            <label for="size">سایز : </label>
+                            <div class="select-custom">
+                                <select name="size" id="size" class="form-control">
+                                    <option value="#" selected="selected">سایز را انتخاب کنید</option>
+                                    {% for size in product_sizes %}
+                                    <option value="{{ size.size }}">{{ size.get_size_display }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <a href="#" class="size-guide"><i class="icon-th-list"></i>راهنمای سایز</a>
+                        </div>
+                        {% endif %}
+
+                        <div class="product-details-action">
+                            <div class="details-action-col">
+                                {% if product.is_available and product.stock > 0 %}
+                                <form action="{% url 'cart:add' product.id %}" method="post" class="d-inline-flex align-items-center flex-wrap">
+                                    {% csrf_token %}
+                                    <div class="product-details-quantity">
+                                        <input type="number" name="quantity" id="qty" class="form-control" value="1" min="1" max="{{ product.stock }}" step="1" data-decimals="0" required>
+                                    </div>
+                                    <button type="submit" class="btn-product btn-cart"><span>افزودن به سبد خرید</span></button>
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                </form>
+                                {% else %}
+                                <p class="text-danger">محصول ناموجود است</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="details-action-wrapper">
+                                <a href="#" class="btn-product btn-wishlist" title="لیست علاقه مندی"><span>افزودن به لیست علاقه مندی</span></a>
+                                <a href="#" class="btn-product btn-compare" title="مقایسه"><span>افزودن به لیست مقایسه</span></a>
+                            </div>
+                        </div>
+
+                        <div class="product-details-footer">
+                            <div class="product-cat">
+                                <span>دسته بندی : </span>
+                                <a href="{% url 'products:category' product.category.slug %}">{{ product.category.name }}</a>
+                                {% if product.brand %}
+                                ، <span>برند : </span><a href="#">{{ product.brand.name }}</a>
+                                {% endif %}
+                            </div>
+
+                            <div class="social-icons social-icons-sm">
+                                <span class="social-label">اشتراک گذاری : </span>
+                                <a href="#" class="social-icon" title="فیسبوک" target="_blank"><i class="icon-facebook-f"></i></a>
+                                <a href="#" class="social-icon" title="توییتر" target="_blank"><i class="icon-twitter"></i></a>
+                                <a href="#" class="social-icon" title="اینستاگرام" target="_blank"><i class="icon-instagram"></i></a>
+                                <a href="#" class="social-icon" title="پینترست" target="_blank"><i class="icon-pinterest"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-details-tab">
+            <ul class="nav nav-pills justify-content-center" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="product-desc-link" data-toggle="tab" href="#product-desc-tab" role="tab" aria-controls="product-desc-tab" aria-selected="true">توضیحات</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="product-info-link" data-toggle="tab" href="#product-info-tab" role="tab" aria-controls="product-info-tab" aria-selected="false">اطلاعات بیشتر</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="product-shipping-link" data-toggle="tab" href="#product-shipping-tab" role="tab" aria-controls="product-shipping-tab" aria-selected="false">ارسال و بازگشت</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="product-review-link" data-toggle="tab" href="#product-review-tab" role="tab" aria-controls="product-review-tab" aria-selected="false">نظرات ({{ reviews.count }})</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="product-desc-tab" role="tabpanel" aria-labelledby="product-desc-link">
+                    <div class="product-desc-content">
+                        <h3>اطلاعات محصول</h3>
+                        {{ product.full_description|default:product.description|linebreaks }}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="product-info-tab" role="tabpanel" aria-labelledby="product-info-link">
+                    <div class="product-desc-content">
+                        <h3>اطلاعات بیشتر</h3>
+                        {{ product.additional_info|linebreaks }}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="product-shipping-tab" role="tabpanel" aria-labelledby="product-shipping-link">
+                    <div class="product-desc-content">
+                        <h3>ارسال و بازگشت</h3>
+                        {{ product.shipping_info|linebreaks }}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
+                    <div class="reviews">
+                        <h3>نظرات ({{ reviews.count }})</h3>
+
+                        {% for review in reviews %}
+                        <div class="review">
+                            <div class="row no-gutters">
+                                <div class="col-auto">
+                                    <h4><a href="#">{{ review.name }}</a></h4>
+                                    <div class="ratings-container">
+                                        <div class="ratings">
+                                            <div class="ratings-val" style="width: {{ review.rating|mul:20 }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <span class="review-date">{{ review.created_at|timesince }} پیش</span>
+                                </div>
+                                <div class="col-12">
+                                    <h4>{{ review.title }}</h4>
+
+                                    <div class="review-content">
+                                        <p>{{ review.comment }}</p>
+                                    </div>
+
+                                    <div class="review-action">
+                                        <a href="#"><i class="icon-thumbs-up"></i>مثبت (0)</a>
+                                        <a href="#"><i class="icon-thumbs-down"></i>منفی (0)</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>هنوز نظری ثبت نشده است.</p>
+                        {% endfor %}
+
+                        <div class="review-form-container mt-5 pt-4 border-top">
+                            <h4 class="mb-3">ثبت نظر جدید</h4>
+                            <form action="{% url 'products:detail' product.slug %}" method="post" class="review-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="submit_review" value="1">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_name">{{ review_form.name.label }} *</label>
+                                            {{ review_form.name }}
+                                            {% if review_form.name.errors %}
+                                                <div class="text-danger small">{{ review_form.name.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_email">{{ review_form.email.label }} *</label>
+                                            {{ review_form.email }}
+                                            {% if review_form.email.errors %}
+                                                <div class="text-danger small">{{ review_form.email.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_rating">{{ review_form.rating.label }} *</label>
+                                    {{ review_form.rating }}
+                                    {% if review_form.rating.errors %}
+                                        <div class="text-danger small">{{ review_form.rating.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_title">{{ review_form.title.label }} *</label>
+                                    {{ review_form.title }}
+                                    {% if review_form.title.errors %}
+                                        <div class="text-danger small">{{ review_form.title.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_comment">{{ review_form.comment.label }} *</label>
+                                    {{ review_form.comment }}
+                                    {% if review_form.comment.errors %}
+                                        <div class="text-danger small">{{ review_form.comment.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <button type="submit" class="btn btn-primary">ارسال نظر</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if related_products %}
+        <h2 class="title text-center mb-4">محصولاتی که شاید بپسندید</h2>
+
+        <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl"
+            data-owl-options='{
+                "nav": false,
+                "dots": true,
+                "margin": 20,
+                "loop": false,
+                "rtl": true,
+                "responsive": {
+                    "0": {"items":1},
+                    "480": {"items":2},
+                    "768": {"items":3},
+                    "992": {"items":4},
+                    "1200": {"items":4, "nav": true, "dots": false}
+                }
+            }'>
+
+            {% for product in related_products %}
+            <div class="product product-7 text-center">
+                <figure class="product-media">
+                    {% if not product.is_available or product.stock <= 0 %}
+                    <span class="product-label label-out">ناموجود</span>
+                    {% elif product.label %}
+                    <span class="product-label label-{{ product.label }}">{{ product.get_label_display }}</span>
+                    {% endif %}
+
+                    <a href="{% url 'products:detail' product.slug %}">
+                        {% with product.images.all.0 as main_image %}
+                        {% if main_image %}
+                            <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% else %}
+                            <img src="{% static 'assets/images/products/product-1.jpg' %}" alt="{{ product.name }}" class="product-image">
+                        {% endif %}
+                        {% endwith %}
+                    </a>
+
+                    <div class="product-action-vertical">
+                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>افزودن به لیست علاقه مندی</span></a>
+                        <a href="{% url 'products:detail' product.slug %}" class="btn-product-icon btn-quickview" title="مشاهده سریع"><span>مشاهده سریع</span></a>
+                        <a href="#" class="btn-product-icon btn-compare" title="مقایسه"><span>لیست مقایسه</span></a>
+                    </div>
+
+                    <div class="product-action">
+                        {% if product.is_available and product.stock > 0 %}
+                        <a href="#" class="btn-product btn-cart"><span>افزودن به سبد خرید</span></a>
+                        {% else %}
+                        <a href="{% url 'products:detail' product.slug %}" class="btn-product btn-cart"><span>مشاهده محصول</span></a>
+                        {% endif %}
+                    </div>
+                </figure>
+
+                <div class="product-body">
+                    <div class="product-cat text-center">
+                        <a href="{% url 'products:category' product.category.slug %}">{{ product.category.name }}</a>
+                    </div>
+                    <h3 class="product-title text-center"><a href="{% url 'products:detail' product.slug %}">{{ product.name }}</a></h3>
+                    <div class="product-price">
+                        {% if not product.is_available or product.stock <= 0 %}
+                            <span class="out-price">{{ product.price|floatformat:0 }} تومان</span>
+                        {% elif product.old_price %}
+                            <span class="new-price">{{ product.price|floatformat:0 }} تومان</span>
+                            <span class="old-price">{{ product.old_price|floatformat:0 }} تومان</span>
+                        {% else %}
+                            {{ product.price|floatformat:0 }} تومان
+                        {% endif %}
+                    </div>
+                    <div class="ratings-container">
+                        <div class="ratings">
+                            <div class="ratings-val" style="width: {{ product.get_rating_percentage }}%;"></div>
+                        </div>
+                        <span class="ratings-text">( {{ product.views_count }} بازدید )</span>
+                    </div>
+                    {% if product.colors.exists %}
+                    <div class="product-nav product-nav-dots">
+                        {% for color in product.colors.all|slice:":3" %}
+                        <a href="#" {% if forloop.first %}class="active"{% endif %} style="background: {{ color.code }};"><span class="sr-only">{{ color.name }}</span></a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    // باز کردن تب نظرات اگر بعد از ارسال نظر به این صفحه آمده باشد
+    if (window.location.hash === '#product-review-tab' || (new URLSearchParams(window.location.search)).get('review_submitted') === '1') {
+        var reviewTab = document.getElementById('product-review-link');
+        if (reviewTab) reviewTab.click();
+    }
+
+    function initProductGalleryFallback() {
+        var gallery = document.getElementById('product-zoom-gallery');
+        var mainImg = document.getElementById('product-zoom');
+        if (!gallery || !mainImg) return;
+        gallery.querySelectorAll('.product-gallery-item').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                var imgUrl = this.getAttribute('data-image');
+                var zoomUrl = this.getAttribute('data-zoom-image') || imgUrl;
+                if (!imgUrl) return;
+                mainImg.setAttribute('src', imgUrl);
+                mainImg.setAttribute('data-zoom-image', zoomUrl);
+                gallery.querySelectorAll('.product-gallery-item').forEach(function(i) { i.classList.remove('active'); });
+                this.classList.add('active');
+            });
+        });
+    }
+
+    function initProductZoom() {
+        var $zoom = $('#product-zoom');
+        var $gallery = $('#product-zoom-gallery');
+        if (!$zoom.length) return;
+
+        if ($.fn.elevateZoom) {
+            $zoom.elevateZoom({
+                gallery: 'product-zoom-gallery',
+                galleryActiveClass: 'active',
+                zoomType: 'lens',
+                lensShape: 'round',
+                lensSize: 180,
+                cursor: 'crosshair',
+                zoomWindowFadeIn: 300,
+                zoomWindowFadeOut: 300,
+                lensFadeIn: 200,
+                lensFadeOut: 200,
+                scrollZoom: true,
+                responsive: true,
+                borderColour: '#cc9966',
+                borderSize: 2
+            });
+        } else {
+            initProductGalleryFallback();
+        }
+    }
+
+    $(function() {
+        initProductZoom();
+    });
+})();
+</script>
+{% endblock %}

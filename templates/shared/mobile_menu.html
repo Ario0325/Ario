@@ -1,0 +1,54 @@
+<div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+<div class="mobile-menu-container mobile-menu-light">
+    <div class="mobile-menu-wrapper">
+        <span class="mobile-menu-close"><i class="icon-close"></i></span>
+
+        <form action="{% url 'products:search' %}" method="get" class="mobile-search">
+            <label for="mobile-search" class="sr-only">جستجو</label>
+            <input type="search" class="form-control" name="q" id="mobile-search"
+                placeholder="جستجوی محصول ..." required>
+            <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
+        </form>
+
+        <ul class="nav nav-pills-mobile nav-border-anim" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="mobile-menu-link" data-toggle="tab" href="#mobile-menu-tab"
+                    role="tab" aria-controls="mobile-menu-tab" aria-selected="true">منو</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="mobile-cats-link" data-toggle="tab" href="#mobile-cats-tab" role="tab"
+                    aria-controls="mobile-cats-tab" aria-selected="false">دسته بندی ها</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="mobile-menu-tab" role="tabpanel" aria-labelledby="mobile-menu-link">
+                <nav class="mobile-nav">
+                    <ul class="mobile-menu">
+                        <li><a href="{% url 'index' %}">خانه</a></li>
+                        <li><a href="{% url 'products:list' %}">فروشگاه</a></li>
+                        <li><a href="{% url 'AboutUs_Module:about' %}">درباره ما</a></li>
+                        <li><a href="{% url 'contact' %}">تماس با ما</a></li>
+                        <li><a href="{% url 'accounts:login_register' %}">ورود / ثبت نام</a></li>
+                        <li><a href="{% url 'cart:detail' %}">سبد خرید</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="tab-pane fade" id="mobile-cats-tab" role="tabpanel" aria-labelledby="mobile-cats-link">
+                <nav class="mobile-nav">
+                    <ul class="mobile-menu">
+                        <li><a href="{% url 'products:list' %}">همه محصولات</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div><!-- End .tab-content -->
+
+        <div class="social-icons">
+            <a href="#" class="social-icon" target="_blank" title="فیسبوک"><i class="icon-facebook-f"></i></a>
+            <a href="#" class="social-icon" target="_blank" title="توییتر"><i class="icon-twitter"></i></a>
+            <a href="#" class="social-icon" target="_blank" title="اینستاگرام"><i class="icon-instagram"></i></a>
+            <a href="#" class="social-icon" target="_blank" title="یوتیوب"><i class="icon-youtube"></i></a>
+        </div><!-- End .social-icons -->
+    </div><!-- End .mobile-menu-wrapper -->
+</div><!-- End .mobile-menu-container -->

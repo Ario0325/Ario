@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پیش‌نمایش هدر مدرن - آریو شاپ</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/bootstrap-rtl.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/demos/demo-12.css">
+    <link rel="stylesheet" href="assets/css/header-fix.css">
+    <link rel="stylesheet" href="assets/css/modern-header.css">
+    <link rel="stylesheet" href="assets/css/modern-header-enhanced.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 150px;
+        }
+        .demo-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .feature-box {
+            padding: 2rem;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            border-right: 5px solid #cc9966;
+        }
+        .feature-box h3 {
+            color: #cc9966;
+            margin-bottom: 1rem;
+        }
+        .demo-section {
+            margin: 3rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- نوار پیشرفت اسکرول -->
+    <div id="scroll-progress-bar" class="scroll-progress-bar"></div>
+
+    <!-- هدر مدرن -->
+    <header class="header header-9 modern-header" role="banner">
+        <div class="header-middle sticky-header">
+            <div class="container">
+                <div class="header-left">
+                    <button class="mobile-menu-toggler modern-hamburger" type="button" aria-label="باز کردن منو">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+
+                    <a href="#" class="logo modern-logo">
+                        <img src="assets/images/demos/demo-12/logo.png" alt="آریو شاپ" width="82" height="25">
+                        <span class="logo-shine"></span>
+                    </a>
+                </div>
+
+                <div class="header-right">
+                    <nav class="main-nav modern-nav" aria-label="منوی اصلی">
+                        <ul class="menu modern-menu">
+                            <li class="modern-menu-item">
+                                <a href="#" class="modern-menu-link">
+                                    <span class="menu-text">خانه</span>
+                                    <span class="menu-underline"></span>
+                                </a>
+                            </li>
+                            <li class="modern-menu-item">
+                                <a href="#" class="modern-menu-link">
+                                    <span class="menu-text">فروشگاه</span>
+                                    <span class="menu-underline"></span>
+                                </a>
+                            </li>
+                            <li class="modern-menu-item has-submenu">
+                                <a href="#" class="modern-menu-link has-dropdown">
+                                    <span class="menu-text">دسته‌بندی‌ها</span>
+                                    <span class="menu-underline"></span>
+                                    <i class="menu-arrow"></i>
+                                </a>
+                                <ul class="modern-submenu">
+                                    <li class="modern-submenu-item">
+                                        <a href="#" class="modern-submenu-link">
+                                            <span class="submenu-icon">●</span>
+                                            لباس مردانه
+                                        </a>
+                                    </li>
+                                    <li class="modern-submenu-item">
+                                        <a href="#" class="modern-submenu-link">
+                                            <span class="submenu-icon">●</span>
+                                            لباس زنانه
+                                        </a>
+                                    </li>
+                                    <li class="modern-submenu-item">
+                                        <a href="#" class="modern-submenu-link">
+                                            <span class="submenu-icon">●</span>
+                                            کفش و کیف
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="modern-menu-item">
+                                <a href="#" class="modern-menu-link">
+                                    <span class="menu-text">درباره ما</span>
+                                    <span class="menu-underline"></span>
+                                </a>
+                            </li>
+                            <li class="modern-menu-item">
+                                <a href="#" class="modern-menu-link">
+                                    <span class="menu-text">تماس با ما</span>
+                                    <span class="menu-underline"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="header-search modern-search">
+                        <button class="search-toggle modern-search-btn" type="button" aria-label="جستجو">
+                            <i class="icon-search"></i>
+                            <span class="search-ripple"></span>
+                        </button>
+                        <form action="#" method="get" class="modern-search-form">
+                            <div class="modern-search-wrapper">
+                                <label for="q" class="sr-only">جستجو</label>
+                                <i class="search-icon icon-search"></i>
+                                <input type="search" class="modern-search-input" name="q" id="q"
+                                    placeholder="جستجوی محصول ..." required>
+                                <button type="button" class="search-close" aria-label="بستن">
+                                    <i class="icon-close"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <a href="#" class="account-link modern-icon-btn" title="ورود / ثبت نام">
+                        <i class="icon-user"></i>
+                        <span class="account-txt">ورود</span>
+                        <span class="btn-ripple"></span>
+                    </a>
+
+                    <a href="#" class="wishlist-link modern-icon-btn modern-wishlist" title="علاقه‌مندی‌ها">
+                        <i class="icon-heart-o"></i>
+                        <span class="wishlist-count modern-badge">3</span>
+                        <span class="btn-ripple"></span>
+                    </a>
+
+                    <div class="dropdown cart-dropdown modern-cart">
+                        <a href="#" class="dropdown-toggle modern-icon-btn" role="button">
+                            <i class="icon-shopping-cart"></i>
+                            <span class="cart-count modern-badge has-items">5</span>
+                            <span class="cart-txt">۲۵۰,۰۰۰ تومان</span>
+                            <span class="btn-ripple"></span>
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-right modern-dropdown modern-cart-dropdown">
+                            <div class="dropdown-header">
+                                <i class="icon-shopping-cart"></i>
+                                <span>سبد خرید شما</span>
+                            </div>
+                            <div class="dropdown-cart-products modern-cart-products">
+                                <div class="product modern-cart-item">
+                                    <figure class="product-image-container">
+                                        <a href="#" class="product-image">
+                                            <img src="assets/images/products/product-1.jpg" alt="محصول نمونه">
+                                        </a>
+                                    </figure>
+                                    <div class="product-cart-details">
+                                        <h4 class="product-title">
+                                            <a href="#">محصول نمونه شماره ۱</a>
+                                        </h4>
+                                        <span class="cart-product-info">
+                                            <span class="cart-product-qty">۲ عدد</span>
+                                            <span class="cart-product-price">۱۰۰,۰۰۰ تومان</span>
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn-remove modern-remove-btn" title="حذف محصول">
+                                        <i class="icon-close"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="dropdown-cart-total modern-cart-total">
+                                <span>مجموع:</span>
+                                <span class="cart-total-price">۲۵۰,۰۰۰ تومان</span>
+                            </div>
+
+                            <div class="dropdown-cart-action modern-cart-action">
+                                <a href="#" class="btn btn-primary modern-btn-primary">
+                                    <i class="icon-shopping-cart"></i>
+                                    <span>مشاهده سبد خرید</span>
+                                </a>
+                                <a href="#" class="btn btn-outline-primary-2 modern-btn-checkout">
+                                    <span>پرداخت</span>
+                                    <i class="icon-long-arrow-left"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- محتوای نمایشی -->
+    <div class="demo-content">
+        <h1 style="text-align: center; color: #cc9966; margin-bottom: 2rem;">
+            🎨 هدر مدرن و حرفه‌ای آریو شاپ
+        </h1>
+
+        <div class="demo-section">
+            <h2 style="color: #333; border-bottom: 3px solid #cc9966; padding-bottom: 1rem;">
+                ✨ ویژگی‌های هدر جدید
+            </h2>
+            
+            <div class="feature-box">
+                <h3>📊 نوار پیشرفت اسکرول</h3>
+                <p>در بالای صفحه یک نوار طلایی وجود دارد که با اسکرول کردن پر می‌شود و پیشرفت شما را نشان می‌دهد.</p>
+            </div>
+
+            <div class="feature-box">
+                <h3>🎭 افکت Glassmorphism</h3>
+                <p>پس‌زمینه هدر از افکت شیشه‌ای مدرن با blur استفاده می‌کند که به آن ظاهری حرفه‌ای می‌دهد.</p>
+            </div>
+
+            <div class="feature-box">
+                <h3>🌊 انیمیشن Ripple</h3>
+                <p>تمام دکمه‌ها دارای افکت موج (Ripple) هستند. روی دکمه‌های سبد خرید، ورود و جستجو کلیک کنید.</p>
+            </div>
+
+            <div class="feature-box">
+                <h3>🔍 جستجوی پیشرفته</h3>
+                <p>باکس جستجو با کلیک روی آیکون ذره‌بین به صورت انیمیشن‌دار باز می‌شود.</p>
+            </div>
+
+            <div class="feature-box">
+                <h3>🎯 منوی تعاملی</h3>
+                <p>منوها دارای خط زیر انیمیشن‌دار و افکت هاور زیبا هستند. روی منو "دسته‌بندی‌ها" هاور کنید.</p>
+            </div>
+
+            <div class="feature-box">
+                <h3>🛒 سبد خرید مدرن</h3>
+                <p>سبد خرید با طراحی جدید و انیمیشن‌های زیبا. بج شمارنده دارای انیمیشن تپش است.</p>
+            </div>
+
+            <div class="feature-box">
+                <h3>📱 کاملاً ریسپانسیو</h3>
+                <p>هدر در تمام اندازه صفحات (موبایل، تبلت، دسکتاپ) به خوبی کار می‌کند.</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2 style="color: #333; border-bottom: 3px solid #cc9966; padding-bottom: 1rem;">
+                🎬 راهنمای تست
+            </h2>
+            <ol style="font-size: 1.1rem; line-height: 2;">
+                <li><strong>اسکرول کنید</strong> - نوار پیشرفت بالا و تغییر رنگ هدر را ببینید</li>
+                <li><strong>روی منوها هاور کنید</strong> - خط زیر انیمیشن‌دار و افکت‌ها را مشاهده کنید</li>
+                <li><strong>روی "دسته‌بندی‌ها" کلیک کنید</strong> - ساب منوی زیبا را ببینید</li>
+                <li><strong>آیکون جستجو را کلیک کنید</strong> - باکس جستجو با انیمیشن باز می‌شود</li>
+                <li><strong>روی سبد خرید هاور کنید</strong> - لیست محصولات را مشاهده کنید</li>
+                <li><strong>روی دکمه‌ها کلیک کنید</strong> - افکت Ripple را ببینید</li>
+                <li><strong>صفحه را کوچک کنید</strong> - ریسپانسیو بودن را تست کنید</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: #f8f9fa; border-radius: 15px;">
+            <h3 style="color: #cc9966;">🎉 هدر شما آماده است!</h3>
+            <p style="font-size: 1.1rem; margin-top: 1rem;">
+                تمام انیمیشن‌ها، افکت‌ها و قابلیت‌های مدرن با موفقیت پیاده‌سازی شده‌اند.
+            </p>
+        </div>
+        
+        <!-- محتوای اضافی برای تست اسکرول -->
+        <div style="height: 800px; margin-top: 3rem; background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; padding: 2rem;">
+            <h3 style="text-align: center; color: #666;">اسکرول کنید تا نوار پیشرفت و تغییرات هدر را ببینید</h3>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/modern-header-enhanced.js"></script>
+</body>
+</html>

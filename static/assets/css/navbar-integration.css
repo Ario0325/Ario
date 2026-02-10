@@ -1,0 +1,123 @@
+/* 
+ * Navbar Integration Fixes
+ * این فایل سازگاری بین navbar جدید و استایل‌های موجود را فراهم می‌کند
+ */
+
+/* جلوگیری از تداخل با استایل‌های قدیمی */
+.modern-navbar-wrapper ~ .main {
+    padding-top: 0;
+}
+
+/* اطمینان از اینکه navbar روی همه چیز قرار دارد */
+.modern-navbar-wrapper {
+    position: relative;
+    z-index: 9999;
+}
+
+/* تنظیم فاصله محتوا از navbar */
+.modern-navbar-wrapper + .main {
+    margin-top: 0;
+}
+
+/* سازگاری با container موجود */
+.modern-navbar-wrapper .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+@media (min-width: 1400px) {
+    .modern-navbar-wrapper .container {
+        max-width: 1320px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .modern-navbar-wrapper .container {
+        max-width: 1440px;
+    }
+}
+
+/* اصلاح لینک‌ها برای سازگاری با Django URLs */
+.modern-navbar-wrapper a {
+    text-decoration: none;
+}
+
+.modern-navbar-wrapper a:hover {
+    text-decoration: none;
+}
+
+/* اطمینان از نمایش صحیح SVG ها */
+.modern-navbar-wrapper svg {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* بهبود نمایش در RTL */
+[dir="rtl"] .modern-navbar-wrapper .mega-menu-item::before {
+    right: auto;
+    left: 0;
+}
+
+[dir="rtl"] .modern-navbar-wrapper .menu-link::before {
+    left: 50%;
+    right: auto;
+}
+
+[dir="rtl"] .modern-navbar-wrapper .mobile-submenu-link::before {
+    right: auto;
+    left: 15px;
+}
+
+/* اصلاح مشکلات احتمالی با فونت‌های فارسی */
+.modern-navbar-wrapper {
+    font-family: 'IRANSans', 'Tahoma', 'Arial', sans-serif;
+}
+
+/* بهبود نمایش badge ها */
+.modern-navbar-wrapper .action-badge {
+    font-family: 'Arial', sans-serif; /* برای اعداد انگلیسی */
+}
+
+/* اصلاح scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* اطمینان از عدم تداخل با سایر sticky elements */
+.modern-navbar-wrapper .main-navigation.sticky {
+    position: sticky;
+    top: 0;
+}
+
+/* پشتیبانی از Dark Mode (اختیاری - برای آینده) */
+@media (prefers-color-scheme: dark) {
+    .modern-navbar-wrapper {
+        /* می‌توانید در آینده استایل‌های dark mode را اضافه کنید */
+    }
+}
+
+/* Loading State */
+.modern-navbar-wrapper.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Performance Optimization */
+.modern-navbar-wrapper * {
+    will-change: auto;
+}
+
+.modern-navbar-wrapper .dropdown-menu,
+.modern-navbar-wrapper .search-panel,
+.modern-navbar-wrapper .mobile-menu-panel {
+    will-change: transform, opacity;
+}
+
+/* Hover Effects با GPU Acceleration */
+.modern-navbar-wrapper .menu-link,
+.modern-navbar-wrapper .action-btn,
+.modern-navbar-wrapper .mega-menu-item {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
