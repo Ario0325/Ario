@@ -16,10 +16,6 @@
                 <a class="nav-link active" id="mobile-menu-link" data-toggle="tab" href="#mobile-menu-tab"
                     role="tab" aria-controls="mobile-menu-tab" aria-selected="true">منو</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" id="mobile-cats-link" data-toggle="tab" href="#mobile-cats-tab" role="tab"
-                    aria-controls="mobile-cats-tab" aria-selected="false">دسته بندی ها</a>
-            </li>
         </ul>
 
         <div class="tab-content">
@@ -32,13 +28,6 @@
                         <li><a href="{% url 'contact' %}">تماس با ما</a></li>
                         <li><a href="{% url 'accounts:login_register' %}">ورود / ثبت نام</a></li>
                         <li><a href="{% url 'cart:detail' %}">سبد خرید</a></li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="tab-pane fade" id="mobile-cats-tab" role="tabpanel" aria-labelledby="mobile-cats-link">
-                <nav class="mobile-nav">
-                    <ul class="mobile-menu">
-                        <li><a href="{% url 'products:list' %}">همه محصولات</a></li>
                     </ul>
                 </nav>
             </div>

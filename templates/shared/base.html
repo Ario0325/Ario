@@ -17,6 +17,9 @@
     <meta name="theme-color" content="#ffffff">
     {% include 'shared/style.html' %}
 
+    <!-- Mobile-only CSS overrides (loaded after theme CSS, affects only small viewports) -->
+    <link rel="stylesheet" href="/static/assets/css/mobile-overrides.css">
+
     {% block extra_css %}{% endblock %}
 </head>
 

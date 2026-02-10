@@ -4,6 +4,10 @@
 
 {% block title %}{{ product.name }} - جزئیات محصول{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/modern-product-gallery.css' %}">
+{% endblock %}
+
 {% block content %}
 <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
     <div class="container d-flex align-items-center">
@@ -397,6 +401,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/modern-product-gallery.js' %}"></script>
 <script>
 (function() {
     // باز کردن تب نظرات اگر بعد از ارسال نظر به این صفحه آمده باشد
@@ -405,29 +410,18 @@
         if (reviewTab) reviewTab.click();
     }
 
-    function initProductGalleryFallback() {
-        var gallery = document.getElementById('product-zoom-gallery');
-        var mainImg = document.getElementById('product-zoom');
-        if (!gallery || !mainImg) return;
-        gallery.querySelectorAll('.product-gallery-item').forEach(function(item) {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                var imgUrl = this.getAttribute('data-image');
-                var zoomUrl = this.getAttribute('data-zoom-image') || imgUrl;
-                if (!imgUrl) return;
-                mainImg.setAttribute('src', imgUrl);
-                mainImg.setAttribute('data-zoom-image', zoomUrl);
-                gallery.querySelectorAll('.product-gallery-item').forEach(function(i) { i.classList.remove('active'); });
-                this.classList.add('active');
-            });
-        });
-    }
-
     function initProductZoom() {
         var $zoom = $('#product-zoom');
         var $gallery = $('#product-zoom-gallery');
         if (!$zoom.length) return;
+        
+        // On small viewports, modern gallery handles everything
+        if (window && window.innerWidth && window.innerWidth < 768) {
+            // Modern gallery already initialized, no need for elevateZoom
+            return;
+        }
 
+        // Desktop version with elevateZoom
         if ($.fn.elevateZoom) {
             $zoom.elevateZoom({
                 gallery: 'product-zoom-gallery',
@@ -445,8 +439,6 @@
                 borderColour: '#cc9966',
                 borderSize: 2
             });
-        } else {
-            initProductGalleryFallback();
         }
     }
 

@@ -18,14 +18,14 @@
             <!-- Desktop links -->
             <ul class="az-links" id="azLinks">
                 <li><a href="{% url 'index' %}">خانه</a></li>
-                <li class="{% if categories %}az-has-dd{% endif %}">
+                <li class="{% if navbar_categories %}az-has-dd{% endif %}">
                     <a href="{% url 'products:list' %}">
-                        فروشگاه
-                        {% if categories %}<svg class="az-chevron" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4"/></svg>{% endif %}
+                        دسته بندی ها
+                        {% if navbar_categories %}<svg class="az-chevron" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4"/></svg>{% endif %}
                     </a>
-                    {% if categories %}
+                    {% if navbar_categories %}
                     <ul class="az-dd">
-                        {% for category in categories %}
+                        {% for category in navbar_categories %}
                         <li class="{% if category.children.exists %}az-has-dd{% endif %}">
                             <a href="{{ category.get_absolute_url }}">
                                 {{ category.name }}

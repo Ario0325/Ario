@@ -1,0 +1,364 @@
+/**
+ * Modern Product Gallery CSS
+ * Professional mobile-first approach with modern UI/UX patterns
+ * Touch-optimized and performance-focused
+ * 
+ * ⚠️ IMPORTANT: This CSS only affects MOBILE devices (< 768px)
+ * Desktop/Tablet styles are NOT modified to preserve original appearance
+ */
+
+/* ============================================================================
+   MOBILE ONLY STYLES - < 768px viewport
+   ========================================================================== */
+@media (max-width: 767px) {
+    /* Modern Gallery Container */
+    .product-gallery {
+        margin-bottom: 1.5rem;
+    }
+
+    .product-gallery .row {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Main Image Container - Modern Styling */
+    .product-gallery figure.product-main-image {
+        position: relative;
+        width: 100%;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background: #f5f5f5;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .product-gallery figure.product-main-image:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Main Image - Responsive and Modern */
+    .product-gallery figure.product-main-image img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+        object-fit: cover;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backface-visibility: hidden;
+    }
+
+    .product-gallery figure.product-main-image img.active-zoom {
+        transform: scale(1.02);
+    }
+
+    /* Gallery Button - Modern Design */
+    .product-gallery #btn-product-gallery {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        color: #333;
+        font-size: 0.875rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 10;
+    }
+
+    .product-gallery #btn-product-gallery:hover {
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+    }
+
+    /* Image Gallery Container - Modern Carousel */
+    #product-zoom-gallery {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        padding-bottom: 0.5rem;
+        margin-top: 0.5rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.05);
+    }
+
+    /* Custom Scrollbar for Modern Look */
+    #product-zoom-gallery::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    #product-zoom-gallery::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 2px;
+    }
+
+    #product-zoom-gallery::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 2px;
+        transition: background 0.3s ease;
+    }
+
+    #product-zoom-gallery::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.15);
+    }
+
+    /* Gallery Item - Touch-Friendly Modern Style */
+    .product-gallery-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 4.5rem;
+        height: 4.5rem;
+        border-radius: 0.375rem;
+        overflow: hidden;
+        background: #f9f9f9;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .product-gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .product-gallery-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .product-gallery-item.active {
+        border-color: #333;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .product-gallery-item.active img {
+        transform: scale(1);
+    }
+
+    /* Image Counter Badge - Modern Addition */
+    .product-gallery .gallery-counter {
+        position: absolute;
+        bottom: 0.75rem;
+        left: 0.75rem;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(4px);
+        z-index: 5;
+    }
+
+    /* Touch Indicator - Professional UX */
+    .product-gallery .touch-indicator {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 50%;
+        transform: translateX(50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.65rem;
+        font-weight: 500;
+        z-index: 4;
+    }
+
+    .product-gallery .touch-indicator::before,
+    .product-gallery .touch-indicator::after {
+        content: '‹';
+        font-size: 0.875rem;
+        opacity: 0;
+        animation: slide-arrow 1.2s ease-in-out infinite;
+    }
+
+    .product-gallery .touch-indicator::after {
+        content: '›';
+        animation-delay: 0.3s;
+    }
+
+    @keyframes slide-arrow {
+        0%, 100% {
+            opacity: 0;
+            transform: translateX(0);
+        }
+        50% {
+            opacity: 1;
+            transform: translateX(0.25rem);
+        }
+    }
+
+    /* Modern Pagination Dots */
+    .gallery-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.375rem;
+        margin-top: 0.75rem;
+    }
+
+    .pagination-dot {
+        width: 0.375rem;
+        height: 0.375rem;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        padding: 0;
+    }
+
+    .pagination-dot.active {
+        width: 1.5rem;
+        background: #333;
+        border-radius: 0.25rem;
+    }
+
+    .pagination-dot:hover {
+        background: rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* ============================================================================
+   LANDSCAPE MOBILE - Special handling for landscape orientation
+   ========================================================================== */
+@media (max-width: 991px) and (orientation: landscape) {
+    .product-gallery figure.product-main-image {
+        height: 25vh;
+    }
+
+    .product-gallery figure.product-main-image img {
+        height: 100%;
+    }
+
+    #product-zoom-gallery {
+        flex-wrap: nowrap;
+        margin-top: 0.375rem;
+    }
+
+    .product-gallery-item {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+}
+
+/* ============================================================================
+   LOADING STATE ANIMATION - Applies to all sizes
+   ========================================================================== */
+.product-gallery img.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ============================================================================
+   ACCESSIBILITY - Reduced Motion Support (all sizes)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .product-gallery figure.product-main-image,
+    .product-gallery figure.product-main-image img,
+    #btn-product-gallery,
+    .product-gallery-item,
+    .product-gallery-item img,
+    .pagination-dot {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* ============================================================================
+   PRINT STYLES - Hide interactive elements
+   ========================================================================== */
+@media print {
+    .product-gallery #btn-product-gallery,
+    .gallery-pagination,
+    .touch-indicator {
+        display: none !important;
+    }
+}
+
+/* Landscape Mobile - Optimized */
+@media (max-width: 991px) and (orientation: landscape) {
+    .product-gallery figure.product-main-image {
+        height: 25vh;
+    }
+
+    .product-gallery figure.product-main-image img {
+        height: 100%;
+    }
+
+    #product-zoom-gallery {
+        flex-wrap: nowrap;
+        margin-top: 0.375rem;
+    }
+
+    .product-gallery-item {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+}
+
+/* Loading and Transition States */
+.product-gallery img.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .product-gallery figure.product-main-image,
+    .product-gallery figure.product-main-image img,
+    #btn-product-gallery,
+    .product-gallery-item,
+    .product-gallery-item img,
+    .pagination-dot {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .product-gallery #btn-product-gallery,
+    .gallery-pagination,
+    .touch-indicator {
+        display: none !important;
+    }
+}
