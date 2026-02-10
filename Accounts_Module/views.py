@@ -45,7 +45,7 @@ class LoginRegisterView(View):
                 remember_me = form.cleaned_data.get('remember_me', True)
                 if not remember_me:
                     request.session.set_expiry(0)
-                login(request, user, backend='accounts.backends.EmailOrUsernameBackend')
+                login(request, user, backend='Accounts_Module.backends.EmailOrUsernameBackend')
                 load_cart_from_db(request)
                 messages.success(request, _('با موفقیت وارد شدید.'))
                 next_url = request.GET.get('next', reverse_lazy('index'))
@@ -60,7 +60,7 @@ class LoginRegisterView(View):
             form = RegisterForm(request.POST)
             if form.is_valid():
                 user = form.save()
-                login(request, user, backend='accounts.backends.EmailOrUsernameBackend')
+                login(request, user, backend='Accounts_Module.backends.EmailOrUsernameBackend')
                 load_cart_from_db(request)
                 messages.success(request, _('ثبت‌نام با موفقیت انجام شد. به فروشگاه خوش آمدید.'))
                 return redirect('index')
