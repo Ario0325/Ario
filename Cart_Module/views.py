@@ -1,9 +1,10 @@
 """
-ویوهای سبد خرید - سشن‌بیس، افزودن/حذف/به‌روزرسانی، فاکتور
+ویوهای سبد خرید - سشن‌بیس، افزودن/حذف/به‌روزرسانی، فاکتور، کد تخفیف
 """
 from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.cache import never_cache
 from django.urls import reverse
@@ -11,7 +12,17 @@ from django.utils import timezone
 
 from Products_Module.models import Product
 from .models import Order, OrderItem
-from .services import sync_cart_to_db, load_cart_from_db, CART_SESSION_KEY
+from .services import (
+    sync_cart_to_db,
+    load_cart_from_db,
+    CART_SESSION_KEY,
+    DISCOUNT_SESSION_KEY,
+    get_active_discount_code,
+    validate_discount_code,
+    apply_discount_to_session,
+    remove_discount_from_session,
+    calculate_cart_with_discount,
+)
 
 
 def _get_cart(request):
@@ -59,12 +70,20 @@ def cart_detail(request):
 
     # هزینه ارسال ساده: رایگان یا ثابت (می‌توان بعداً از تنظیمات خواند)
     shipping_cost = Decimal('0')
-    total_payable = cart_total + shipping_cost
+
+    # کد تخفیف فعال
+    discount_code = get_active_discount_code(request)
+    discount_info = calculate_cart_with_discount(items, discount_code)
+
+    total_payable = discount_info['total_payable'] + shipping_cost
 
     context = {
         'cart_items': items,
-        'cart_total': cart_total,
+        'cart_total': discount_info['subtotal'],
         'shipping_cost': shipping_cost,
+        'discount_code': discount_code,
+        'discount_amount': discount_info['discount_amount'],
+        'discounted_product_id': discount_info['discounted_product_id'],
         'total_payable': total_payable,
     }
     return render(request, 'cart/cart.html', context)
@@ -173,13 +192,74 @@ def cart_context(request):
     }
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ویوهای کد تخفیف
+# ─────────────────────────────────────────────────────────────────────────────
+
+@require_POST
+def discount_apply(request):
+    """اعمال کد تخفیف روی سبد خرید"""
+    if not request.user.is_authenticated:
+        messages.info(request, 'برای استفاده از کد تخفیف ابتدا وارد شوید.')
+        return redirect(reverse('accounts:login_register') + '?next=' + reverse('cart:detail'))
+
+    code_str = request.POST.get('code', '').strip()
+    if not code_str:
+        messages.error(request, 'لطفاً یک کد تخفیف وارد کنید.')
+        return redirect('cart:detail')
+
+    items, _ = _cart_item_list(request)
+    if not items:
+        messages.warning(request, 'سبد خرید شما خالی است.')
+        return redirect('cart:empty')
+
+    discount_code, error = validate_discount_code(code_str, items, request.user, request)
+
+    if error:
+        messages.error(request, error)
+        return redirect('cart:detail')
+
+    apply_discount_to_session(request, discount_code.code)
+    discount_info = calculate_cart_with_discount(items, discount_code)
+    discount_amount = discount_info['discount_amount']
+
+    if discount_code.scope == 'product' and discount_code.product:
+        messages.success(
+            request,
+            f'کد تخفیف «{discount_code.code}» اعمال شد. '
+            f'{discount_amount:,.0f} تومان تخفیف برای «{discount_code.product.name}» دریافت کردید.'
+        )
+    else:
+        messages.success(
+            request,
+            f'کد تخفیف «{discount_code.code}» اعمال شد. '
+            f'{discount_amount:,.0f} تومان تخفیف دریافت کردید.'
+        )
+
+    return redirect('cart:detail')
+
+
+@require_POST
+def discount_remove(request):
+    """حذف کد تخفیف از سبد خرید"""
+    remove_discount_from_session(request)
+    messages.info(request, 'کد تخفیف حذف شد.')
+    return redirect('cart:detail')
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ویوهای سفارش و پرداخت
+# ─────────────────────────────────────────────────────────────────────────────
+
+@login_required
 def checkout_view(request):
     """ثبت سفارش از سبد و هدایت به صفحه پرداخت (ساده - بدون درگاه)"""
-    from django.contrib.auth.decorators import login_required
+    from django.urls import reverse
     if not request.user.is_authenticated:
         from django.urls import reverse
         messages.info(request, 'برای ثبت سفارش وارد حساب کاربری شوید.')
         return redirect(reverse('accounts:login_register') + '?next=' + reverse('cart:checkout'))
+
     items, cart_total = _cart_item_list(request)
     if not items:
         messages.warning(request, 'سبد خرید شما خالی است.')
@@ -209,6 +289,25 @@ def checkout_view(request):
         messages.info(request, 'لطفاً در داشبورد نام، تلفن و آدرس را تکمیل کنید سپس به پرداخت برگردید.')
         return redirect('accounts:dashboard')
 
+    # ── اعتبارسنجی مجدد کد تخفیف در زمان checkout ────────────────────────────
+    discount_code_obj = None
+    discount_amount = Decimal('0')
+    subtotal = sum(item['total'] for item in items)
+
+    code_str = request.session.get(DISCOUNT_SESSION_KEY)
+    if code_str:
+        validated_code, error = validate_discount_code(code_str, items, request.user, request)
+        if validated_code:
+            discount_code_obj = validated_code
+            discount_info = calculate_cart_with_discount(items, validated_code)
+            discount_amount = discount_info['discount_amount']
+        else:
+            # کد دیگر معتبر نیست - از سشن پاک کن و به کاربر اطلاع بده
+            remove_discount_from_session(request)
+            messages.warning(request, f'کد تخفیف «{code_str}» دیگر معتبر نیست و از سبد حذف شد.')
+
+    final_total = max(subtotal - discount_amount, Decimal('0'))
+
     order = Order(
         user=request.user if request.user.is_authenticated else None,
         full_name=full_name,
@@ -217,7 +316,10 @@ def checkout_view(request):
         address=address,
         postal_code=postal_code,
         city=city,
-        total=cart_total,
+        subtotal=subtotal,
+        discount_code=discount_code_obj,
+        discount_amount=discount_amount,
+        total=final_total,
         shipping_cost=Decimal('0'),
         tax=Decimal('0'),
         status='pending',
@@ -234,8 +336,15 @@ def checkout_view(request):
             total=item['total'],
         )
 
-    # خالی کردن سبد
+    # افزایش شمارنده استفاده از کد تخفیف
+    if discount_code_obj:
+        from django.db.models import F
+        from .models import DiscountCode
+        DiscountCode.objects.filter(pk=discount_code_obj.pk).update(used_count=F('used_count') + 1)
+
+    # خالی کردن سبد و کد تخفیف
     request.session[CART_SESSION_KEY] = {}
+    remove_discount_from_session(request)
     request.session.modified = True
     sync_cart_to_db(request)
 
@@ -246,8 +355,14 @@ def checkout_view(request):
 @never_cache
 def payment_view(request, order_id):
     """نمایش صفحه پرداخت (شبیه‌سازی درگاه پرداخت)."""
+    # Require login to view payment page
+    if not request.user.is_authenticated:
+        from django.urls import reverse
+        return redirect(reverse('accounts:login_register') + '?next=' + reverse('cart:payment', args=[order_id]))
+    
     order = get_object_or_404(Order, pk=order_id)
-    if request.user.is_authenticated and order.user_id and order.user_id != request.user.id:
+    # SECURE: Properly verify ownership - user can only see their own payment page
+    if order.user_id != request.user.id:
         from django.http import HttpResponseForbidden
         return HttpResponseForbidden('دسترسی مجاز نیست.')
 
@@ -266,7 +381,7 @@ def payment_view(request, order_id):
                     else:
                         messages.error(request, f'موجودی کافی از «{product.name}» وجود ندارد.')
                         return redirect('cart:payment', order_id=order.id)
-                
+
                 order.status = 'paid'
                 order.save(update_fields=['status', 'updated_at'])
                 messages.success(request, 'پرداخت با موفقیت انجام شد. فاکتور شما آماده است.')
@@ -279,9 +394,16 @@ def payment_view(request, order_id):
 
 
 def invoice_view(request, order_id):
-    """نمایش فاکتور سفارش (فقط سفارش خود کاربر یا همه در حالت توسعه)"""
+    """نمایش فاکتور سفارش (فقط سفارش خود کاربر)"""
+    # Require login to view invoice
+    if not request.user.is_authenticated:
+        from django.contrib.auth.decorators import login_required
+        from django.urls import reverse
+        return redirect(reverse('accounts:login_register') + '?next=' + reverse('cart:invoice', args=[order_id]))
+    
     order = get_object_or_404(Order, pk=order_id)
-    if request.user.is_authenticated and order.user_id and order.user_id != request.user.id:
+    # SECURE: Properly verify ownership - user can only see their own orders
+    if order.user_id != request.user.id:
         from django.http import HttpResponseForbidden
         return HttpResponseForbidden('دسترسی مجاز نیست.')
     return render(request, 'cart/invoice.html', {'order': order})

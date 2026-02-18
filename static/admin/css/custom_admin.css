@@ -1,229 +1,1031 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   آریو شاپ — پنل مدیریت سفارشی
+   Modern Dark Admin Theme — v4.0 (Royal Purple Edition)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── متغیرهای رنگ ─────────────────────────────────────────────────────────── */
 :root {
-    --admin-primary: #7c5cff;
-    --admin-primary-dark: #5b3ee6;
-    --admin-accent: #22d3ee;
-    --admin-bg: #0b1020;
-    --admin-surface: #111827;
-    --admin-surface-2: #151e2f;
-    --admin-card: #0f172a;
-    --admin-text: #e5e7eb;
-    --admin-muted: #94a3b8;
-    --admin-border: #1f2937;
-    --admin-shadow: 0 18px 40px rgba(2, 6, 23, 0.65);
-    --admin-radius: 18px;
+    /* رنگ‌های اصلی بنفش سلطنتی */
+    --ap-primary:       #8b5cf6;
+    --ap-primary-dark:  #7c3aed;
+    --ap-primary-light: #a78bfa;
+    --ap-primary-glow:  rgba(139, 92, 246, 0.25);
+    
+    --ap-accent:        #c4b5fd;
+    --ap-accent-glow:   rgba(196, 181, 253, 0.2);
+    --ap-accent-light:  #ede9fe;
+    
+    /* رنگ‌های مکمل */
+    --ap-success:       #10b981;
+    --ap-warning:       #f59e0b;
+    --ap-danger:        #ef4444;
+    --ap-info:          #06b6d4;
+    
+    /* رنگ‌های پس‌زمینه تیره */
+    --ap-bg:            #0f0f14;
+    --ap-surface:       #18181f;
+    --ap-surface-2:     #1f1f2a;
+    --ap-card:          #1a1a24;
+    --ap-card-hover:    #24242f;
+    --ap-border:        rgba(255, 255, 255, 0.06);
+    --ap-border-focus:  rgba(139, 92, 246, 0.5);
+    
+    /* متن */
+    --ap-text:          #f1f5f9;
+    --ap-text-muted:    #94a3b8;
+    --ap-text-dim:      #64748b;
+    
+    /* سایه و شعاع */
+    --ap-shadow-sm:     0 4px 12px rgba(0, 0, 0, 0.5);
+    --ap-shadow-md:     0 8px 24px rgba(0, 0, 0, 0.6);
+    --ap-shadow-lg:     0 16px 48px rgba(0, 0, 0, 0.7);
+    --ap-shadow-glow:   0 0 30px rgba(139, 92, 246, 0.15);
+    
+    --ap-radius-sm:     8px;
+    --ap-radius-md:     12px;
+    --ap-radius-lg:     16px;
+    --ap-radius-xl:     24px;
+    
+    --ap-transition:    all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── فونت وزیر ─────────────────────────────────────────────────────────────── */
+@font-face {
+    font-family: 'Vazir';
+    src: url('../assets/fonts/vazir-font-v16.1.0/Vazir.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazir';
+    src: url('../assets/fonts/vazir-font-v16.1.0/Vazir-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazir';
+    src: url('../assets/fonts/vazir-font-v16.1.0/Vazir-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ── ریست پایه ────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    direction: rtl;
 }
 
 body {
-    background: radial-gradient(circle at top, rgba(124, 92, 255, 0.12), transparent 55%),
-        var(--admin-bg) !important;
-    color: var(--admin-text);
+    background: var(--ap-bg) !important;
+    color: var(--ap-text) !important;
+    font-family: 'Vazir', 'Segoe UI', Tahoma, sans-serif !important;
+    line-height: 1.6 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
 }
 
+/* بهبودهای مدرن - انیمیشن‌های نرم‌تر */
+*:hover {
+    transition: all 0.2s ease-out !important;
+}
+
+* {
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--ap-primary-dark) var(--ap-surface) !important;
+}
+
+/* ── هدر ──────────────────────────────────────────────────────────────────── */
 #header {
-    background: linear-gradient(120deg, #1f2a44, #1c1b3a 55%, #2a1f5c) !important;
-    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.8);
-    border-bottom: 1px solid rgba(124, 92, 255, 0.2) !important;
+    background: linear-gradient(135deg, #1a1028 0%, #0f0a1a 50%, #1a1025 100%) !important;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.7), var(--ap-shadow-glow), 0 0 0 1px rgba(139, 92, 246, 0.1) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.15) !important;
+    padding: 0 20px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
 }
 
 #header a:link,
 #header a:visited,
-#branding h1 {
-    color: #f8fafc !important;
+#branding h1,
+#branding h1 a:link,
+#branding h1 a:visited {
+    color: #f0f6fc !important;
+    text-decoration: none !important;
 }
 
+/* ── برندینگ ──────────────────────────────────────────────────────────────── */
 .admin-brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.3px !important;
+    margin: 0 !important;
+    padding: 14px 0 !important;
+}
+
+.admin-brand a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    color: #f0f6fc !important;
+    text-decoration: none !important;
+}
+
+.admin-brand__logo {
+    font-size: 22px !important;
+    line-height: 1 !important;
 }
 
 .admin-brand__badge {
-    font-size: 12px;
-    background: rgba(124, 92, 255, 0.2);
-    color: #e0e7ff;
-    padding: 4px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(124, 92, 255, 0.35);
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(196, 181, 253, 0.2)) !important;
+    color: var(--ap-accent-light) !important;
+    padding: 3px 10px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    letter-spacing: 0.3px !important;
+}
+
+/* ── ناوبری هدر ───────────────────────────────────────────────────────────── */
+#user-tools {
+    color: var(--ap-text-muted) !important;
+    font-size: 13px !important;
+}
+
+#user-tools a {
+    color: var(--ap-accent) !important;
+    border-radius: var(--ap-radius-sm) !important;
+    padding: 4px 8px !important;
+    transition: var(--ap-transition) !important;
+}
+
+#user-tools a:hover {
+    background: var(--ap-accent-glow) !important;
+    color: #fff !important;
+    transform: translateX(-2px) !important;
+}
+
+#user-tools a:focus {
+    outline: 2px solid var(--ap-primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* ── breadcrumbs ──────────────────────────────────────────────────────────── */
+.breadcrumbs {
+    background: var(--ap-surface) !important;
+    color: var(--ap-text-muted) !important;
+    padding: 10px 20px !important;
+    border-bottom: 1px solid var(--ap-border) !important;
+    font-size: 13px !important;
+}
+
+.breadcrumbs a {
+    color: var(--ap-accent) !important;
+    text-decoration: none !important;
+    transition: var(--ap-transition) !important;
+}
+
+.breadcrumbs a:hover {
+    color: #fff !important;
+    text-shadow: 0 0 8px var(--ap-primary-glow) !important;
+}
+
+.breadcrumbs a:focus {
+    outline: 2px solid var(--ap-primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* ── محتوای اصلی ──────────────────────────────────────────────────────────── */
+#content {
+    padding: 28px 32px 48px !important;
+    background: transparent !important;
+}
+
+#content h1 {
+    color: var(--ap-text) !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    margin-bottom: 20px !important;
+}
+
+/* ── ماژول‌ها (کارت‌ها) ───────────────────────────────────────────────────── */
+.module {
+    background: var(--ap-card) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-lg) !important;
+    box-shadow: var(--ap-shadow-md) !important;
+    overflow: hidden !important;
+    margin-bottom: 24px !important;
+    transition: var(--ap-transition) !important;
+}
+
+.module:hover {
+    border-color: rgba(139, 92, 246, 0.2) !important;
+    box-shadow: var(--ap-shadow-lg), var(--ap-shadow-glow) !important;
 }
 
 .module h2,
 .module caption,
-.inline-group h2,
-#content h1 {
+.inline-group h2 {
+    background: linear-gradient(135deg, var(--ap-surface-2), var(--ap-card)) !important;
+    color: var(--ap-text) !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    padding: 14px 18px !important;
+    border-bottom: 1px solid var(--ap-border) !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* ── جدول لیست ───────────────────────────────────────────────────────────── */
+#changelist {
     background: transparent !important;
-    color: var(--admin-text) !important;
-    font-weight: 700;
-}
-
-#content {
-    padding: 26px 30px 40px;
-}
-
-.module {
-    border-radius: var(--admin-radius);
-    border: 1px solid var(--admin-border);
-    box-shadow: var(--admin-shadow);
-    overflow: hidden;
-    background: var(--admin-card);
-}
-
-.dashboard .module {
-    margin-bottom: 24px;
-}
-
-.module table {
-    border-radius: var(--admin-radius);
-}
-
-.object-tools a,
-.button,
-input[type="submit"],
-input[type="button"],
-.submit-row input {
-    border-radius: 999px !important;
-    background: linear-gradient(135deg, var(--admin-primary), var(--admin-accent)) !important;
-    border-color: transparent !important;
-    color: #0b1020 !important;
-    padding: 10px 18px !important;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.object-tools a:hover,
-.button:hover,
-input[type="submit"]:hover,
-input[type="button"]:hover,
-.submit-row input:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 18px rgba(124, 92, 255, 0.25);
-}
-
-.breadcrumbs {
-    background: transparent !important;
-    color: var(--admin-muted) !important;
-    padding: 12px 20px;
-}
-
-.breadcrumbs a {
-    color: var(--admin-accent) !important;
 }
 
 #changelist-filter {
-    border-radius: var(--admin-radius);
-    background: var(--admin-surface);
-    border: 1px solid var(--admin-border);
-    box-shadow: var(--admin-shadow);
-    color: var(--admin-text);
+    background: var(--ap-card) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-lg) !important;
+    box-shadow: var(--ap-shadow-sm) !important;
+    padding: 0 !important;
+    overflow: hidden !important;
 }
 
-#changelist table thead th {
-    background: var(--admin-surface-2) !important;
-    color: var(--admin-text) !important;
-    border-bottom: 1px solid var(--admin-border);
+#changelist-filter h2 {
+    background: var(--ap-surface-2) !important;
+    color: var(--ap-text) !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid var(--ap-border) !important;
+    margin: 0 !important;
 }
 
-#changelist table tbody tr {
-    background: transparent;
+#changelist-filter h3 {
+    color: var(--ap-text-muted) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 10px 16px 4px !important;
+    margin: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
 }
 
-#changelist table tbody tr:hover {
-    background: rgba(124, 92, 255, 0.08);
+#changelist-filter ul {
+    padding: 4px 8px 12px !important;
+    margin: 0 !important;
+    list-style: none !important;
 }
 
-form .form-row {
-    background: var(--admin-card);
-    border-radius: var(--admin-radius);
-    border: 1px solid var(--admin-border);
-    padding: 16px 18px;
-    margin-bottom: 14px;
-    box-shadow: var(--admin-shadow);
+#changelist-filter li {
+    padding: 2px 0 !important;
 }
 
-form .form-row fieldset {
-    border: none;
+#changelist-filter a {
+    color: var(--ap-text-muted) !important;
+    font-size: 13px !important;
+    padding: 5px 8px !important;
+    border-radius: var(--ap-radius-sm) !important;
+    display: block !important;
+    transition: var(--ap-transition) !important;
+    text-decoration: none !important;
 }
 
-form input[type="text"],
-form input[type="password"],
-form input[type="email"],
-form input[type="number"],
-form input[type="url"],
-form input[type="search"],
-form select,
-form textarea {
-    border-radius: 12px !important;
-    border: 1px solid var(--admin-border) !important;
-    padding: 10px 12px !important;
-    background: #0b1222 !important;
-    color: var(--admin-text) !important;
+#changelist-filter a:hover,
+#changelist-filter li.selected a {
+    background: var(--ap-primary-glow) !important;
+    color: var(--ap-accent-light) !important;
 }
 
-.submit-row {
+/* جدول لیست */
+#result_list {
+    border-radius: var(--ap-radius-md) !important;
+    overflow: hidden !important;
+    border: 1px solid var(--ap-border) !important;
+    background: var(--ap-card) !important;
+}
+
+#result_list thead th {
+    background: var(--ap-surface-2) !important;
+    color: var(--ap-text-muted) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 12px 14px !important;
+    border-bottom: 1px solid var(--ap-border) !important;
+    white-space: nowrap !important;
+}
+
+#result_list thead th a {
+    color: var(--ap-text-muted) !important;
+    text-decoration: none !important;
+}
+
+#result_list thead th a:hover {
+    color: var(--ap-text) !important;
+}
+
+#result_list tbody tr {
     background: transparent !important;
+    border-bottom: 1px solid var(--ap-border) !important;
+    transition: var(--ap-transition) !important;
+}
+
+#result_list tbody tr:last-child {
+    border-bottom: none !important;
+}
+
+#result_list tbody tr:hover {
+    background: var(--ap-card-hover) !important;
+    transform: scale(1.005) !important;
+}
+
+#result_list tbody tr:focus-within {
+    background: var(--ap-card-hover) !important;
+}
+
+#result_list tbody td,
+#result_list tbody th {
+    color: var(--ap-text) !important;
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+    vertical-align: middle !important;
     border: none !important;
 }
 
-#content-main .module table td,
-#content-main .module table th {
-    border-color: var(--admin-border) !important;
+#result_list tbody td a {
+    color: var(--ap-accent) !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    transition: var(--ap-transition) !important;
 }
 
-#content-main a,
-.module a {
-    color: #c4b5fd;
+#result_list tbody td a:hover {
+    color: #fff !important;
+    text-shadow: 0 0 8px var(--ap-primary-glow) !important;
 }
 
+#result_list tbody td a:focus {
+    outline: 2px solid var(--ap-primary) !important;
+    outline-offset: 2px !important;
+    border-radius: 2px !important;
+}
+
+/* ── فرم‌های ویرایش ───────────────────────────────────────────────────────── */
+.change-form .form-row,
+.change-form fieldset .form-row {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 16px 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.change-form .form-row > * {
+    max-width: 100% !important;
+}
+
+.change-form fieldset {
+    background: var(--ap-card) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-lg) !important;
+    padding: 20px 24px !important;
+    margin-bottom: 20px !important;
+    box-shadow: var(--ap-shadow-sm) !important;
+    transition: var(--ap-transition) !important;
+}
+
+.change-form fieldset:hover {
+    border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+.change-form fieldset h2 {
+    background: transparent !important;
+    color: var(--ap-primary) !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    padding: 0 0 12px 0 !important;
+    margin: 0 0 16px 0 !important;
+    border-bottom: 1px solid var(--ap-border) !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.change-form fieldset h2::before {
+    content: '' !important;
+    display: inline-block !important;
+    width: 4px !important;
+    height: 18px !important;
+    background: linear-gradient(180deg, var(--ap-primary), var(--ap-accent)) !important;
+    border-radius: 2px !important;
+    flex-shrink: 0 !important;
+}
+
+/* توضیحات fieldset */
+.change-form fieldset .description {
+    color: var(--ap-text-muted) !important;
+    font-size: 12.5px !important;
+    background: rgba(139, 92, 246, 0.06) !important;
+    border: 1px solid rgba(139, 92, 246, 0.12) !important;
+    border-radius: var(--ap-radius-sm) !important;
+    padding: 10px 14px !important;
+    margin-bottom: 16px !important;
+    line-height: 1.7 !important;
+}
+
+/* لیبل‌ها */
+.change-form label,
+.change-form .form-row label {
+    color: var(--ap-text) !important;
+    font-weight: 600 !important;
+    font-size: 13.5px !important;
+    display: block !important;
+    margin-bottom: 8px !important;
+}
+
+/* help_text */
+.help,
+.form-row .help {
+    color: var(--ap-text-muted) !important;
+    font-size: 12px !important;
+    margin-top: 5px !important;
+    line-height: 1.6 !important;
+    display: block !important;
+}
+
+/* ── فیلدهای ورودی ────────────────────────────────────────────────────────── */
+.change-form input[type="text"],
+.change-form input[type="password"],
+.change-form input[type="email"],
+.change-form input[type="number"],
+.change-form input[type="url"],
+.change-form input[type="search"],
+.change-form input[type="date"],
+.change-form input[type="datetime-local"],
+.change-form select,
+.change-form textarea,
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+input[type="search"],
+input[type="date"],
+input[type="datetime-local"],
+select,
+textarea {
+    background: var(--ap-surface) !important;
+    color: var(--ap-text) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-sm) !important;
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+    width: 100% !important;
+    transition: var(--ap-transition) !important;
+    outline: none !important;
+    line-height: 1.5 !important;
+    min-height: 44px !important;
+}
+
+.change-form input[type="text"]:focus,
+.change-form input[type="password"]:focus,
+.change-form input[type="email"]:focus,
+.change-form input[type="number"]:focus,
+.change-form input[type="url"]:focus,
+.change-form input[type="search"]:focus,
+.change-form input[type="date"]:focus,
+.change-form input[type="datetime-local"]:focus,
+.change-form select:focus,
+.change-form textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--ap-border-focus) !important;
+    box-shadow: 0 0 0 3px var(--ap-primary-glow) !important;
+    background: var(--ap-surface-2) !important;
+}
+
+/* گزینه‌های select */
+select option {
+    background: var(--ap-surface) !important;
+    color: var(--ap-text) !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+}
+
+/* بهبود نمایش select - فلش و ارتفاع */
+select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: left 14px center !important;
+    padding-left: 36px !important;
+    cursor: pointer !important;
+}
+
+/* placeholder */
+input::placeholder,
+textarea::placeholder {
+    color: var(--ap-text-dim) !important;
+}
+
+/* checkbox و radio */
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: var(--ap-primary) !important;
+    width: 16px !important;
+    height: 16px !important;
+    cursor: pointer !important;
+}
+
+/* فیلدهای readonly */
+.readonly,
+.form-row .readonly {
+    color: var(--ap-text-muted) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-sm) !important;
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+    display: block !important;
+    line-height: 1.5 !important;
+    min-height: 44px !important;
+}
+
+/* ── دکمه‌ها ──────────────────────────────────────────────────────────────── */
+.object-tools a,
+.object-tools a:link,
+.object-tools a:visited {
+    background: linear-gradient(135deg, var(--ap-primary), var(--ap-primary-dark)) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 999px !important;
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: var(--ap-transition) !important;
+    box-shadow: 0 4px 12px var(--ap-primary-glow) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.object-tools a:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 20px var(--ap-primary-glow) !important;
+    background: linear-gradient(135deg, #8b6dff, var(--ap-primary)) !important;
+}
+
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+.submit-row button {
+    background: linear-gradient(135deg, var(--ap-primary), var(--ap-primary-dark)) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 999px !important;
+    padding: 10px 22px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: var(--ap-transition) !important;
+    box-shadow: 0 4px 12px var(--ap-primary-glow) !important;
+    letter-spacing: 0.2px !important;
+}
+
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.submit-row input:hover,
+.submit-row button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 20px var(--ap-primary-glow) !important;
+}
+
+/* دکمه حذف */
+.deletelink,
+.submit-row a.deletelink {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    padding: 10px 22px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: var(--ap-transition) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+}
+
+.deletelink:hover,
+.submit-row a.deletelink:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* ردیف submit */
+.submit-row {
+    background: var(--ap-surface) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-lg) !important;
+    padding: 16px 20px !important;
+    margin-top: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+}
+
+/* ── جستجو ────────────────────────────────────────────────────────────────── */
+#toolbar {
+    background: var(--ap-surface) !important;
+    border-bottom: 1px solid var(--ap-border) !important;
+    padding: 12px 20px !important;
+}
+
+#searchbar {
+    background: var(--ap-surface-2) !important;
+    color: var(--ap-text) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-sm) !important;
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+    width: 280px !important;
+    transition: var(--ap-transition) !important;
+}
+
+#searchbar:focus {
+    border-color: var(--ap-border-focus) !important;
+    box-shadow: 0 0 0 3px var(--ap-primary-glow) !important;
+    outline: none !important;
+}
+
+/* ── پیام‌ها ───────────────────────────────────────────────────────────────── */
+.messagelist {
+    padding: 0 !important;
+    margin: 0 0 20px 0 !important;
+    list-style: none !important;
+}
+
+.messagelist li {
+    padding: 12px 18px !important;
+    border-radius: var(--ap-radius-md) !important;
+    margin-bottom: 10px !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    animation: slideInDown 0.3s ease !important;
+}
+
+.messagelist li.success {
+    background: rgba(52, 211, 153, 0.12) !important;
+    border: 1px solid rgba(52, 211, 153, 0.25) !important;
+    color: #6ee7b7 !important;
+}
+
+.messagelist li.warning {
+    background: rgba(251, 191, 36, 0.12) !important;
+    border: 1px solid rgba(251, 191, 36, 0.25) !important;
+    color: #fde68a !important;
+}
+
+.messagelist li.error {
+    background: rgba(248, 113, 113, 0.12) !important;
+    border: 1px solid rgba(248, 113, 113, 0.25) !important;
+    color: #fca5a5 !important;
+}
+
+/* ── inline ───────────────────────────────────────────────────────────────── */
+.inline-group {
+    background: var(--ap-card) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-lg) !important;
+    overflow: hidden !important;
+    margin-bottom: 20px !important;
+}
+
+.inline-group .tabular {
+    background: transparent !important;
+}
+
+.inline-group table {
+    background: transparent !important;
+}
+
+.inline-group table thead th {
+    background: var(--ap-surface-2) !important;
+    color: var(--ap-text-muted) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 10px 12px !important;
+    border-bottom: 1px solid var(--ap-border) !important;
+}
+
+.inline-group table tbody tr {
+    border-bottom: 1px solid var(--ap-border) !important;
+    transition: var(--ap-transition) !important;
+}
+
+.inline-group table tbody tr:hover {
+    background: var(--ap-card-hover) !important;
+}
+
+.inline-group table tbody td {
+    color: var(--ap-text) !important;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    vertical-align: middle !important;
+}
+
+/* ── صفحه داشبورد ─────────────────────────────────────────────────────────── */
+.dashboard .module {
+    margin-bottom: 24px !important;
+}
+
+.dashboard .module table td,
+.dashboard .module table th {
+    color: var(--ap-text) !important;
+    border-color: var(--ap-border) !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+}
+
+.dashboard .module table td a {
+    color: #c4b5fd !important;
+    text-decoration: none !important;
+    transition: var(--ap-transition) !important;
+}
+
+.dashboard .module table td a:hover {
+    color: #fff !important;
+}
+
+/* ── لینک‌های عمومی ───────────────────────────────────────────────────────── */
+a:link,
+a:visited {
+    color: #c4b5fd !important;
+    text-decoration: none !important;
+}
+
+a:hover {
+    color: #fff !important;
+}
+
+/* ── pagination ───────────────────────────────────────────────────────────── */
+.paginator {
+    color: var(--ap-text-muted) !important;
+    font-size: 13px !important;
+    padding: 12px 0 !important;
+}
+
+.paginator a {
+    color: var(--ap-accent) !important;
+    padding: 4px 10px !important;
+    border-radius: var(--ap-radius-sm) !important;
+    transition: var(--ap-transition) !important;
+}
+
+.paginator a:hover {
+    background: var(--ap-accent-glow) !important;
+    color: #fff !important;
+}
+
+.paginator .this-page {
+    background: var(--ap-primary-glow) !important;
+    color: #c4b5fd !important;
+    padding: 4px 10px !important;
+    border-radius: var(--ap-radius-sm) !important;
+    font-weight: 700 !important;
+}
+
+/* ── آمار استفاده (usage_stats_display) ──────────────────────────────────── */
+.field-usage_stats_display .readonly {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+.field-usage_stats_display .readonly div {
+    background: linear-gradient(135deg, rgba(124, 92, 255, 0.08), rgba(34, 211, 238, 0.05)) !important;
+    border: 1px solid rgba(124, 92, 255, 0.2) !important;
+    border-radius: var(--ap-radius-md) !important;
+    padding: 16px 20px !important;
+    color: var(--ap-text) !important;
+    line-height: 2.2 !important;
+    font-size: 13.5px !important;
+}
+
+.field-usage_stats_display .readonly div strong {
+    color: #c4b5fd !important;
+}
+
+/* ── badge‌های رنگی در list_display ──────────────────────────────────────── */
+#result_list span[style*="background:#e3f2fd"] {
+    background: rgba(34, 211, 238, 0.15) !important;
+    color: #67e8f9 !important;
+    border: 1px solid rgba(34, 211, 238, 0.25) !important;
+}
+
+#result_list span[style*="background:#e8f5e9"] {
+    background: rgba(52, 211, 153, 0.15) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(52, 211, 153, 0.25) !important;
+}
+
+#result_list span[style*="background:#fff3e0"] {
+    background: rgba(251, 191, 36, 0.15) !important;
+    color: #fde68a !important;
+    border: 1px solid rgba(251, 191, 36, 0.25) !important;
+}
+
+#result_list span[style*="background:#f3e5f5"] {
+    background: rgba(167, 139, 250, 0.15) !important;
+    color: #c4b5fd !important;
+    border: 1px solid rgba(167, 139, 250, 0.25) !important;
+}
+
+#result_list span[style*="background:#ffebee"] {
+    background: rgba(248, 113, 113, 0.15) !important;
+    color: #fca5a5 !important;
+    border: 1px solid rgba(248, 113, 113, 0.25) !important;
+}
+
+/* ── صفحه ورود ────────────────────────────────────────────────────────────── */
 .admin-auth-wrapper {
-    display: flex;
-    justify-content: center;
-    padding: 40px 16px;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: calc(100vh - 80px) !important;
+    padding: 40px 16px !important;
 }
 
 .admin-auth-card {
-    background: var(--admin-card);
-    border-radius: var(--admin-radius);
-    box-shadow: var(--admin-shadow);
-    padding: 30px 32px 24px;
-    width: min(460px, 100%);
-    border: 1px solid var(--admin-border);
+    background: var(--ap-card) !important;
+    border: 1px solid var(--ap-border) !important;
+    border-radius: var(--ap-radius-lg) !important;
+    box-shadow: var(--ap-shadow-lg) !important;
+    padding: 36px 40px 32px !important;
+    width: min(480px, 100%) !important;
+    animation: fadeInUp 0.4s ease !important;
 }
 
 .admin-auth-header {
-    text-align: center;
-    margin-bottom: 20px;
+    text-align: center !important;
+    margin-bottom: 28px !important;
 }
 
 .admin-auth-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 6px;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: var(--ap-text) !important;
+    margin-bottom: 8px !important;
 }
 
 .admin-auth-subtitle {
-    color: var(--admin-muted);
-    font-size: 14px;
+    color: var(--ap-text-muted) !important;
+    font-size: 14px !important;
 }
 
 #login-form .form-row {
-    background: transparent;
-    box-shadow: none;
-    border: none;
-    padding: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 16px !important;
 }
 
 #login-form input[type="text"],
 #login-form input[type="password"] {
-    background: var(--admin-surface) !important;
+    background: var(--ap-surface) !important;
+    border: 1px solid var(--ap-border) !important;
+    color: var(--ap-text) !important;
+}
+
+#login-form input[type="text"]:focus,
+#login-form input[type="password"]:focus {
+    border-color: var(--ap-border-focus) !important;
+    box-shadow: 0 0 0 3px var(--ap-primary-glow) !important;
+}
+
+/* ── انیمیشن‌های ورودی ────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 var(--ap-primary-glow); }
+    50%       { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* ── انیمیشن ورود ماژول‌ها ────────────────────────────────────────────────── */
+.module,
+.change-form fieldset,
+.inline-group {
+    animation: fadeInUp 0.35s ease both !important;
+}
+
+/* ── اسکرول‌بار سفارشی ────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--ap-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ap-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 92, 255, 0.4);
+}
+
+/* ── ریسپانسیو ────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    #content {
+        padding: 20px 20px 40px !important;
+    }
 }
 
 @media (max-width: 768px) {
     #content {
-        padding: 20px 16px 32px;
+        padding: 16px 14px 32px !important;
+    }
+
+    .change-form fieldset {
+        padding: 16px 16px !important;
     }
 
     .admin-auth-card {
-        padding: 24px;
+        padding: 28px 24px !important;
     }
+
+    .submit-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .submit-row input,
+    .submit-row button,
+    .submit-row a {
+        width: 100% !important;
+        text-align: center !important;
+    }
+}
+
+/* ── انتخاب متن ───────────────────────────────────────────────────────────── */
+::selection {
+    background: var(--ap-primary-glow);
+    color: #fff;
 }

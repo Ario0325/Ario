@@ -45,6 +45,8 @@ class LoginRegisterView(View):
                 remember_me = form.cleaned_data.get('remember_me', True)
                 if not remember_me:
                     request.session.set_expiry(0)
+                # CRITICAL: Regenerate session to prevent session fixation attacks
+                request.session.cycle_key()
                 login(request, user, backend='Accounts_Module.backends.EmailOrUsernameBackend')
                 load_cart_from_db(request)
                 messages.success(request, _('با موفقیت وارد شدید.'))
@@ -60,6 +62,8 @@ class LoginRegisterView(View):
             form = RegisterForm(request.POST)
             if form.is_valid():
                 user = form.save()
+                # CRITICAL: Regenerate session after registration
+                request.session.cycle_key()
                 login(request, user, backend='Accounts_Module.backends.EmailOrUsernameBackend')
                 load_cart_from_db(request)
                 messages.success(request, _('ثبت‌نام با موفقیت انجام شد. به فروشگاه خوش آمدید.'))

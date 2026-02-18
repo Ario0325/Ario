@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)!p5!29ica=qk%(3s=rp48^b=0s7qj@c$5$&dr!3m!lwt+39lg'
+# MUST be set via environment variable in production!
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-default-change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG=False in production environment
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS - configure for production
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -91,6 +98,14 @@ DATABASES = {
     }
 }
 
+# Cache configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -146,3 +161,41 @@ LOGOUT_REDIRECT_URL = '/'
 # برای بازیابی رمز عبور (در حالت توسعه ایمیل در کنسول چاپ می‌شود)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@arioshop.local'
+
+# =============================================================================
+# SECURITY SETTINGS - MANDATORY FOR PRODUCTION
+# =============================================================================
+
+# HTTPS/SSL Settings - Only enable in production!
+SECURE_SSL_REDIRECT = not DEBUG  # Redirect HTTP to HTTPS only in production
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # HSTS only in production
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_REDIRECT_EXEMPT = []
+
+# Cookie Security - Only secure in production
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True  # Always safe
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = True
+
+# X-Frame-Options - Clickjacking protection
+X_FRAME_OPTIONS = 'DENY'
+
+# X-Content-Type-Options - MIME sniffing protection
+SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
+
+# X-XSS-Protection (legacy but still recommended)
+SECURE_BROWSER_XSS_FILTER = not DEBUG
+
+# SSL/TLS Settings - Only in production
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if not DEBUG else None
+
+# Password Hashing - Use PBKDF2 (built-in, no external dependency needed)
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+]
+
+# =============================================================================

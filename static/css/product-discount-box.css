@@ -1,0 +1,544 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   product-discount-box.css - ویجت کد تخفیف صفحه جزئیات محصول
+   Fully Responsive Discount Code Widget for Product Detail Page
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── متغیرهای رنگ ──────────────────────────────────────────────────────────── */
+:root {
+    --pdb-primary:       #cc9966;        /* رنگ اصلی سایت */
+    --pdb-primary-light: #ddb088;        /* رنگ اصلی روشن */
+    --pdb-primary-dark:  #b3885a;        /* رنگ اصلی تیره */
+    --pdb-accent:        #d4a574;        /* اکسنت */
+    --pdb-accent-glow:   rgba(204, 153, 102, 0.3);
+    
+    --pdb-bg:            #faf8f6;        /* پس‌زمینه روشن */
+    --pdb-surface:       #ffffff;        /* سطح کارت */
+    --pdb-surface-light: #f5f3f0;        /* سطح روشن‌تر */
+    --pdb-border:        rgba(204, 153, 102, 0.2);
+    --pdb-border-active: rgba(204, 153, 102, 0.5);
+    
+    --pdb-text:          #333333;
+    --pdb-text-muted:    #777777;
+    --pdb-text-placeholder: #999999;
+    
+    --pdb-success:       #28a745;
+    --pdb-error:         #dc3545;
+    
+    --pdb-radius:        12px;
+    --pdb-radius-sm:     8px;
+    --pdb-radius-lg:     16px;
+    
+    --pdb-shadow:        0 4px 20px rgba(0, 0, 0, 0.08);
+    --pdb-shadow-hover:  0 8px 30px rgba(204, 153, 102, 0.15);
+    
+    --pdb-transition:    all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── کانتینر اصلی باکس کد تخفیف ───────────────────────────────────────────── */
+.product-discount-box {
+    background: linear-gradient(135deg, var(--pdb-surface) 0%, var(--pdb-bg) 100%) !important;
+    border: 1.5px solid var(--pdb-border) !important;
+    border-radius: var(--pdb-radius-lg) !important;
+    padding: 1.25rem 1.5rem !important;
+    margin: 1rem 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: var(--pdb-transition) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* افکت نوری پس‌زمینه */
+.product-discount-box::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -50% !important;
+    right: -50% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: radial-gradient(circle, var(--pdb-accent-glow) 0%, transparent 70%) !important;
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+    transition: var(--pdb-transition) !important;
+}
+
+.product-discount-box:hover {
+    border-color: var(--pdb-primary) !important;
+    box-shadow: var(--pdb-shadow-hover) !important;
+    transform: translateY(-2px);
+}
+
+.product-discount-box:hover::before {
+    opacity: 0.8 !important;
+}
+
+/* ── هدر ویجت ─────────────────────────────────────────────────────────────── */
+.discount-box-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.75rem !important;
+    margin-bottom: 1rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.discount-box-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: linear-gradient(135deg, var(--pdb-primary) 0%, var(--pdb-primary-dark) 100%) !important;
+    border-radius: var(--pdb-radius-sm) !important;
+    color: #fff !important;
+    font-size: 1.1rem !important;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4) !important;
+}
+
+.discount-box-title-group {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.discount-box-title {
+    margin: 0 !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: var(--pdb-text) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.discount-box-subtitle {
+    font-size: 0.8rem !important;
+    color: var(--pdb-text-muted) !important;
+    margin-top: 2px !important;
+}
+
+.discount-box-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    padding: 0.3rem 0.7rem !important;
+    background: linear-gradient(135deg, rgba(225, 29, 72, 0.2), rgba(244, 114, 182, 0.15)) !important;
+    border: 1px solid rgba(225, 29, 72, 0.3) !important;
+    border-radius: 20px !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    color: var(--pdb-accent) !important;
+    white-space: nowrap !important;
+}
+
+/* ── فرم ورود کد تخفیف ───────────────────────────────────────────────────── */
+.discount-box-form {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+}
+
+.discount-box-input-group {
+    display: flex !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 0 !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-radius: var(--pdb-radius) !important;
+    overflow: hidden !important;
+    border: 1.5px solid var(--pdb-border) !important;
+    transition: var(--pdb-transition) !important;
+}
+
+.discount-box-input-group:focus-within {
+    border-color: var(--pdb-primary) !important;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15) !important;
+}
+
+.discount-box-input {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    height: 48px !important;
+    border: none !important;
+    background: transparent !important;
+    color: var(--pdb-text) !important;
+    font-size: 0.95rem !important;
+    padding: 0 1rem !important;
+    outline: none !important;
+    text-align: right !important;
+    direction: rtl !important;
+    font-family: inherit !important;
+}
+
+.discount-box-input::placeholder {
+    color: var(--pdb-text-placeholder) !important;
+    font-size: 0.85rem !important;
+}
+
+.discount-box-input:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* دکمه اعمال کد */
+.discount-box-submit {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    height: 48px !important;
+    min-width: 100px !important;
+    padding: 0 1.25rem !important;
+    border: none !important;
+    border-radius: 0 var(--pdb-radius) var(--pdb-radius) 0 !important;
+    background: linear-gradient(135deg, var(--pdb-primary) 0%, var(--pdb-primary-dark) 100%) !important;
+    color: #fff !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: var(--pdb-transition) !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.discount-box-submit::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+    transition: left 0.5s ease !important;
+}
+
+.discount-box-submit:hover {
+    background: linear-gradient(135deg, var(--pdb-primary-light) 0%, var(--pdb-primary) 100%) !important;
+    box-shadow: 0 4px 15px rgba(225, 29, 72, 0.5) !important;
+    transform: translateX(2px);
+}
+
+.discount-box-submit:hover::before {
+    left: 100% !important;
+}
+
+.discount-box-submit:active {
+    transform: translateX(2px) scale(0.98);
+}
+
+.discount-box-submit-icon {
+    font-size: 0.85rem !important;
+}
+
+.discount-box-submit-text {
+    font-size: 0.85rem !important;
+}
+
+/* ── پیام‌های وضعیت ───────────────────────────────────────────────────────── */
+.discount-box-message {
+    margin-top: 0.75rem !important;
+    padding: 0.6rem 0.9rem !important;
+    border-radius: var(--pdb-radius-sm) !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    display: none !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    animation: pdbFadeIn 0.3s ease !important;
+}
+
+.discount-box-message.success {
+    display: flex !important;
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    color: var(--pdb-success) !important;
+}
+
+.discount-box-message.error {
+    display: flex !important;
+    background: rgba(239, 68, 68, 0.15) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    color: var(--pdb-error) !important;
+}
+
+.discount-box-message-icon {
+    font-size: 1rem !important;
+}
+
+/* ── کد فعال شده ─────────────────────────────────────────────────────────── */
+.discount-box-active {
+    display: none !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    padding: 1rem 1.25rem !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    border-radius: var(--pdb-radius) !important;
+    margin-top: 1rem !important;
+    animation: pdbSlideIn 0.4s ease !important;
+}
+
+.discount-box-active.show {
+    display: flex !important;
+}
+
+.discount-box-active-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    flex-wrap: wrap !important;
+}
+
+.discount-box-active-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    background: var(--pdb-success) !important;
+    border-radius: 50% !important;
+    color: #fff !important;
+    font-size: 0.9rem !important;
+}
+
+.discount-box-active-label {
+    font-size: 0.85rem !important;
+    color: var(--pdb-text-muted) !important;
+}
+
+.discount-box-active-code {
+    font-weight: 700 !important;
+    color: var(--pdb-success) !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.05em !important;
+    padding: 0.25rem 0.6rem !important;
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-radius: 6px !important;
+}
+
+.discount-box-active-amount {
+    font-size: 0.9rem !important;
+    color: var(--pdb-success) !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+}
+
+.discount-box-remove-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    padding: 0.5rem 1rem !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    border-radius: var(--pdb-radius-sm) !important;
+    background: transparent !important;
+    color: var(--pdb-error) !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: var(--pdb-transition) !important;
+    white-space: nowrap !important;
+}
+
+.discount-box-remove-btn:hover {
+    background: var(--pdb-error) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+}
+
+/* ── لودینگ اسپینر ───────────────────────────────────────────────────────── */
+.discount-box-loading {
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding: 0.5rem !important;
+    color: var(--pdb-text-muted) !important;
+    font-size: 0.8rem !important;
+}
+
+.discount-box-loading.show {
+    display: flex !important;
+}
+
+.discount-box-spinner {
+    width: 16px !important;
+    height: 16px !important;
+    border: 2px solid var(--pdb-border) !important;
+    border-top-color: var(--pdb-primary) !important;
+    border-radius: 50% !important;
+    animation: pdbSpin 0.8s linear infinite !important;
+}
+
+/* ── انیمیشن‌ها ───────────────────────────────────────────────────────────── */
+@keyframes pdbFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pdbSlideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pdbSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── ریسپانسیو: تبلت (768px - 1024px) ───────────────────────────────────── */
+@media (max-width: 1024px) {
+    .product-discount-box {
+        padding: 1rem 1.25rem !important;
+    }
+    
+    .discount-box-submit {
+        min-width: 85px !important;
+        padding: 0 1rem !important;
+    }
+    
+    .discount-box-submit-text {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* ── ریسپانسیو: موبایل بزرگ (480px - 767px) ──────────────────────────────── */
+@media (max-width: 767px) {
+    .product-discount-box {
+        padding: 1rem !important;
+        border-radius: var(--pdb-radius) !important;
+    }
+    
+    .discount-box-header {
+        flex-wrap: wrap !important;
+        gap: 0.6rem !important;
+    }
+    
+    .discount-box-icon {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 1rem !important;
+    }
+    
+    .discount-box-title {
+        font-size: 0.9rem !important;
+    }
+    
+    .discount-box-subtitle {
+        font-size: 0.75rem !important;
+    }
+    
+    .discount-box-badge {
+        font-size: 0.65rem !important;
+        padding: 0.2rem 0.5rem !important;
+    }
+    
+    .discount-box-input-group {
+        flex-direction: row !important;
+    }
+    
+    .discount-box-input {
+        height: 44px !important;
+        font-size: 0.9rem !important;
+        padding: 0 0.75rem !important;
+    }
+    
+    .discount-box-input::placeholder {
+        font-size: 0.8rem !important;
+    }
+    
+    .discount-box-submit {
+        height: 44px !important;
+        min-width: 75px !important;
+        padding: 0 0.75rem !important;
+    }
+    
+    .discount-box-submit-text {
+        display: none !important;
+    }
+    
+    .discount-box-active {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+    
+    .discount-box-active-info {
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+    
+    .discount-box-remove-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+/* ── ریسپانسیو: موبایل کوچک (زیر 480px) ─────────────────────────────────── */
+@media (max-width: 480px) {
+    .product-discount-box {
+        padding: 0.875rem !important;
+    }
+    
+    .discount-box-header {
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .discount-box-title-group {
+        flex: 1 !important;
+    }
+    
+    .discount-box-input {
+        height: 42px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .discount-box-submit {
+        height: 42px !important;
+        min-width: 60px !important;
+        padding: 0 0.6rem !important;
+    }
+    
+    .discount-box-submit-icon {
+        font-size: 0.9rem !important;
+    }
+    
+    .discount-box-message {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+    
+    .discount-box-active {
+        padding: 0.875rem 1rem !important;
+    }
+    
+    .discount-box-active-label {
+        font-size: 0.8rem !important;
+    }
+    
+    .discount-box-active-code {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ── دسکتاپ بزرگ (بالای 1440px) ─────────────────────────────────────────── */
+@media (min-width: 1440px) {
+    .product-discount-box {
+        padding: 1.5rem 2rem !important;
+    }
+    
+    .discount-box-input {
+        height: 52px !important;
+        font-size: 1rem !important;
+    }
+    
+    .discount-box-submit {
+        height: 52px !important;
+        min-width: 120px !important;
+        padding: 0 1.5rem !important;
+    }
+}

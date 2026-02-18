@@ -12,5 +12,7 @@ urlpatterns = [
     path('checkout/', views.checkout_view, name='checkout'),
     path('payment/<int:order_id>/', views.payment_view, name='payment'),
     path('invoice/<int:order_id>/', views.invoice_view, name='invoice'),
+    # کد تخفیف
+    path('discount/apply/', views.discount_apply, name='discount_apply'),
+    path('discount/remove/', views.discount_remove, name='discount_remove'),
 ]
-

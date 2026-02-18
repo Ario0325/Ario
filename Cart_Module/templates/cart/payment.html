@@ -53,6 +53,28 @@
         padding: 6px 14px;
         font-size: 0.9rem;
     }
+    /* کد تخفیف در صفحه پرداخت */
+    .payment-discount-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(31, 122, 69, 0.1);
+        color: #1f7a45;
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        margin-bottom: 8px;
+    }
+    .payment-discount-row {
+        color: #c62828;
+        font-weight: 600;
+    }
+    .summary-divider {
+        border-top: 1px solid rgba(0,0,0,0.08);
+        margin: 8px 0;
+    }
 </style>
 {% endblock %}
 
@@ -144,19 +166,44 @@
             <div class="col-lg-4">
                 <div class="payment-summary">
                     <h4 class="mb-3">خلاصه پرداخت</h4>
+
+                    {% if order.discount_code %}
+                    <div class="mb-3">
+                        <span class="payment-discount-chip" id="payment-discount-chip">
+                            🏷️ {{ order.discount_code.code }}
+                        </span>
+                    </div>
+                    {% endif %}
+
                     <ul class="list-unstyled mb-4">
+                        {% if order.subtotal and order.subtotal != order.total %}
                         <li class="d-flex justify-content-between mb-2">
                             <span>جمع سفارش</span>
-                            <span>{{ order.total|floatformat:0 }} تومان</span>
+                            <span>{{ order.subtotal|floatformat:0 }} تومان</span>
                         </li>
+                        {% endif %}
+
+                        {% if order.discount_amount and order.discount_amount > 0 %}
+                        <li class="d-flex justify-content-between mb-2 payment-discount-row" id="payment-discount-row">
+                            <span>
+                                تخفیف
+                                {% if order.discount_code %}({{ order.discount_code.code }}){% endif %}
+                            </span>
+                            <span>- {{ order.discount_amount|floatformat:0 }} تومان</span>
+                        </li>
+                        <li><div class="summary-divider"></div></li>
+                        {% endif %}
+
                         <li class="d-flex justify-content-between mb-2">
                             <span>هزینه ارسال</span>
                             <span>{{ order.shipping_cost|floatformat:0 }} تومان</span>
                         </li>
+                        {% if order.tax and order.tax > 0 %}
                         <li class="d-flex justify-content-between mb-2">
                             <span>مالیات</span>
                             <span>{{ order.tax|floatformat:0 }} تومان</span>
                         </li>
+                        {% endif %}
                         <li class="d-flex justify-content-between font-weight-bold">
                             <span>مبلغ قابل پرداخت</span>
                             <span>{{ order.total|floatformat:0 }} تومان</span>

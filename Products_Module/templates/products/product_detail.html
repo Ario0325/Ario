@@ -6,6 +6,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/modern-product-gallery.css' %}">
+<link rel="stylesheet" href="{% static 'css/product-discount-box.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -160,6 +161,48 @@
                                 <a href="#" class="btn-product btn-wishlist" title="لیست علاقه مندی"><span>افزودن به لیست علاقه مندی</span></a>
                                 <a href="#" class="btn-product btn-compare" title="مقایسه"><span>افزودن به لیست مقایسه</span></a>
                             </div>
+                        </div>
+
+                        {# ── باکس کد تخفیف در صفحه محصول ── #}
+                        <div class="product-discount-box" id="product-discount-box">
+                            <div class="discount-box-header">
+                                <div class="discount-box-icon">
+                                    <i class="icon-tag"></i>
+                                </div>
+                                <div class="discount-box-title-group">
+                                    <h3 class="discount-box-title">
+                                        <i class="icon-gift mr-2"></i>
+                                        کد تخفیف دارید؟
+                                    </h3>
+                                    <p class="discount-box-subtitle">تخفیف ویژه محصول را از دست ندهید</p>
+                                </div>
+                                <span class="discount-box-badge">
+                                    <i class="icon-star"></i>
+                                    تا 30% تخفیف
+                                </span>
+                            </div>
+                            
+                            <div class="discount-box-form">
+                                <div class="discount-box-input-group">
+                                    <input type="text" 
+                                           class="discount-box-input" 
+                                           placeholder="کد تخفیف را وارد کنید..." 
+                                           id="product-discount-input" 
+                                           autocomplete="off" 
+                                           autocapitalize="characters" 
+                                           maxlength="50">
+                                    <button type="button" class="discount-box-submit" id="product-discount-apply-btn">
+                                        <span class="discount-box-submit-icon"><i class="icon-check"></i></span>
+                                        <span class="discount-box-submit-text">اعمال</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {# فرم مخفی برای ارسال کد تخفیف #}
+                            <form action="{% url 'cart:discount_apply' %}" method="post" id="product-discount-form" style="display:none;">
+                                {% csrf_token %}
+                                <input type="hidden" name="code" id="product-discount-code-input">
+                            </form>
                         </div>
 
                         <div class="product-details-footer">
@@ -447,4 +490,5 @@
     });
 })();
 </script>
+<script src="{% static 'js/product-discount-box.js' %}"></script>
 {% endblock %}

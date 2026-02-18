@@ -48,6 +48,9 @@
                                         <ul>
                                             <li>تاریخ فاکتور : <span>{{ order.created_at|date:"Y/m/d" }}</span></li>
                                             <li>شماره فاکتور : <span>{{ order.order_number }}</span></li>
+                                            {% if order.discount_code %}
+                                            <li>کد تخفیف : <span style="color:#1f7a45;font-weight:700;">{{ order.discount_code.code }}</span></li>
+                                            {% endif %}
                                         </ul>
                                     </div>
                                 </div>
@@ -78,11 +81,36 @@
                                     {% endfor %}
                                 </tbody>
                                 <tfoot>
+                                    {% if order.subtotal and order.subtotal > 0 %}
+                                    <tr>
+                                        <td colspan="2"></td>
+                                        <td colspan="2">جمع فاکتور</td>
+                                        <td>{{ order.subtotal|floatformat:0 }} تومان</td>
+                                    </tr>
+                                    {% else %}
                                     <tr>
                                         <td colspan="2"></td>
                                         <td colspan="2">جمع فاکتور</td>
                                         <td>{{ order.total|floatformat:0 }} تومان</td>
                                     </tr>
+                                    {% endif %}
+
+                                    {% if order.discount_code %}
+                                    <tr id="invoice-discount-code-row" style="color:#1f7a45;">
+                                        <td colspan="2"></td>
+                                        <td colspan="2">کد تخفیف ({{ order.discount_code.code }})</td>
+                                        <td>—</td>
+                                    </tr>
+                                    {% endif %}
+
+                                    {% if order.discount_amount and order.discount_amount > 0 %}
+                                    <tr id="invoice-discount-row" style="color:#c62828;">
+                                        <td colspan="2"></td>
+                                        <td colspan="2">تخفیف</td>
+                                        <td>- {{ order.discount_amount|floatformat:0 }} تومان</td>
+                                    </tr>
+                                    {% endif %}
+
                                     {% if order.shipping_cost and order.shipping_cost > 0 %}
                                     <tr>
                                         <td colspan="2"></td>
@@ -97,7 +125,7 @@
                                         <td>{{ order.tax|floatformat:0 }} تومان</td>
                                     </tr>
                                     {% endif %}
-                                    <tr>
+                                    <tr style="font-weight:700;">
                                         <td colspan="2"></td>
                                         <td colspan="2">مبلغ نهایی</td>
                                         <td>{{ order.total|floatformat:0 }} تومان</td>

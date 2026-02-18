@@ -4,6 +4,10 @@
 
 {% block title %}سبد خرید - فروشگاه{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/discount-widget.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="page-header text-center" style="background-image: url('/static/assets/images/page-header-bg.jpg')">
     <div class="container">
@@ -40,7 +44,7 @@
                             </thead>
                             <tbody>
                                 {% for item in cart_items %}
-                                <tr>
+                                <tr{% if discounted_product_id and item.product.id == discounted_product_id %} class="table-success"{% endif %}>
                                     <td class="product-col">
                                         <div class="product">
                                             <figure class="product-media">
@@ -56,6 +60,9 @@
                                             </figure>
                                             <h3 class="product-title">
                                                 <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                                                {% if discounted_product_id and item.product.id == discounted_product_id %}
+                                                <span class="badge badge-success" style="font-size:11px;margin-right:4px;">تخفیف اعمال شد</span>
+                                                {% endif %}
                                             </h3>
                                         </div>
                                     </td>
@@ -79,16 +86,81 @@
                         </table>
 
                         <div class="cart-bottom">
+                            {# ── ویجت کد تخفیف ── #}
                             <div class="cart-discount">
-                                <form action="#" method="post">
-                                    {% csrf_token %}
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="کد تخفیف" name="coupon" disabled>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-primary-2" type="button" disabled><i class="icon-long-arrow-left"></i></button>
+                                <div class="discount-widget">
+                                    <div class="discount-widget__surface"></div>
+
+                                    {# هدر ویجت #}
+                                    <div class="discount-widget__header">
+                                        <div class="discount-widget__title-group">
+                                            <span class="discount-widget__icon" aria-hidden="true">🏷️</span>
+                                            <span class="discount-widget__title">کد تخفیف</span>
                                         </div>
+                                        {% if discount_code %}
+                                        <span class="discount-widget__badge discount-widget__badge--active">فعال</span>
+                                        {% else %}
+                                        <span class="discount-widget__badge">دارید؟</span>
+                                        {% endif %}
                                     </div>
-                                </form>
+
+                                    {% if discount_code %}
+                                    {# حالت: کد تخفیف فعال است #}
+                                    <div class="discount-widget__active" id="coupon-active-code">
+                                        <div class="discount-widget__active-info">
+                                            <span class="discount-widget__active-label">کد فعال:</span>
+                                            <span class="discount-widget__active-code">{{ discount_code.code }}</span>
+                                            {% if discount_code.scope == 'product' and discount_code.product %}
+                                            <span class="discount-widget__active-scope">
+                                                (مخصوص: {{ discount_code.product.name }})
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="discount-widget__active-amount" id="summary-discount-amount">
+                                            <span class="discount-widget__active-amount-label">تخفیف:</span>
+                                            <span class="discount-widget__active-amount-value">{{ discount_amount|floatformat:0 }} تومان</span>
+                                        </div>
+                                        <form action="{% url 'cart:discount_remove' %}" method="post" class="discount-widget__remove-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="discount-widget__remove-btn" title="حذف کد تخفیف">
+                                                <span class="discount-widget__remove-icon">✕</span>
+                                                <span class="discount-widget__remove-text">حذف کد</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {# فرم مخفی برای تغییر کد - همیشه URL اعمال کد در دسترس است #}
+                                    <div class="discount-widget__form mt-2" style="display:none;" aria-hidden="true">
+                                        <form action="{% url 'cart:discount_apply' %}" method="post" class="discount-widget__form-inner">
+                                            {% csrf_token %}
+                                        </form>
+                                    </div>
+                                    {% else %}
+                                    {# حالت: فرم ورود کد تخفیف #}
+                                    <div class="discount-widget__form">
+                                        <form action="{% url 'cart:discount_apply' %}" method="post" class="discount-widget__form-inner">
+                                            {% csrf_token %}
+                                            <div class="input-group discount-widget__input-group">
+                                                <input
+                                                    type="text"
+                                                    class="form-control discount-widget__input"
+                                                    placeholder="کد تخفیف خود را وارد کنید"
+                                                    name="code"
+                                                    autocomplete="off"
+                                                    autocapitalize="characters"
+                                                    maxlength="50"
+                                                    aria-label="کد تخفیف"
+                                                >
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-primary-2 discount-widget__submit-btn" type="submit">
+                                                        <span class="discount-widget__submit-text">اعمال کد</span>
+                                                        <i class="icon-long-arrow-left discount-widget__submit-icon"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-outline-dark-2"><span>به روز رسانی سبد خرید</span><i class="icon-refresh"></i></button>
                         </div>
@@ -104,6 +176,12 @@
                                     <td>جمع کل سبد خرید :</td>
                                     <td class="text-left">{{ cart_total|floatformat:0 }} تومان</td>
                                 </tr>
+                                {% if discount_code and discount_amount %}
+                                <tr class="summary-discount" style="color:#c62828;">
+                                    <td>تخفیف ({{ discount_code.code }}) :</td>
+                                    <td class="text-left">- {{ discount_amount|floatformat:0 }} تومان</td>
+                                </tr>
+                                {% endif %}
                                 <tr class="summary-shipping">
                                     <td>شیوه ارسال :</td>
                                     <td>&nbsp;</td>
