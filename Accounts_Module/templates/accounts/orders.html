@@ -1,5 +1,6 @@
 {% extends 'shared/base.html' %}
 {% load static %}
+{% load persian_date_tags %}
 
 {% block title %}سفارشات من - فروگاه{% endblock %}
 
@@ -79,7 +80,7 @@
                                 <div class="order-header">
                                     <div class="order-info">
                                         <span class="order-number">شماره سفارش: <strong>{{ order.order_number }}</strong></span>
-                                        <span class="order-date">{{ order.created_at|date:"d M Y" }}</span>
+                                        <span class="order-date">{{ order.created_at|to_persian_date }}</span>
                                     </div>
                                     <div class="order-status status-{{ order.status }}">
                                         {% if order.status == 'pending' %}

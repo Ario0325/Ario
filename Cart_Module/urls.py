@@ -15,4 +15,6 @@ urlpatterns = [
     # کد تخفیف
     path('discount/apply/', views.discount_apply, name='discount_apply'),
     path('discount/remove/', views.discount_remove, name='discount_remove'),
+    # API برای اعلان‌های سفارش
+    path('api/new-orders/', views.api_new_orders, name='api_new_orders'),
 ]

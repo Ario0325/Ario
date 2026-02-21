@@ -19,6 +19,10 @@ class Category(models.Model):
         verbose_name = 'دسته‌بندی'
         verbose_name_plural = 'دسته‌بندی‌ها'
         ordering = ['name']
+        indexes = [
+            # Index for active categories
+            models.Index(fields=['is_active', 'parent'], name='category_active_parent_idx'),
+        ]
 
     def __str__(self):
         return self.name
@@ -49,6 +53,10 @@ class Brand(models.Model):
         verbose_name = 'برند'
         verbose_name_plural = 'برندها'
         ordering = ['name']
+        indexes = [
+            # Index for active brands
+            models.Index(fields=['is_active', 'name'], name='brand_active_name_idx'),
+        ]
 
     def __str__(self):
         return self.name

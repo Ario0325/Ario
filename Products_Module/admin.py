@@ -1,5 +1,24 @@
 from django.contrib import admin
+import jdatetime
 from .models import Category, Brand, Product, ProductImage, ProductColor, ProductSize, ProductReview
+
+
+# نام ماه‌های شمسی به فارسی
+PERSIAN_MONTHS = [
+    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+    'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+]
+
+
+def to_persian_date_admin(value):
+    """تبدیل تاریخ به فرمت شمسی برای ادمین پنل"""
+    if not value:
+        return ''
+    try:
+        jdate = jdatetime.datetime.frominstance(value)
+        return f'{jdate.day} {PERSIAN_MONTHS[jdate.month - 1]} {jdate.year}'
+    except:
+        return str(value)
 
 
 class ProductImageInline(admin.TabularInline):
@@ -20,20 +39,28 @@ class ProductSizeInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'parent', 'is_active', 'products_count', 'created_at']
+    list_display = ['name', 'parent', 'is_active', 'products_count', 'created_at_persian']
     list_filter = ['is_active', 'created_at']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ['is_active']
+
+    @admin.display(description='تاریخ ایجاد', ordering='created_at')
+    def created_at_persian(self, obj):
+        return to_persian_date_admin(obj.created_at)
 
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ['name', 'is_active', 'created_at']
+    list_display = ['name', 'is_active', 'created_at_persian']
     list_filter = ['is_active', 'created_at']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ['is_active']
+
+    @admin.display(description='تاریخ ایجاد', ordering='created_at')
+    def created_at_persian(self, obj):
+        return to_persian_date_admin(obj.created_at)
 
 
 @admin.register(Product)
@@ -62,13 +89,21 @@ class ProductAdmin(admin.ModelAdmin):
         }),
     )
 
+    @admin.display(description='تاریخ ایجاد', ordering='created_at')
+    def created_at_persian(self, obj):
+        return to_persian_date_admin(obj.created_at)
+
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ['product', 'is_main', 'order', 'created_at']
+    list_display = ['product', 'is_main', 'order', 'created_at_persian']
     list_filter = ['is_main', 'created_at']
     search_fields = ['product__name', 'alt_text']
     list_editable = ['is_main', 'order']
+
+    @admin.display(description='تاریخ ایجاد', ordering='created_at')
+    def created_at_persian(self, obj):
+        return to_persian_date_admin(obj.created_at)
 
 
 @admin.register(ProductColor)
@@ -89,8 +124,12 @@ class ProductSizeAdmin(admin.ModelAdmin):
 
 @admin.register(ProductReview)
 class ProductReviewAdmin(admin.ModelAdmin):
-    list_display = ['product', 'name', 'rating', 'is_approved', 'created_at']
+    list_display = ['product', 'name', 'rating', 'is_approved', 'created_at_persian']
     list_filter = ['is_approved', 'rating', 'created_at']
     search_fields = ['product__name', 'name', 'email', 'comment']
     list_editable = ['is_approved']
     readonly_fields = ['created_at']
+
+    @admin.display(description='تاریخ ایجاد', ordering='created_at')
+    def created_at_persian(self, obj):
+        return to_persian_date_admin(obj.created_at)

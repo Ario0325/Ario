@@ -138,6 +138,12 @@ class DiscountCode(models.Model):
         verbose_name = 'کد تخفیف'
         verbose_name_plural = 'کدهای تخفیف'
         ordering = ['-created_at']
+        indexes = [
+            # Index for active discount codes
+            models.Index(fields=['is_active', 'starts_at', 'ends_at'], name='discount_active_idx'),
+            # Index for code lookup
+            models.Index(fields=['code'], name='discount_code_idx'),
+        ]
 
     def __str__(self):
         scope_label = 'کل سبد' if self.scope == self.SCOPE_CART else f'محصول: {self.product}'
@@ -351,6 +357,10 @@ class CartItem(models.Model):
         verbose_name = 'آیتم سبد خرید'
         verbose_name_plural = 'آیتم‌های سبد خرید'
         unique_together = ('user', 'product')
+        indexes = [
+            # Index for user cart items lookup
+            models.Index(fields=['user', 'created_at'], name='cart_user_date_idx'),
+        ]
 
     def __str__(self):
         return f'{self.user} - {self.product} ({self.quantity})'

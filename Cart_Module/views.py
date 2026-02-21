@@ -9,6 +9,8 @@ from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.cache import never_cache
 from django.urls import reverse
 from django.utils import timezone
+from django_ratelimit.decorators import ratelimit
+from django.core.cache import cache
 
 from Products_Module.models import Product
 from .models import Order, OrderItem
@@ -35,6 +37,15 @@ def _get_cart(request):
         request.session[CART_SESSION_KEY] = {}
         cart = request.session[CART_SESSION_KEY]
     return cart
+
+
+def _clear_cart_cache(request):
+    """پاک کردن کش سبد خرید - هنگام تغییر سبد فراخوانی شود"""
+    if request.user.is_authenticated:
+        cache_key = f'cart_context_user_{request.user.id}'
+    else:
+        cache_key = f'cart_context_session_{request.session.session_key}'
+    cache.delete(cache_key)
 
 
 def _cart_item_list(request):
@@ -129,6 +140,7 @@ def cart_add(request, product_id):
     cart[pid] = current_qty + qty
     request.session.modified = True
     sync_cart_to_db(request)
+    _clear_cart_cache(request)  # پاک کردن کش سبد
 
     messages.success(request, f'«{product.name}» به سبد خرید اضافه شد.')
     next_url = request.POST.get('next') or request.GET.get('next')
@@ -148,6 +160,7 @@ def cart_remove(request, product_id):
         del cart[pid]
         request.session.modified = True
         sync_cart_to_db(request)
+        _clear_cart_cache(request)  # پاک کردن کش سبد
         messages.info(request, 'محصول از سبد خرید حذف شد.')
 
     next_url = request.POST.get('next') or request.GET.get('next')
@@ -178,18 +191,34 @@ def cart_update(request):
                 continue
     request.session.modified = True
     sync_cart_to_db(request)
+    _clear_cart_cache(request)  # پاک کردن کش سبد
     messages.success(request, 'سبد خرید به‌روزرسانی شد.')
     return redirect('cart:detail')
 
 
 def cart_context(request):
-    """برای استفاده در هدر: تعداد آیتم، جمع کل و چند آیتم اول برای دراپ‌داون"""
+    """برای استفاده در هدر: تعداد آیتم، جمع کل و چند آیتم اول برای دراپ‌داون - با کشینگ"""
+    # کش مخصوص هر کاربر برای عملکرد بهتر
+    if request.user.is_authenticated:
+        cache_key = f'cart_context_user_{request.user.id}'
+    else:
+        cache_key = f'cart_context_session_{request.session.session_key}'
+
+    cached_context = cache.get(cache_key)
+    if cached_context is not None:
+        return cached_context
+
     items, total = _cart_item_list(request)
-    return {
+    context = {
         'cart_count': sum(i['quantity'] for i in items),
         'cart_total': total,
         'cart_items_preview': items[:3],  # حداکثر ۳ آیتم برای دراپ‌داون هدر
     }
+
+    # کش برای 2 دقیقه
+    cache.set(cache_key, context, 60 * 2)
+
+    return context
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -197,8 +226,9 @@ def cart_context(request):
 # ─────────────────────────────────────────────────────────────────────────────
 
 @require_POST
+@ratelimit(key='user', rate='10/m', block=True)
 def discount_apply(request):
-    """اعمال کد تخفیف روی سبد خرید"""
+    """اعمال کد تخفیف روی سبد خرید - با Rate Limiting برای جلوگیری از سوء استفاده"""
     if not request.user.is_authenticated:
         messages.info(request, 'برای استفاده از کد تخفیف ابتدا وارد شوید.')
         return redirect(reverse('accounts:login_register') + '?next=' + reverse('cart:detail'))
@@ -252,8 +282,9 @@ def discount_remove(request):
 # ─────────────────────────────────────────────────────────────────────────────
 
 @login_required
+@ratelimit(key='user', rate='5/m', block=True)
 def checkout_view(request):
-    """ثبت سفارش از سبد و هدایت به صفحه پرداخت (ساده - بدون درگاه)"""
+    """ثبت سفارش از سبد و هدایت به صفحه پرداخت (ساده - بدون درگاه) - با Rate Limiting"""
     from django.urls import reverse
     if not request.user.is_authenticated:
         from django.urls import reverse
@@ -353,8 +384,9 @@ def checkout_view(request):
 
 
 @never_cache
+@ratelimit(key='user', rate='10/m', block=True)
 def payment_view(request, order_id):
-    """نمایش صفحه پرداخت (شبیه‌سازی درگاه پرداخت)."""
+    """نمایش صفحه پرداخت (شبیه‌سازی درگاه پرداخت) - با Rate Limiting"""
     # Require login to view payment page
     if not request.user.is_authenticated:
         from django.urls import reverse
@@ -407,3 +439,114 @@ def invoice_view(request, order_id):
         from django.http import HttpResponseForbidden
         return HttpResponseForbidden('دسترسی مجاز نیست.')
     return render(request, 'cart/invoice.html', {'order': order})
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# API برای اعلان‌های سفارش در پنل ادمین
+# ═══════════════════════════════════════════════════════════════════════════
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils import timezone
+from datetime import timedelta
+
+# وارد کردن jdatetime
+import jdatetime
+
+
+def to_persian_datetime(dt):
+    """تبدیل datetime میلادی به شمسی"""
+    if not dt:
+        return ''
+    try:
+        # تبدیل به شمسی
+        jdate = jdatetime.datetime.frominstance(dt)
+        return {
+            'full': jdate.strftime('%Y/%m/%d - %H:%M'),
+            'date': jdate.strftime('%d %B %Y'),
+            'time': jdate.strftime('%H:%M'),
+            'day_name': jdate.strftime('%A'),
+            'timestamp': dt.isoformat()
+        }
+    except:
+        return {
+            'full': str(dt),
+            'date': str(dt.date()),
+            'time': str(dt.time()),
+            'day_name': '',
+            'timestamp': dt.isoformat()
+        }
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def api_new_orders(request):
+    """
+    API برای دریافت سفارش‌های جدید
+    این API توسط JavaScript در پنل ادمین فراخوانی می‌شود
+    
+    پارامترها:
+    - since: زمان آخرین بررسی (timestamp)
+    - limit: تعداد سفارش‌های دریافتی (پیش‌فرض: 10)
+    
+    خروجی:
+    - orders: لیست سفارش‌های جدید
+    - total_count: تعداد کل سفارش‌های پرداخت شده
+    - last_check: زمان فعلی سرور
+    """
+    try:
+        # دریافت پارامترها
+        since_timestamp = request.GET.get('since')
+        limit = int(request.GET.get('limit', 10))
+        
+        # محدود کردن تعداد
+        limit = min(limit, 50)
+        
+        # فیلتر سفارش‌های پرداخت شده
+        orders_query = Order.objects.filter(
+            status__in=['paid', 'processing']
+        ).select_related('user').order_by('-created_at')[:limit]
+        
+        # ساخت لیست سفارش‌ها با تاریخ شمسی
+        orders_data = []
+        for order in orders_query:
+            persian_datetime = to_persian_datetime(order.created_at)
+            
+            orders_data.append({
+                'id': order.id,
+                'order_number': order.order_number,
+                'customer_name': order.full_name,
+                'phone': order.phone,
+                'total': str(order.total),
+                'status': order.status,
+                'status_display': order.get_status_display(),
+                # تاریخ میلادی
+                'created_at': order.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                # تاریخ شمسی
+                'persian_datetime': persian_datetime,
+                'user_id': order.user_id if order.user else None,
+            })
+        
+        # تعداد کل سفارش‌های پرداخت شده
+        total_paid_orders = Order.objects.filter(
+            status__in=['paid', 'processing']
+        ).count()
+        
+        # زمان فعلی سرور به شمسی
+        now_persian = to_persian_datetime(timezone.now())
+        
+        return JsonResponse({
+            'success': True,
+            'orders': orders_data,
+            'total_count': total_paid_orders,
+            'last_check': timezone.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'server_time': timezone.now().isoformat(),
+            'server_time_persian': now_persian,
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e),
+        }, status=500)

@@ -1,0 +1,48 @@
+{
+    "name": "آریو شاپ - Ario Shop",
+    "short_name": "آریو شاپ",
+    "description": "فروشگاه اینترنتی آریو شاپ - Ario Shop Online Store",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "fa",
+    "dir": "rtl",
+    "categories": ["shopping", "e-commerce"],
+    "icons": [
+        {
+            "src": "/static/assets/images/icons/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/static/assets/images/icons/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/static/assets/images/icons/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "سبد خرید",
+            "short_name": "سبد خرید",
+            "description": "مشاهده سبد خرید",
+            "url": "/cart/",
+            "icons": [
+                {
+                    "src": "/static/assets/images/icons/apple-touch-icon.png",
+                    "sizes": "180x180"
+                }
+            ]
+        }
+    ]
+}

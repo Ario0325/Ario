@@ -1,5 +1,6 @@
 {% extends 'shared/base.html' %}
 {% load static %}
+{% load persian_date_tags %}
 
 {% block title %}جزئیات سفارش {{ order.order_number }} - فروگاه{% endblock %}
 
@@ -35,7 +36,7 @@
                     </div>
                     <div class="timeline-content">
                         <span class="timeline-title">ثبت سفارش</span>
-                        <span class="timeline-date">{{ order.created_at|date:"d M Y" }}</span>
+                        <span class="timeline-date">{{ order.created_at|to_persian_date }}</span>
                     </div>
                 </div>
                 
