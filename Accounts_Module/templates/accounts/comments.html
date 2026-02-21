@@ -1,0 +1,153 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block title %}نظرات من - فروگاه{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/user-comments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header text-center" style="background-image: url('/static/assets/images/page-header-bg.jpg')">
+    <div class="container">
+        <h1 class="page-title">نظرات<span>من</span></h1>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}">حساب کاربری</a></li>
+            <li class="breadcrumb-item active" aria-current="page">نظرات من</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="page-content">
+    <div class="container">
+        <div class="user-dashboard">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="dashboard-sidebar">
+                        <ul class="nav nav-dashboard flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:dashboard' %}">
+                                    <i class="icon-user"></i>
+                                    <span>اطلاعات حساب</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:orders' %}">
+                                    <i class="icon-shopping-bag"></i>
+                                    <span>سفارشات</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="{% url 'accounts:comments' %}">
+                                    <i class="icon-comment"></i>
+                                    <span>نظرات من</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'cart:detail' %}">
+                                    <i class="icon-shopping-cart"></i>
+                                    <span>سبد خرید</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:logout' %}">
+                                    <i class="icon-logout"></i>
+                                    <span>خروج</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-9">
+                    <div class="dashboard-content">
+                        <div class="comments-header">
+                            <h2 class="comments-title">نظرات شما</h2>
+                            <p class="comments-subtitle">نظراتی که برای محصولات ثبت کرده‌اید</p>
+                        </div>
+                        
+                        {% if reviews %}
+                        <div class="comments-list">
+                            {% for review in reviews %}
+                            <div class="comment-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                                <div class="comment-product">
+                                    <div class="product-image">
+                                        {% if review.product and review.product.images.all.0 %}
+                                        <img src="{{ review.product.images.all.0.image.url }}" alt="{{ review.product.name }}">
+                                        {% else %}
+                                        <img src="{% static 'assets/images/products/product-1.jpg' %}" alt="{{ review.product.name }}">
+                                        {% endif %}
+                                    </div>
+                                    <div class="product-info">
+                                        <h4 class="product-name">
+                                            {% if review.product %}
+                                            <a href="{{ review.product.get_absolute_url }}">{{ review.product.name }}</a>
+                                            {% else %}
+                                            {{ review.title }}
+                                            {% endif %}
+                                        </h4>
+                                        <div class="product-rating">
+                                            {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                            <i class="icon-star filled"></i>
+                                            {% else %}
+                                            <i class="icon-star"></i>
+                                            {% endif %}
+                                            {% endfor %}
+                                            <span class="rating-number">{{ review.rating }}/5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="comment-content">
+                                    <div class="comment-header">
+                                        <h5 class="comment-title">{{ review.title }}</h5>
+                                        <span class="comment-status {% if review.is_approved %}approved{% else %}pending{% endif %}">
+                                            {% if review.is_approved %}
+                                            <i class="icon-check"></i> تایید شده
+                                            {% else %}
+                                            <i class="icon-clock"></i> در انتظار تایید
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <p class="comment-text">{{ review.comment }}</p>
+                                    <div class="comment-footer">
+                                        <span class="comment-date">
+                                            <i class="icon-calendar"></i>
+                                            {{ review.created_at|date:"d M Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state" data-aos="fade-up">
+                            <div class="empty-icon">
+                                <i class="icon-comment"></i>
+                            </div>
+                            <h3>نظری ندارید</h3>
+                            <p>شما هنوز نظری برای محصولات ثبت نکرده‌اید</p>
+                            <a href="{% url 'products:list' %}" class="btn btn-primary">
+                                <span>مشاهده محصولات</span>
+                                <i class="icon-arrow-left"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/user-comments.js' %}"></script>
+{% endblock %}

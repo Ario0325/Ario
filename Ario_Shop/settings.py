@@ -11,29 +11,30 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# =============================================================================
+# ENVIRONMENT CONFIGURATION
+# =============================================================================
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# MUST be set via environment variable in production!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-default-change-me-in-production')
+# Set DEBUG to True for local development, False for production
+# For production deployment on PythonAnywhere, set to False
+DEBUG = True  # تغییر به False برای محیط production
 
-# SECURITY WARNING: don't run with debug turned on in production!
-# Set DEBUG=False in production environment
-DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
+# Secret key for Django - change this in production for better security
+# این کلید را در محیط production تغییر دهید
+SECRET_KEY = 'django-insecure-dev-key-for-local-development-only-change-in-prod'
 
-# ALLOWED_HOSTS - configure for production
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
+# Allowed hosts - for production, add your domain
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '::1',
+    'arya0325.pythonanywhere.com',  # PythonAnywhere domain
+]
 
 # Application definition
 
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # Security middleware - order matters!
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,13 +100,29 @@ DATABASES = {
     }
 }
 
-# Cache configuration
+# Cache configuration - use Redis in production, LocMem for development
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-snowflake',
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,
+        }
     }
 }
+
+# For production, use Redis cache:
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django.core.cache.backends.redis.RedisCacheClient',
+#         },
+#         'KEY_PREFIX': 'ario_shop',
+#         'TIMEOUT': 300,  # 5 minutes default
+#     }
+# }
 
 
 # Password validation
@@ -144,7 +162,6 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -163,39 +180,94 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@arioshop.local'
 
 # =============================================================================
-# SECURITY SETTINGS - MANDATORY FOR PRODUCTION
+# SECURITY SETTINGS - PRODUCTION READY
 # =============================================================================
 
 # HTTPS/SSL Settings - Only enable in production!
 SECURE_SSL_REDIRECT = not DEBUG  # Redirect HTTP to HTTPS only in production
-SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # HSTS only in production
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # HSTS only in production (1 year)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 SECURE_REDIRECT_EXEMPT = []
 
-# Cookie Security - Only secure in production
+# Cookie Security
 SESSION_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_HTTPONLY = True  # Always safe
-SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_HTTPONLY = True  # Always safe - prevents XSS from reading cookies
+SESSION_COOKIE_SAMESITE = 'Lax' if DEBUG else 'Strict'  # Strict in production
 CSRF_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True  # Prevents CSRF token theft via JavaScript
+CSRF_COOKIE_SAMESITE = 'Lax' if DEBUG else 'Strict'
+
+# CSRF Settings - Allow localhost for development and PythonAnywhere
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost',
+    'http://localhost:8000',
+    'http://127.0.0.1',
+    'http://127.0.0.1:8000',
+    'http://[::1]',
+    'http://[::1]:8000',
+    'https://arya0325.pythonanywhere.com',
+]
 
 # X-Frame-Options - Clickjacking protection
 X_FRAME_OPTIONS = 'DENY'
 
 # X-Content-Type-Options - MIME sniffing protection
-SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Always enabled
 
 # X-XSS-Protection (legacy but still recommended)
-SECURE_BROWSER_XSS_FILTER = not DEBUG
+SECURE_BROWSER_XSS_FILTER = True  # Always enabled
 
 # SSL/TLS Settings - Only in production
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if not DEBUG else None
 
+# Referrer Policy - Control referrer information sent with requests
+REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Permissions Policy - Control browser features
+PERMISSIONS_POLICY = {
+    'geolocation': (),
+    'microphone': (),
+    'camera': (),
+    'payment': (),
+}
+
+# Content Security Policy - Prevent XSS and injection attacks
+# In production, customize this based on your static assets
+if DEBUG:
+    # Relaxed CSP for development - only log violations
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+else:
+    # Strict CSP for production (customize based on needs)
+    pass  # Add CSP settings in production as needed
+
 # Password Hashing - Use PBKDF2 (built-in, no external dependency needed)
+# Consider using Argon2 in production (requires argon2-cffi package)
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
 ]
 
 # =============================================================================
+# RATE LIMITING SETTINGS
+# =============================================================================
+
+# Rate limiting configuration using django-ratelimit
+RATELIMIT_USE_CACHE = 'default'
+RATELIMIT_CACHE_PREFIX = 'rl'
+
+# Rate limit defaults (can be overridden per-view)
+RATELIMIT_DEFAULT = '10/m'  # 10 requests per minute by default
+
+# Login rate limiting
+LOGIN_RATE_LIMIT = '5/m'  # 5 login attempts per minute
+LOGIN_RATE_LIMIT_USER = '10/m'  # Per user limit
+
+# =============================================================================
+# SESSION SETTINGS
+# =============================================================================
+
+# Session configuration
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days in seconds
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

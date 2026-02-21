@@ -29,10 +29,16 @@
                         <a class="nav-link active" id="tab-profile" data-toggle="tab" href="#profile" role="tab" aria-selected="true">اطلاعات حساب</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:orders' %}">سفارشات من</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:comments' %}">نظرات من</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'cart:detail' %}">سبد خرید</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'index' %}">بازگشت به فروشگاه</a>
+                        <a class="nav-link" href="{% url 'accounts:logout' %}">خروج</a>
                     </li>
                 </ul>
             </div>

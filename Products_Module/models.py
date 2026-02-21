@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.utils.text import slugify
 from django.urls import reverse
 
@@ -99,6 +100,18 @@ class Product(models.Model):
         verbose_name = 'محصول'
         verbose_name_plural = 'محصولات'
         ordering = ['-created_at']
+        indexes = [
+            # Index for filtering by active status and availability
+            models.Index(fields=['is_active', 'is_available'], name='product_active_avail_idx'),
+            # Index for ordering by views (trending products)
+            models.Index(fields=['-views_count'], name='product_views_idx'),
+            # Index for category filtering
+            models.Index(fields=['category', 'is_active'], name='product_category_idx'),
+            # Index for price range filtering
+            models.Index(fields=['price'], name='product_price_idx'),
+            # Index for created_at ordering
+            models.Index(fields=['-created_at'], name='product_created_idx'),
+        ]
 
     def __str__(self):
         return self.name
@@ -120,11 +133,10 @@ class Product(models.Model):
 
     @property
     def average_rating(self):
-        """میانگین امتیاز"""
-        reviews = self.reviews.filter(is_approved=True)
-        if reviews.exists():
-            return sum(r.rating for r in reviews) / reviews.count()
-        return 0
+        """میانگین امتیاز - با استفاده از aggregation برای عملکرد بهتر"""
+        from django.db.models import Avg
+        result = self.reviews.filter(is_approved=True).aggregate(avg_rating=Avg('rating'))
+        return result['avg_rating'] or 0
 
     def get_rating_percentage(self):
         """درصد امتیاز برای نمایش ستاره‌ها"""
@@ -192,6 +204,14 @@ class ProductSize(models.Model):
 class ProductReview(models.Model):
     """مدل نظرات محصول"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews', verbose_name='محصول')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='product_reviews',
+        verbose_name='کاربر',
+    )
     name = models.CharField(max_length=200, verbose_name='نام')
     email = models.EmailField(verbose_name='ایمیل')
     rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)], verbose_name='امتیاز')
@@ -204,6 +224,12 @@ class ProductReview(models.Model):
         verbose_name = 'نظر محصول'
         verbose_name_plural = 'نظرات محصول'
         ordering = ['-created_at']
+        indexes = [
+            # Index for approved reviews filtering
+            models.Index(fields=['product', 'is_approved'], name='review_product_approved_idx'),
+            # Index for user reviews
+            models.Index(fields=['user', '-created_at'], name='review_user_date_idx'),
+        ]
 
     def __str__(self):
         return f'{self.name} - {self.product.name}'

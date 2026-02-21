@@ -130,3 +130,64 @@ def dashboard_view(request):
         'form': form,
         'profile': profile,
     })
+
+
+@login_required
+def user_orders_view(request):
+    """لیست سفارشات کاربر"""
+    from Cart_Module.models import Order
+    orders = Order.objects.filter(user=request.user).prefetch_related('items').order_by('-created_at')
+    return render(request, 'accounts/orders.html', {
+        'orders': orders,
+    })
+
+
+@login_required
+def user_order_detail_view(request, order_id):
+    """جزئیات یک سفارش"""
+    from Cart_Module.models import Order
+    from django.http import Http404
+    try:
+        order = Order.objects.prefetch_related('items__product').get(id=order_id, user=request.user)
+    except Order.DoesNotExist:
+        raise Http404("سفارش یافت نشد")
+    return render(request, 'accounts/order_detail.html', {
+        'order': order,
+    })
+
+
+@login_required
+def user_order_cancel_view(request, order_id):
+    """لغو سفارش - فقط برای سفارشاتی که ارسال نشده‌اند"""
+    from Cart_Module.models import Order
+    from django.http import Http404, HttpResponseForbidden
+    
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+    except Order.DoesNotExist:
+        raise Http404("سفارش یافت نشد")
+    
+    # سفارشات قابل لغو: pending, paid, processing
+    cancellable_statuses = ['pending', 'paid', 'processing']
+    
+    if order.status not in cancellable_statuses:
+        messages.error(request, _('این سفارش قابل لغو نیست.'))
+        return redirect('accounts:order_detail', order_id=order.id)
+    
+    if request.method == 'POST':
+        order.status = 'cancelled'
+        order.save(update_fields=['status', 'updated_at'])
+        messages.success(request, _('سفارش با موفقیت لغو شد.'))
+        return redirect('accounts:orders')
+    
+    return redirect('accounts:order_detail', order_id=order.id)
+
+
+@login_required
+def user_comments_view(request):
+    """لیست نظرات کاربر"""
+    from Products_Module.models import ProductReview
+    reviews = ProductReview.objects.filter(user=request.user).select_related('product').order_by('-created_at')
+    return render(request, 'accounts/comments.html', {
+        'reviews': reviews,
+    })

@@ -275,6 +275,14 @@ class Order(models.Model):
         verbose_name = 'سفارش'
         verbose_name_plural = 'سفارش‌ها'
         ordering = ['-created_at']
+        indexes = [
+            # Index for user orders
+            models.Index(fields=['user', '-created_at'], name='order_user_date_idx'),
+            # Index for order status filtering
+            models.Index(fields=['status', '-created_at'], name='order_status_idx'),
+            # Index for order number lookup
+            models.Index(fields=['order_number'], name='order_number_idx'),
+        ]
 
     def __str__(self):
         return f'{self.order_number} - {self.full_name}'

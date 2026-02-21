@@ -1,14 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
-from django.db.models import Q, Count, Min, Max
+from django.db.models import Q, Count, Min, Max, F
 from django.contrib import messages
 from django.urls import reverse
+from django.core.cache import cache
+from django_ratelimit.decorators import ratelimit
 from .models import Product, Category, Brand, ProductReview
 from .forms import ProductReviewForm
 
 
 def product_list(request):
-    """نمایش لیست محصولات با فیلترینگ"""
+    """نمایش لیست محصولات با فیلترینگ - بهینه شده"""
 
     products = Product.objects.filter(is_active=True).select_related('category', 'brand').prefetch_related('images')
 
@@ -65,22 +67,34 @@ def product_list(request):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    # دریافت تمام دسته‌بندی‌ها برای سایدبار
-    categories = Category.objects.filter(is_active=True).annotate(
-        product_count=Count('products', filter=Q(products__is_active=True))
-    )
+    # دریافت تمام دسته‌بندی‌ها برای سایدبار - با کشینگ
+    from django.core.cache import cache
+    categories_cache_key = 'all_active_categories_with_count'
+    categories = cache.get(categories_cache_key)
+    if categories is None:
+        categories = list(Category.objects.filter(is_active=True).annotate(
+            product_count=Count('products', filter=Q(products__is_active=True))
+        ))
+        cache.set(categories_cache_key, categories, 60 * 15)
 
-    # دریافت تمام برندها برای سایدبار
-    brands = Brand.objects.filter(is_active=True).annotate(
-        product_count=Count('products', filter=Q(products__is_active=True))
-    )
+    # دریافت تمام برندها برای سایدبار - با کشینگ
+    brands_cache_key = 'all_active_brands_with_count'
+    brands = cache.get(brands_cache_key)
+    if brands is None:
+        brands = list(Brand.objects.filter(is_active=True).annotate(
+            product_count=Count('products', filter=Q(products__is_active=True))
+        ))
+        cache.set(brands_cache_key, brands, 60 * 15)
 
-    # محاسبه محدوده قیمت
-    from django.db.models import Min, Max
-    price_range = Product.objects.filter(is_active=True).aggregate(
-        min_price=Min('price'),
-        max_price=Max('price')
-    )
+    # محاسبه محدوده قیمت - با کشینگ
+    price_range_cache_key = 'active_products_price_range'
+    price_range = cache.get(price_range_cache_key)
+    if price_range is None:
+        price_range = Product.objects.filter(is_active=True).aggregate(
+            min_price=Min('price'),
+            max_price=Max('price')
+        )
+        cache.set(price_range_cache_key, price_range, 60 * 15)
 
     # حفظ پارامترهای GET برای pagination و sort
     get_params = request.GET.copy()
@@ -112,12 +126,15 @@ def product_detail(request, slug):
         is_active=True
     )
 
-    # افزایش تعداد بازدید
-    product.views_count += 1
-    product.save(update_fields=['views_count'])
+    # افزایش تعداد بازدید به صورت اتمیک (atomic)
+    Product.objects.filter(pk=product.pk).update(views_count=F('views_count') + 1)
 
-    # دریافت نظرات تایید شده
-    reviews = product.reviews.filter(is_approved=True).order_by('-created_at')
+    # دریافت نظرات تایید شده - با کشینگ
+    reviews_cache_key = f'product_{product.id}_approved_reviews'
+    reviews = cache.get(reviews_cache_key)
+    if reviews is None:
+        reviews = list(product.reviews.filter(is_approved=True).order_by('-created_at'))
+        cache.set(reviews_cache_key, reviews, 60 * 5)  # Cache for 5 minutes
 
     # فرم نظر و پردازش POST
     initial = {}
@@ -125,18 +142,32 @@ def product_detail(request, slug):
         initial['name'] = request.user.get_full_name() or request.user.get_username()
         initial['email'] = getattr(request.user, 'email', '') or ''
     review_form = ProductReviewForm(initial=initial)
+    
     if request.method == 'POST' and request.POST.get('submit_review'):
-        review_form = ProductReviewForm(request.POST)
-        if review_form.is_valid():
-            review = review_form.save(commit=False)
-            review.product = product
-            if request.user.is_authenticated:
+        # Rate limit review submissions
+        if request.user.is_authenticated:
+            # Check if user recently submitted a review
+            recent_review_key = f'last_review_{request.user.id}'
+            last_review_time = cache.get(recent_review_key)
+            if last_review_time:
+                messages.error(request, 'لطفاً چند دقیقه صبر کنید قبل از ثبت نظر بعدی.')
+                return redirect(reverse('products:detail', kwargs={'slug': slug}) + '?review_submitted=1#product-review-tab')
+            
+            review_form = ProductReviewForm(request.POST)
+            if review_form.is_valid():
+                review = review_form.save(commit=False)
+                review.product = product
+                review.user = request.user
                 review.name = review.name or request.user.get_full_name() or request.user.get_username()
                 review.email = review.email or getattr(request.user, 'email', '') or review.email
-            review.is_approved = False
-            review.save()
-            messages.success(request, 'نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده می‌شود.')
-            return redirect(reverse('products:detail', kwargs={'slug': slug}) + '?review_submitted=1#product-review-tab')
+                review.is_approved = False
+                review.save()
+                
+                # Set rate limit cache
+                cache.set(recent_review_key, True, 60 * 5)  # 5 minute cooldown
+                
+                messages.success(request, 'نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده می‌شود.')
+                return redirect(reverse('products:detail', kwargs={'slug': slug}) + '?review_submitted=1#product-review-tab')
 
     # محصولات مشابه
     related_products = Product.objects.filter(

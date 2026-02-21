@@ -1,0 +1,263 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block title %}جزئیات سفارش {{ order.order_number }} - فروگاه{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/order-detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header text-center" style="background-image: url('/static/assets/images/page-header-bg.jpg')">
+    <div class="container">
+        <h1 class="page-title">سفارش <span>{{ order.order_number }}</span></h1>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:orders' %}">سفارشات</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ order.order_number }}</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="page-content">
+    <div class="container">
+        <div class="order-detail-wrapper">
+            <!-- Status Timeline -->
+            <div class="order-timeline" data-aos="fade-up">
+                <div class="timeline-step {% if order.status != 'pending' %}completed{% endif %} {% if order.status == 'pending' %}active{% endif %}">
+                    <div class="timeline-icon">
+                        <i class="icon-clock"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-title">ثبت سفارش</span>
+                        <span class="timeline-date">{{ order.created_at|date:"d M Y" }}</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-step {% if order.status in 'paid,processing,shipped,delivered' %}completed{% endif %} {% if order.status == 'paid' %}active{% endif %}">
+                    <div class="timeline-icon">
+                        <i class="icon-credit-card"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-title">پرداخت</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-step {% if order.status in 'processing,shipped,delivered' %}completed{% endif %} {% if order.status == 'processing' %}active{% endif %}">
+                    <div class="timeline-icon">
+                        <i class="icon-gear"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-title">پردازش</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-step {% if order.status in 'shipped,delivered' %}completed{% endif %} {% if order.status == 'shipped' %}active{% endif %}">
+                    <div class="timeline-icon">
+                        <i class="icon-truck"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-title">ارسال</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-step {% if order.status == 'delivered' %}completed{% endif %} {% if order.status == 'delivered' %}active{% endif %}">
+                    <div class="timeline-icon">
+                        <i class="icon-check"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-title">تحویل</span>
+                    </div>
+                </div>
+                
+                {% if order.status == 'cancelled' %}
+                <div class="timeline-step cancelled active">
+                    <div class="timeline-icon">
+                        <i class="icon-close"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-title">لغو شده</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="row">
+                <!-- Order Items -->
+                <div class="col-lg-8">
+                    <div class="order-items-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="card-header">
+                            <h3>محصولات سفارش</h3>
+                            <span class="items-count">{{ order.items.count }} محصول</span>
+                        </div>
+                        <div class="card-body">
+                            {% for item in order.items.all %}
+                            <div class="order-item">
+                                <div class="item-image">
+                                    {% if item.product and item.product.images.all.0 %}
+                                    <img src="{{ item.product.images.all.0.image.url }}" alt="{{ item.product_name }}">
+                                    {% else %}
+                                    <img src="{% static 'assets/images/products/product-1.jpg' %}" alt="{{ item.product_name }}">
+                                    {% endif %}
+                                </div>
+                                <div class="item-details">
+                                    <h4 class="item-name">
+                                        {% if item.product %}
+                                        <a href="{{ item.product.get_absolute_url }}">{{ item.product_name }}</a>
+                                        {% else %}
+                                        {{ item.product_name }}
+                                        {% endif %}
+                                    </h4>
+                                    <div class="item-meta">
+                                        <span class="item-qty">تعداد: {{ item.quantity }}</span>
+                                        <span class="item-price">قیمت واحد: {{ item.price|floatformat:0 }} تومان</span>
+                                    </div>
+                                </div>
+                                <div class="item-total">
+                                    <span>{{ item.total|floatformat:0 }} تومان</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Shipping Info -->
+                    <div class="shipping-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="card-header">
+                            <h3>اطلاعات ارسال</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="shipping-info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">نام مشتری:</span>
+                                    <span class="info-value">{{ order.full_name }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">شماره تماس:</span>
+                                    <span class="info-value">{{ order.phone }}</span>
+                                </div>
+                                {% if order.email %}
+                                <div class="info-item">
+                                    <span class="info-label">ایمیل:</span>
+                                    <span class="info-value">{{ order.email }}</span>
+                                </div>
+                                {% endif %}
+                                {% if order.city %}
+                                <div class="info-item">
+                                    <span class="info-label">شهر:</span>
+                                    <span class="info-value">{{ order.city }}</span>
+                                </div>
+                                {% endif %}
+                                {% if order.postal_code %}
+                                <div class="info-item">
+                                    <span class="info-label">کد پستی:</span>
+                                    <span class="info-value">{{ order.postal_code }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="info-item full-width">
+                                    <span class="info-label">آدرس:</span>
+                                    <span class="info-value">{{ order.address }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="order-summary-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="card-header">
+                            <h3>خلاصه سفارش</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="summary-status">
+                                <span class="status-label">وضعیت:</span>
+                                {% if order.status == 'pending' %}
+                                <span class="status-badge badge-pending">در انتظار پرداخت</span>
+                                {% elif order.status == 'paid' %}
+                                <span class="status-badge badge-paid">پرداخت شده</span>
+                                {% elif order.status == 'processing' %}
+                                <span class="status-badge badge-processing">در حال پردازش</span>
+                                {% elif order.status == 'shipped' %}
+                                <span class="status-badge badge-shipped">ارسال شده</span>
+                                {% elif order.status == 'delivered' %}
+                                <span class="status-badge badge-delivered">تحویل داده شده</span>
+                                {% elif order.status == 'cancelled' %}
+                                <span class="status-badge badge-cancelled">لغو شده</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="summary-details">
+                                <div class="summary-row">
+                                    <span>جمع کل:</span>
+                                    <span>{{ order.subtotal|floatformat:0 }} تومان</span>
+                                </div>
+                                {% if order.discount_amount > 0 %}
+                                <div class="summary-row discount">
+                                    <span>تخفیف:</span>
+                                    <span>- {{ order.discount_amount|floatformat:0 }} تومان</span>
+                                </div>
+                                {% if order.discount_code %}
+                                <div class="summary-row">
+                                    <span>کد تخفیف:</span>
+                                    <span>{{ order.discount_code.code }}</span>
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                                {% if order.shipping_cost > 0 %}
+                                <div class="summary-row">
+                                    <span>هزینه ارسال:</span>
+                                    <span>{{ order.shipping_cost|floatformat:0 }} تومان</span>
+                                </div>
+                                {% else %}
+                                <div class="summary-row">
+                                    <span>هزینه ارسال:</span>
+                                    <span>رایگان</span>
+                                </div>
+                                {% endif %}
+                                <div class="summary-row total">
+                                    <span>مبلغ قابل پرداخت:</span>
+                                    <span>{{ order.total|floatformat:0 }} تومان</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-actions">
+                                {% if order.status == 'pending' %}
+                                <a href="{% url 'cart:payment' order.id %}" class="btn btn-primary btn-block">
+                                    <i class="icon-credit-card"></i>
+                                    <span>پرداخت</span>
+                                </a>
+                                {% endif %}
+                                
+                                {% if order.status in 'pending,paid,processing' %}
+                                <form method="post" action="{% url 'accounts:order_cancel' order.id %}" class="cancel-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-block">
+                                        <i class="icon-close"></i>
+                                        <span>لغو سفارش</span>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                
+                                <a href="{% url 'accounts:orders' %}" class="btn btn-outline-dark btn-block">
+                                    <i class="icon-arrow-right"></i>
+                                    <span>بازگشت به لیست</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/order-detail.js' %}"></script>
+{% endblock %}

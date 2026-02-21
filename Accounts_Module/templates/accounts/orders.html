@@ -1,0 +1,179 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block title %}سفارشات من - فروگاه{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/user-orders.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header text-center" style="background-image: url('/static/assets/images/page-header-bg.jpg')">
+    <div class="container">
+        <h1 class="page-title">سفارشات<span>من</span></h1>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}">حساب کاربری</a></li>
+            <li class="breadcrumb-item active" aria-current="page">سفارشات</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="page-content">
+    <div class="container">
+        <div class="user-dashboard">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="dashboard-sidebar">
+                        <ul class="nav nav-dashboard flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:dashboard' %}">
+                                    <i class="icon-user"></i>
+                                    <span>اطلاعات حساب</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="{% url 'accounts:orders' %}">
+                                    <i class="icon-shopping-bag"></i>
+                                    <span>سفارشات</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:comments' %}">
+                                    <i class="icon-comment"></i>
+                                    <span>نظرات من</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'cart:detail' %}">
+                                    <i class="icon-shopping-cart"></i>
+                                    <span>سبد خرید</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:logout' %}">
+                                    <i class="icon-logout"></i>
+                                    <span>خروج</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-9">
+                    <div class="dashboard-content">
+                        <div class="orders-header">
+                            <h2 class="orders-title">لیست سفارشات</h2>
+                            <p class="orders-subtitle">تمام سفارشات شما در اینجا نمایش داده می‌شود</p>
+                        </div>
+                        
+                        {% if orders %}
+                        <div class="orders-list">
+                            {% for order in orders %}
+                            <div class="order-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                                <div class="order-header">
+                                    <div class="order-info">
+                                        <span class="order-number">شماره سفارش: <strong>{{ order.order_number }}</strong></span>
+                                        <span class="order-date">{{ order.created_at|date:"d M Y" }}</span>
+                                    </div>
+                                    <div class="order-status status-{{ order.status }}">
+                                        {% if order.status == 'pending' %}
+                                        <span class="status-badge badge-pending">در انتظار پرداخت</span>
+                                        {% elif order.status == 'paid' %}
+                                        <span class="status-badge badge-paid">پرداخت شده</span>
+                                        {% elif order.status == 'processing' %}
+                                        <span class="status-badge badge-processing">در حال پردازش</span>
+                                        {% elif order.status == 'shipped' %}
+                                        <span class="status-badge badge-shipped">ارسال شده</span>
+                                        {% elif order.status == 'delivered' %}
+                                        <span class="status-badge badge-delivered">تحویل داده شده</span>
+                                        {% elif order.status == 'cancelled' %}
+                                        <span class="status-badge badge-cancelled">لغو شده</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="order-body">
+                                    <div class="order-items-preview">
+                                        {% for item in order.items.all|slice:":3" %}
+                                        <div class="order-item-thumb">
+                                            {% if item.product and item.product.images.all.0 %}
+                                            <img src="{{ item.product.images.all.0.image.url }}" alt="{{ item.product_name }}">
+                                            {% else %}
+                                            <img src="{% static 'assets/images/products/product-1.jpg' %}" alt="{{ item.product_name }}">
+                                            {% endif %}
+                                            <span class="item-qty">×{{ item.quantity }}</span>
+                                        </div>
+                                        {% endfor %}
+                                        {% if order.items.count > 3 %}
+                                        <div class="order-items-more">
+                                            <span>+{{ order.items.count|add:"-3" }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="order-summary">
+                                        <div class="summary-row">
+                                            <span>تعداد محصول:</span>
+                                            <span>{{ order.items.count }} عدد</span>
+                                        </div>
+                                        <div class="summary-row total">
+                                            <span>مبلغ کل:</span>
+                                            <span class="total-amount">{{ order.total|default:0|floatformat:0 }} تومان</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-footer">
+                                    <a href="{% url 'accounts:order_detail' order.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="icon-eye"></i>
+                                        <span>مشاهده جزئیات</span>
+                                    </a>
+                                    {% if order.status in 'pending,paid,processing' %}
+                                    <form method="post" action="{% url 'accounts:order_cancel' order.id %}" class="d-inline cancel-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm btn-cancel">
+                                            <i class="icon-close"></i>
+                                            <span>لغو سفارش</span>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    {% if order.status == 'pending' %}
+                                    <a href="{% url 'cart:payment' order.id %}" class="btn btn-primary btn-sm">
+                                        <i class="icon-credit-card"></i>
+                                        <span>پرداخت</span>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state" data-aos="fade-up">
+                            <div class="empty-icon">
+                                <i class="icon-shopping-bag"></i>
+                            </div>
+                            <h3>سفارشی ندارید</h3>
+                            <p>شما هنوز سفارشی ثبت نکرده‌اید</p>
+                            <a href="{% url 'products:list' %}" class="btn btn-primary">
+                                <span>شروع خرید</span>
+                                <i class="icon-arrow-left"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/user-orders.js' %}"></script>
+{% endblock %}
