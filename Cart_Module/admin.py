@@ -1,15 +1,20 @@
 from django import forms
 from django.contrib import admin
+from django.db import models
 from django.db.models import Count
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils import timezone
 import jdatetime
 
+# Use Core_Module utilities for date conversion
+from Core_Module.utils import gregorian_to_jalali, gregorian_to_jalali_long
+from Core_Module.admin_widgets import JalaliDateWidget, JalaliDateTimeWidget
+
 from .models import DiscountCode, Order, OrderItem
 
 
-# نام ماه‌های شمسی به فارسی
+# Persian month names (kept for backward compatibility)
 PERSIAN_MONTHS = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
@@ -18,13 +23,12 @@ PERSIAN_MONTHS = [
 
 def to_persian_date_admin(value):
     """تبدیل تاریخ به فرمت شمسی برای ادمین پنل"""
-    if not value:
-        return ''
-    try:
-        jdate = jdatetime.datetime.frominstance(value)
-        return f'{jdate.day} {PERSIAN_MONTHS[jdate.month - 1]} {jdate.year}'
-    except:
-        return str(value)
+    return gregorian_to_jalali_long(value)
+
+
+def to_persian_date_short(value):
+    """تبدیل تاریخ به فرمت کوتاه شمسی برای ادمین پنل"""
+    return gregorian_to_jalali(value)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -142,6 +146,12 @@ class DiscountCodeAdminForm(forms.ModelForm):
 @admin.register(DiscountCode)
 class DiscountCodeAdmin(admin.ModelAdmin):
     form = DiscountCodeAdminForm
+
+    # Use Jalali date widgets for date fields
+    formfield_overrides = {
+        models.DateTimeField: {'widget': JalaliDateTimeWidget},
+        models.DateField: {'widget': JalaliDateWidget},
+    }
 
     list_display = (
         'code',
@@ -289,6 +299,12 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    # Use Jalali date widgets for date fields
+    formfield_overrides = {
+        models.DateTimeField: {'widget': JalaliDateTimeWidget},
+        models.DateField: {'widget': JalaliDateWidget},
+    }
+
     list_display = (
         'order_number',
         'full_name',

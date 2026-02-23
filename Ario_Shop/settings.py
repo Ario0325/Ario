@@ -65,6 +65,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Local apps
+    'Core_Module',
     'Home_Module',
     'Menu_Module',
     'Contact_Module',
@@ -181,6 +183,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
+    BASE_DIR / "Core_Module/admin",
 ]
 
 MEDIA_URL = '/media/'

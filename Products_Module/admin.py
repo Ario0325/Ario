@@ -1,24 +1,15 @@
 from django.contrib import admin
-import jdatetime
+from django.db import models
 from .models import Category, Brand, Product, ProductImage, ProductColor, ProductSize, ProductReview
 
-
-# نام ماه‌های شمسی به فارسی
-PERSIAN_MONTHS = [
-    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
-    'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
-]
+# Use Core_Module utilities for date conversion
+from Core_Module.utils import gregorian_to_jalali, gregorian_to_jalali_long
+from Core_Module.admin_widgets import JalaliDateWidget, JalaliDateTimeWidget
 
 
 def to_persian_date_admin(value):
     """تبدیل تاریخ به فرمت شمسی برای ادمین پنل"""
-    if not value:
-        return ''
-    try:
-        jdate = jdatetime.datetime.frominstance(value)
-        return f'{jdate.day} {PERSIAN_MONTHS[jdate.month - 1]} {jdate.year}'
-    except:
-        return str(value)
+    return gregorian_to_jalali_long(value)
 
 
 class ProductImageInline(admin.TabularInline):
@@ -39,6 +30,12 @@ class ProductSizeInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    # Use Jalali date widgets
+    formfield_overrides = {
+        models.DateTimeField: {'widget': JalaliDateTimeWidget},
+        models.DateField: {'widget': JalaliDateWidget},
+    }
+    
     list_display = ['name', 'parent', 'is_active', 'products_count', 'created_at_persian']
     list_filter = ['is_active', 'created_at']
     search_fields = ['name']
@@ -52,6 +49,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
+    # Use Jalali date widgets
+    formfield_overrides = {
+        models.DateTimeField: {'widget': JalaliDateTimeWidget},
+        models.DateField: {'widget': JalaliDateWidget},
+    }
+    
     list_display = ['name', 'is_active', 'created_at_persian']
     list_filter = ['is_active', 'created_at']
     search_fields = ['name']
@@ -65,6 +68,12 @@ class BrandAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    # Use Jalali date widgets
+    formfield_overrides = {
+        models.DateTimeField: {'widget': JalaliDateTimeWidget},
+        models.DateField: {'widget': JalaliDateWidget},
+    }
+    
     list_display = ['name', 'category', 'brand', 'price', 'old_price', 'stock', 'is_available', 'is_active', 'label',
                     'views_count']
     list_filter = ['is_active', 'is_available', 'category', 'brand', 'label', 'created_at']
@@ -96,6 +105,12 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
+    # Use Jalali date widgets
+    formfield_overrides = {
+        models.DateTimeField: {'widget': JalaliDateTimeWidget},
+        models.DateField: {'widget': JalaliDateWidget},
+    }
+    
     list_display = ['product', 'is_main', 'order', 'created_at_persian']
     list_filter = ['is_main', 'created_at']
     search_fields = ['product__name', 'alt_text']
@@ -124,6 +139,12 @@ class ProductSizeAdmin(admin.ModelAdmin):
 
 @admin.register(ProductReview)
 class ProductReviewAdmin(admin.ModelAdmin):
+    # Use Jalali date widgets
+    formfield_overrides = {
+        models.DateTimeField: {'widget': JalaliDateTimeWidget},
+        models.DateField: {'widget': JalaliDateWidget},
+    }
+    
     list_display = ['product', 'name', 'rating', 'is_approved', 'created_at_persian']
     list_filter = ['is_approved', 'rating', 'created_at']
     search_fields = ['product__name', 'name', 'email', 'comment']

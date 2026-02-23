@@ -1,6 +1,7 @@
 {% extends 'shared/base.html' %}
 {% load static %}
 {% load math_filters %}
+{% load persian_date_tags %}
 
 {% block title %}{{ product.name }} - جزئیات محصول{% endblock %}
 
@@ -279,7 +280,7 @@
                                             <div class="ratings-val" style="width: {{ review.rating|mul:20 }}%;"></div>
                                         </div>
                                     </div>
-                                    <span class="review-date">{{ review.created_at|timesince }} پیش</span>
+                                    <span class="review-date">{{ review.created_at|time_ago_persian }}</span>
                                 </div>
                                 <div class="col-12">
                                     <h4>{{ review.title }}</h4>
