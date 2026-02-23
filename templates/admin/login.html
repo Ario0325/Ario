@@ -9,6 +9,11 @@
 <link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}">
 {% endblock %}
 
+{% block extrahead %}
+{{ block.super }}
+<script src="{% static 'admin/js/theme-switcher.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <div class="admin-auth-wrapper">
     <div class="admin-auth-card">

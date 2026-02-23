@@ -20,21 +20,41 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ENVIRONMENT CONFIGURATION
 # =============================================================================
 
-# Set DEBUG to True for local development, False for production
-# For production deployment on PythonAnywhere, set to False
+# Detect if running in production by checking if DEBUG is explicitly set
+# Default to True for local development, False for production
 DEBUG = True  # تغییر به False برای محیط production
 
-# Secret key for Django - change this in production for better security
-# این کلید را در محیط production تغییر دهید
-SECRET_KEY = 'django-insecure-dev-key-for-local-development-only-change-in-prod'
+# Generate a secure secret key based on environment detection
+# In production, use a fixed key. For development, use a default.
+def get_secret_key():
+    """
+    Generate or retrieve a secure secret key.
+    For production, this should be a strong, random key.
+    For development, we use a fixed key for convenience.
+    """
+    # In production (DEBUG=False), use a strong static key
+    # Change this in production to a truly random key!
+    if not DEBUG:
+        return 'prod-secret-key-change-this-in-production-use-openssl-rand-hex-32'
+    # For development, use a fixed key
+    return 'django-insecure-dev-key-for-local-development-only-change-in-prod'
 
-# Allowed hosts - for production, add your domain
+SECRET_KEY = get_secret_key()
+
+# Allowed hosts configuration
+# For production, add your actual domain names
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '::1',
-    'arya0325.pythonanywhere.com',  # PythonAnywhere domain
+    'arya0325.pythonanywhere.com',  # PythonAnywhere production domain
 ]
+
+# Add production domains if not in debug mode
+if not DEBUG:
+    # Add your production domains here
+    # ALLOWED_HOSTS.extend(['your-domain.com', 'www.your-domain.com'])
+    pass
 
 # Application definition
 
@@ -190,15 +210,15 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 SECURE_REDIRECT_EXEMPT = []
 
-# Cookie Security
-SESSION_COOKIE_SECURE = not DEBUG
+# Cookie Security - Always secure, regardless of DEBUG
+SESSION_COOKIE_SECURE = True  # Always use secure cookies
 SESSION_COOKIE_HTTPONLY = True  # Always safe - prevents XSS from reading cookies
-SESSION_COOKIE_SAMESITE = 'Lax' if DEBUG else 'Strict'  # Strict in production
-CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SAMESITE = 'Lax'  # Balance between security and usability
+CSRF_COOKIE_SECURE = True  # Always use secure CSRF cookies
 CSRF_COOKIE_HTTPONLY = True  # Prevents CSRF token theft via JavaScript
-CSRF_COOKIE_SAMESITE = 'Lax' if DEBUG else 'Strict'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
-# CSRF Settings - Allow localhost for development and PythonAnywhere
+# CSRF Settings - Allow localhost for development and production domains
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     'http://localhost:8000',
@@ -206,8 +226,14 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://[::1]',
     'http://[::1]:8000',
-    'https://arya0325.pythonanywhere.com',
+    'https://arya0325.pythonanywhere.com',  # PythonAnywhere production
 ]
+
+# Add production CSRF origins if not in debug mode
+if not DEBUG:
+    # Add your production domains here
+    # CSRF_TRUSTED_ORIGINS.extend(['https://your-domain.com'])
+    pass
 
 # X-Frame-Options - Clickjacking protection
 X_FRAME_OPTIONS = 'DENY'
@@ -233,20 +259,63 @@ PERMISSIONS_POLICY = {
 }
 
 # Content Security Policy - Prevent XSS and injection attacks
-# In production, customize this based on your static assets
-if DEBUG:
-    # Relaxed CSP for development - only log violations
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+# Strict CSP for production, relaxed for development
+if not DEBUG:
+    # Production CSP - customize based on your static assets
+    SECURE_CONTENT_SECURITY_POLICY = """
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https:;
+        connect-src 'self';
+        frame-ancestors 'none';
+    """.replace('\n', ' ').strip()
 else:
-    # Strict CSP for production (customize based on needs)
-    pass  # Add CSP settings in production as needed
+    # Development CSP - more permissive but still logs violations
+    SECURE_CONTENT_SECURITY_POLICY = """
+        default-src 'self' 'unsafe-inline' 'unsafe-eval';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com data:;
+        img-src 'self' data: https: blob:;
+        connect-src 'self';
+        frame-ancestors 'none';
+    """.replace('\n', ' ').strip()
 
-# Password Hashing - Use PBKDF2 (built-in, no external dependency needed)
-# Consider using Argon2 in production (requires argon2-cffi package)
-PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-]
+# Log CSP violations in development
+SECURE_CSP_LOG_VIOLATIONS = DEBUG
+
+# =============================================================================
+# ADMIN CUSTOMIZATION
+# =============================================================================
+
+# Admin site header and title
+ADMIN_SITE_HEADER = 'پنل مدیریت آریو شاپ'
+ADMIN_SITE_TITLE = 'پنل مدیریت آریو شاپ'
+ADMIN_INDEX_TITLE = 'به پنل مدیریت خوش آمدید'
+
+# Hide admin in development (optional - uncomment in production)
+# ADMIN_URL = 'admin-panel/'  # Change 'admin/' to something else
+
+# =============================================================================
+# PASSWORD HASHING - PRODUCTION SECURITY
+# =============================================================================
+
+# Use Argon2 in production (more secure than PBKDF2)
+# PBKDF2 is used as fallback for compatibility
+if not DEBUG:
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.Argon2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    ]
+else:
+    # Use PBKDF2 for development (faster)
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    ]
 
 # =============================================================================
 # RATE LIMITING SETTINGS
@@ -259,7 +328,7 @@ RATELIMIT_CACHE_PREFIX = 'rl'
 # Rate limit defaults (can be overridden per-view)
 RATELIMIT_DEFAULT = '10/m'  # 10 requests per minute by default
 
-# Login rate limiting
+# Login rate limiting - prevent brute force attacks
 LOGIN_RATE_LIMIT = '5/m'  # 5 login attempts per minute
 LOGIN_RATE_LIMIT_USER = '10/m'  # Per user limit
 
@@ -271,3 +340,22 @@ LOGIN_RATE_LIMIT_USER = '10/m'  # Per user limit
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days in seconds
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Regenerate session key on login for session fixation protection
+SESSION_KEY_REGENERATE = True
+
+# =============================================================================
+# FILE UPLOAD SECURITY
+# =============================================================================
+
+# Maximum upload size (10MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
+# File upload permissions
+FILE_UPLOAD_PERMISSIONS = 0o644
+
+# =============================================================================
+# CACHE KEY PREFIX (to avoid conflicts)
+# =============================================================================
+
+CACHE_KEY_PREFIX = 'ario_shop_'

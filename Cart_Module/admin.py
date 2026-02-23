@@ -4,8 +4,27 @@ from django.db.models import Count
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils import timezone
+import jdatetime
 
 from .models import DiscountCode, Order, OrderItem
+
+
+# نام ماه‌های شمسی به فارسی
+PERSIAN_MONTHS = [
+    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+    'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+]
+
+
+def to_persian_date_admin(value):
+    """تبدیل تاریخ به فرمت شمسی برای ادمین پنل"""
+    if not value:
+        return ''
+    try:
+        jdate = jdatetime.datetime.frominstance(value)
+        return f'{jdate.day} {PERSIAN_MONTHS[jdate.month - 1]} {jdate.year}'
+    except:
+        return str(value)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -135,7 +154,7 @@ class DiscountCodeAdmin(admin.ModelAdmin):
         'usage_limit_total',
         'is_active_badge',
         'validity_status',
-        'ends_at',
+        'ends_at_persian',
     )
     list_filter = ('is_active', 'discount_type', 'scope')
     search_fields = ('code', 'title', 'description', 'product__name')
@@ -224,6 +243,10 @@ class DiscountCodeAdmin(admin.ModelAdmin):
             return mark_safe('<span style="color:#c62828;">منقضی شده</span>')
         return mark_safe('<span style="color:#2e7d32;">معتبر</span>')
 
+    @admin.display(description='تاریخ انقضا', ordering='ends_at')
+    def ends_at_persian(self, obj):
+        return to_persian_date_admin(obj.ends_at)
+
     @admin.display(description='آمار استفاده')
     def usage_stats_display(self, obj):
         if not obj.pk:
@@ -272,12 +295,16 @@ class OrderAdmin(admin.ModelAdmin):
         'discount_amount_display',
         'total',
         'status',
-        'created_at',
+        'created_at_persian',
     )
     list_filter = ('status', 'created_at')
     search_fields = ('order_number', 'full_name', 'phone')
     inlines = [OrderItemInline]
     readonly_fields = ('order_number', 'created_at', 'updated_at')
+
+    @admin.display(description='تاریخ ثبت', ordering='created_at')
+    def created_at_persian(self, obj):
+        return to_persian_date_admin(obj.created_at)
 
     @admin.display(description='جمع قبل از تخفیف')
     def subtotal_display(self, obj):

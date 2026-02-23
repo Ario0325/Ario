@@ -1,5 +1,6 @@
 {% extends 'shared/base.html' %}
 {% load static %}
+{% load persian_date_tags %}
 
 {% block title %}فاکتور {{ order.order_number }}{% endblock %}
 
@@ -46,7 +47,7 @@
                                 <div class="col-md-6">
                                     <div class="breadcrumb-left">
                                         <ul>
-                                            <li>تاریخ فاکتور : <span>{{ order.created_at|date:"Y/m/d" }}</span></li>
+                                            <li>تاریخ فاکتور : <span>{{ order.created_at|to_persian_date }}</span></li>
                                             <li>شماره فاکتور : <span>{{ order.order_number }}</span></li>
                                             {% if order.discount_code %}
                                             <li>کد تخفیف : <span style="color:#1f7a45;font-weight:700;">{{ order.discount_code.code }}</span></li>

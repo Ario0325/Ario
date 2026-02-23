@@ -21,6 +21,10 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = 'پروفایل کاربر'
         verbose_name_plural = 'پروفایل‌های کاربران'
+        indexes = [
+            # Index for city-based lookups
+            models.Index(fields=['city'], name='profile_city_idx'),
+        ]
 
     def __str__(self):
         return self.full_name or self.user.email or str(self.user)

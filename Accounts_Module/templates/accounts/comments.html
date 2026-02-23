@@ -1,5 +1,6 @@
 {% extends 'shared/base.html' %}
 {% load static %}
+{% load persian_date_tags %}
 
 {% block title %}نظرات من - فروگاه{% endblock %}
 
@@ -120,7 +121,7 @@
                                     <div class="comment-footer">
                                         <span class="comment-date">
                                             <i class="icon-calendar"></i>
-                                            {{ review.created_at|date:"d M Y" }}
+                                            {{ review.created_at|to_persian_date }}
                                         </span>
                                     </div>
                                 </div>
