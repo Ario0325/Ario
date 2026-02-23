@@ -255,8 +255,8 @@ class DiscountCodeAdmin(admin.ModelAdmin):
         total_orders = obj.orders.count()
         unique_users = obj.orders.values('user').distinct().count()
         total_discount = sum(o.discount_amount for o in obj.orders.all())
-        # Convert to float for proper formatting
-        total_discount_formatted = f'{float(total_discount):,.0f}'
+        # Format as string first to avoid Decimal formatting issues
+        total_discount_formatted = f'{int(total_discount):,}'
 
         return format_html(
             '<div style="background:#f5f5f5;padding:12px;border-radius:8px;line-height:2;">'
@@ -316,12 +316,12 @@ class OrderAdmin(admin.ModelAdmin):
 
     @admin.display(description='مبلغ تخفیف')
     def discount_amount_display(self, obj):
-        if obj.discount_amount:
-            # Convert Decimal to float for proper formatting
-            discount_value = float(obj.discount_amount)
+        if obj.discount_amount and float(obj.discount_amount) > 0:
+            # Format as string first to avoid Decimal formatting issues
+            formatted_amount = f'{int(obj.discount_amount):,}'
             return format_html(
-                '<span style="color:#c62828;">- {:,.0f} تومان</span>',
-                discount_value,
+                '<span style="color:#c62828;">- {} تومان</span>',
+                formatted_amount,
             )
         return '—'
 
