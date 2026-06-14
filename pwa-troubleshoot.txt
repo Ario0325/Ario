@@ -1,127 +1,27 @@
 ============================================================
-  راهنمای کامل رفع مشکل PWA - آریو شاپ
-  دامنه: aryaabdi1850325.pythonanywhere.com
+  رفع مشکل loaddata - آریو شاپ
 ============================================================
 
-== مشکل اصلی ==
-کد روی PythonAnywhere هنوز آپدیت نشده.
-سایت زنده هنوز manifest قدیمی با اسم "molla" رو داره.
-یعنی git pull انجام نشده یا وب‌اپ ریلود نشده.
+== مشکل ==
+UNIQUE constraint failed: Accounts_Module_userprofile.user_id
+signal پروفایل کاربر هنگام loaddata اجرا میشد و تکراری میساخت.
 
-== مراحل حل مشکل (به ترتیب اجرا کن) ==
-
-------------------------------------------------------------
-مرحله 1: وارد کنسول Bash بشو
-------------------------------------------------------------
-از منوی بالای PythonAnywhere روی "Consoles" کلیک کن
-روی "Bash" کلیک کن تا ترمینال باز بشه
-
-------------------------------------------------------------
-مرحله 2: کد رو آپدیت کن
-------------------------------------------------------------
-این دستورات رو یکی یکی تایپ کن و Enter بزن:
+== راه حل ==
+signal اصلاح شد (raw=True رو نادیده میگیره).
+حالا این دستورات رو اجرا کن:
 
 cd ~/Ario
 git pull origin main
+rm -f db.sqlite3
+python3.13 manage.py migrate
+python3.13 manage.py loaddata db.json
 
-خروجی باید شامل این کامیت‌ها باشه:
-  6ff9869 docs: update PWA troubleshoot guide
-  b8448d1 fix: remove WhiteNoise, serve manifest via Django view
-  86eaaf2 fix: add aryaabdi1850325.pythonanywhere.com to ALLOWED_HOSTS
-  8aa9234 docs: add PWA fix report
-  63cb34f fix: PWA manifest - add screenshots, fix icon purposes
-  f91097f fix: PWA not installable - add WhiteNoise, serve sw.js
+== توضیح ==
+1. git pull → کد جدید با signal اصلاح‌شده رو میگیره
+2. rm db.sqlite3 → دیتابیس قدیمی رو حذف میکنه
+3. migrate → جدول‌های خالی رو میسازه
+4. loaddata → داده‌ها رو بدون تداخل میریزه
 
-------------------------------------------------------------
-مرحله 3: چک کن فایل‌ها درست شدن
-------------------------------------------------------------
-
-این دستور رو اجرا کن:
-cat Ario_Shop/urls.py | grep manifest
-
-خروجی باید این باشه:
-  path('manifest.json', manifest, name='manifest'),
-
-اگه این خروجی رو ندیدی، یعنی git pull موفق نبوده.
-
-------------------------------------------------------------
-مرحله 4: Static File Mapping تنظیم کن
-------------------------------------------------------------
-1. برو به صفحه "Web" (از منوی بالا)
-2. بخش "Static files" رو پیدا کن
-3. اگه قبلاً mapping اضافه کردی، اول حذفش کن (روی Delete بزن)
-4. روی "Add a new static file mapping" کلیک کن
-5. این مقادیر رو وارد کن:
-   URL: /static/
-   Directory: /home/aryaabdi1850325/Ario/static
-6. روی "Add" کلیک کن
-
-------------------------------------------------------------
-مرحله 5: وب‌اپ رو Reload کن
-------------------------------------------------------------
-همون صفحه Web بالای صفحه روی دکمه "Reload" بزن
-
-------------------------------------------------------------
-مرحله 6: تست کن
-------------------------------------------------------------
-مرورگر رو باز کن و این آدرس‌ها رو تست کن:
-
-تست 1: مانیفست
-https://aryaabdi1850325.pythonanywhere.com/manifest.json
-باید JSON بیاد با این محتوا:
-  "name": "فروشگاه آریو شاپ"
-  "short_name": "آریو شاپ"
-
-تست 2: سرویس ورکر
-https://aryaabdi1850325.pythonanywhere.com/sw.js
-باید کد JavaScript بیاد
-
-تست 3: فایل استاتیک
-https://aryaabdi1850325.pythonanywhere.com/static/assets/css/style.css
-باید کد CSS بیاد
-
-تست 4: صفحه اصلی
-https://aryaabdi1850325.pythonanywhere.com/
-باید صفحه سایت بیاد
-
-------------------------------------------------------------
-مرحله 7: Chrome DevTools تست نهایی
-------------------------------------------------------------
-1. برو به سایت
-2. Ctrl+Shift+I (یا F12) بزن
-3. تب Application رو انتخاب کن
-4. از سمت چپ روی Manifest کلیک کن
-5. باید اطلاعات زیر رو ببینی:
-   - name: فروشگاه آریو شاپ
-   - short_name: آریو شاپ
-   - start_url: /
-   - icons: 3 آیکون
-6. از سمت چپ روی Service Workers کلیک کن
-7. باید Status: "activated and is running" باشه
-8. اگه همه چیز درست باشه، آیکون نصب (+) توی نوار آدرس ظاهر میشه
-
-== اگه مشکلی پیش اومد ==
-
-مشکل: git pull ارور میده
-→ اجرا کن: git stash
-→ بعد: git pull origin main
-
-مشکل: manifest.json هنوز 404 میده
-→ چک کن وب‌اپ ریلود شده باشه (صفحه Web → Reload)
-→ چک کن ALLOWED_HOSTS دامنه درست رو داشته باشه
-
-مشکل: فایل‌های استاتیک 404 میدن
-→ Static File Mapping رو چک کن
-→ مطمئن شو مسیر /home/aryaabdi1850325/Ario/static درسته
-
-مشکل: Service Worker ثبت نمیشه
-→ توی Chrome DevTools تب Console رو چک کن
-→ اگه ارور قرمز هست، اسکرین‌شات بگیر و بفرست
-
-== اسکرین‌شات بگیر و بفرست ==
-اگه بازم مشکل داشتی، از اینا اسکرین‌شات بگیر:
-1. Chrome DevTools → Application → Manifest
-2. Chrome DevTools → Application → Service Workers
-3. Chrome DevTools → Console (ارورهای قرمز)
-4. صفحه Web پنل PythonAnywhere (بخش Static files)
-5. خروجی git log --oneline -5 توی کنسول Bash
+== بعد از اتمام ==
+از صفحه Web → Reload بزن
+سایت رو تست کن: https://aryaabdi1850325.pythonanywhere.com/
