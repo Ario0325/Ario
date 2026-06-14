@@ -1,0 +1,63 @@
+=== گزارش رفع مشکل PWA - آریو شاپ ===
+
+مشکلات پیدا شده و راه حل ها:
+
+1. فایل‌های استاتیک 404 برمیگردوندن (sw.js, manifest, icons)
+   → WhiteNoise اضافه شد به requirements.txt و MIDDLEWARE
+
+2. Service Worker scope اشتباه بود (sw.js در /static/ ولی scope / بود)
+   → sw.js از طریق Django view در مسیر /sw.js سرو میشه با هدر Service-Worker-Allowed
+
+3. فایل manifest با Content-Type اشتباه سرو میشد
+   → WHITENOISE_MIMETYPES اضافه شد برای .webmanifest
+
+4. STATICFILES_STORAGE پیش‌فرض hash اضافه میکرد به اسم فایل‌ها
+   → CompressedStaticFilesStorage تنظیم شد (بدون hash)
+
+5. آیکون‌ها purpose نداشتن و maskable جدا نبود
+   → purpose: any برای آیکون‌های اصلی و purpose: maskable جداگانه
+
+6. screenshots در manifest نبود
+   → دو اسکرین‌شات اضافه شد (دسکتاپ 1280x720 و موبایل 720x1280)
+
+7. display-override نبود
+   → اضافه شد برای Window Controls Overlay
+
+=== فایل‌های تغییر یافته ===
+
+- requirements.txt → اضافه شدن whitenoise>=6.6.0
+- Ario_Shop/settings.py → WhiteNoise middleware, STATICFILES_STORAGE, WHITENOISE_MIMETYPES, STATIC_URL
+- Ario_Shop/urls.py → view جدید برای سرو sw.js با هدر Service-Worker-Allowed
+- templates/shared/script.html → مسیر ثبت‌نام SW از /static/sw.js به /sw.js
+- static/assets/images/icons/site.webmanifest → کامل بازنویسی شد
+- static/sw.js → فایل service worker (بدون تغییر)
+- static/assets/images/screenshots/screenshot-desktop.png → جدید
+- static/assets/images/screenshots/screenshot-mobile.png → جدید
+
+=== نحوه دیپلوی روی PythonAnywhere ===
+
+1. کنسول Bash پنل PythonAnywhere رو باز کن
+2. دستورات زیر رو اجرا کن:
+
+   cd ~/Ario
+   git pull origin main
+   pip install whitenoise
+   python manage.py collectstatic --noinput
+
+3. از صفحه Web روی دکمه Reload بزن
+4. مرورگر رو باز کن و به سایت برو
+5. توی Chrome → DevTools → Application → Manifest رو چک کن
+6. دکمه نصب PWA باید توی آدرس‌بار ظاهر بشه
+
+=== نحوه تست ===
+
+- Chrome دسکتاپ: آیکون نصب (+) توی نوار آدرس ظاهر میشه
+- Chrome موبایل: منوی سه‌نقطه → "افزودن به صفحه اصلی"
+- آفلاین: بعد از نصب، اگه نت قطع بشه، صفحات کش‌شده نمایش داده میشن
+
+=== نکات مهم ===
+
+- WhiteNoise فایل‌های استاتیک رو فشرده (gzip) میکنه → سرعت لود بیشتر
+- Service Worker فایل‌های استاتیک رو کش میکنه → لود سریع‌تر در بازدیدهای بعدی
+- صفحات HTML با network-first کش میشن → آفلاین هم کار میکنه
+- مسیرهای admin و accounts و cart کش نمیشن (امنیت)
