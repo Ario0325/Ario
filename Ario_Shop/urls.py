@@ -26,12 +26,21 @@ from Products_Module.sitemaps import ProductSitemap, CategorySitemap
 
 @cache_control(max_age=0, no_cache=True, no_store=True)
 def service_worker(request):
-    sw_path = settings.STATIC_ROOT / 'sw.js'
+    sw_path = settings.BASE_DIR / 'static' / 'sw.js'
     if not sw_path.exists():
         raise Http404
     with open(sw_path, 'rb') as f:
         response = HttpResponse(f.read(), content_type='application/javascript')
     response['Service-Worker-Allowed'] = '/'
+    return response
+
+
+def manifest(request):
+    manifest_path = settings.BASE_DIR / 'static' / 'assets' / 'images' / 'icons' / 'site.webmanifest'
+    if not manifest_path.exists():
+        raise Http404
+    with open(manifest_path, 'rb') as f:
+        response = HttpResponse(f.read(), content_type='application/manifest+json')
     return response
 
 sitemaps = {
@@ -41,6 +50,7 @@ sitemaps = {
 
 urlpatterns = [
     path('sw.js', service_worker, name='service_worker'),
+    path('manifest.json', manifest, name='manifest'),
     path('admin/core/', include('Core_Module.urls')),
     path('admin/', admin.site.urls),
     path('', include('Home_Module.urls')),
