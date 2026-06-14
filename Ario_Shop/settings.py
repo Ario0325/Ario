@@ -206,7 +206,7 @@ DEFAULT_FROM_EMAIL = 'noreply@arioshop.local'
 # N8N AUTHENTICATION WEBHOOK
 # =============================================================================
 
-N8N_WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL', 'http://localhost:5678/webhook/django-auth-event')
+N8N_WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL', 'https://tjnryhbtgvrfdcs.app.n8n.cloud/webhook/django-auth-event')
 N8N_WEBHOOK_SECRET = os.environ.get('N8N_WEBHOOK_SECRET', 'ario-shop-secret-token')
 OTP_EXPIRY_MINUTES = 15
 
@@ -214,7 +214,7 @@ OTP_EXPIRY_MINUTES = 15
 # N8N ORDER CONFIRMATION WEBHOOK
 # =============================================================================
 
-N8N_ORDER_WEBHOOK_URL = os.environ.get('N8N_ORDER_WEBHOOK_URL', 'http://localhost:5678/webhook/order-paid')
+N8N_ORDER_WEBHOOK_URL = os.environ.get('N8N_ORDER_WEBHOOK_URL', 'https://tjnryhbtgvrfdcs.app.n8n.cloud/webhook/order-paid')
 N8N_ORDER_WEBHOOK_SECRET = os.environ.get('N8N_ORDER_WEBHOOK_SECRET', N8N_WEBHOOK_SECRET)
 N8N_SENDER_EMAIL = os.environ.get('N8N_SENDER_EMAIL', 'bardiaabdi1393@gmail.com')
 
