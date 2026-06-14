@@ -1,83 +1,48 @@
 ============================================================
-  عیب‌یابی ارسال ایمیل - آریو شاپ
+  تست ارسال ایمیل از PythonAnywhere
 ============================================================
 
-== نتیجه تست ==
-وبهوک n8n از اینجا تست شد و کار میکنه:
-Status: 200 - Response: {"status":"ok","message":"email sent"}
-یعنی URL درسته و n8n فعاله.
+== مرحله 1: تست وبهوک ==
+توی کنسول Bash PythonAnywhere این دستور رو اجرا کن:
 
-== مشکل احتمالی ==
-PythonAnywhere نمیتونه به n8n.cloud درخواست بفرسته.
-یا کد قدیمی هنوز روی سروره.
+python3.13 -c "import requests; r = requests.post('https://tjnryhbtgvrfdcs.app.n8n.cloud/webhook/django-auth-event', json={'event':'register','email':'test@test.com','username':'test','code':'123456','reset_link':'','sender_email':'bardiaabdi1393@gmail.com'}, headers={'Content-Type':'application/json','X-Webhook-Secret':'ario-shop-secret-token'}, timeout=15); print(f'Status: {r.status_code}, Response: {r.text}')"
 
-== مراحل عیب‌یابی ==
+== خروجی احتمالی ==
 
-مرحله 1: چک کن کد آپدیت شده
-توی کنسول Bash PythonAnywhere اجرا کن:
+خروجی 1: Status: 200, Response: {"status":"ok","message":"email sent"}
+→ وبهوک کار میکنه. مشکل از جای دیگه‌ست. برو مرحله 3.
 
-cd ~/Ario
-git pull origin main
-cat Ario_Shop/settings.py | grep tjnryhbtgvrfdcs
+خروجی 2: ConnectionError یا Timeout
+→ PythonAnywhere نمیتونه به n8n وصل بشه.
+→ احتمالاً پلن رایگان بلاک میکنه.
+→ راه حل: ارتقا به پلن Hacker یا استفاده از PythonAnywhere Anywhere Tasks.
 
-خروجی باید این باشه:
-N8N_WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL', 'https://tjnryhbtgvrfdcs.app.n8n.cloud/webhook/django-auth-event')
+خروجی 3: 401 یا 403
+→ n8n درخواست رو رد کرده.
+→ چک کن Workflow فعال باشه.
 
-مرحله 2: تست وبهوک از PythonAnywhere
-توی کنسول Bash اجرا کن:
+خروجی 4: ModuleNotFoundError: No module named 'requests'
+→ requests نصب نیست.
+→ اجرا کن: pip3.13 install requests
 
-python3.13 -c "
-import requests
-url = 'https://tjnryhbtgvrfdcs.app.n8n.cloud/webhook/django-auth-event'
-payload = {'event':'register','email':'test@test.com','username':'test','code':'123456','reset_link':'','sender_email':'bardiaabdi1393@gmail.com'}
-headers = {'Content-Type':'application/json','X-Webhook-Secret':'ario-shop-secret-token'}
-try:
-    r = requests.post(url, json=payload, headers=headers, timeout=15)
-    print(f'Status: {r.status_code}')
-    print(f'Response: {r.text}')
-except Exception as e:
-    print(f'Error: {type(e).__name__}: {e}')
-"
+== مرحله 2: اگه وبهوک کار کرد ولی ثبت‌نام still خطا میده ==
+لاگ‌های Django رو چک کن:
 
-خروجی احتمالی:
-- Status: 200 → وبهوک کار میکنه، مشکل جای دیگه‌ست
-- ConnectionError → PythonAnywhere نمیتونه به n8n وصل بشه
-- Timeout → n8n کنده یا بلاک شده
-- 403 → n8n درخواست رو رد کرده
+tail -100 /var/log/AryaAbdi1850325.pythonanywhere.com.error.log
 
-مرحله 3: چک کن requests نصب باشه
-pip3.13 list | grep requests
-
-مرحله 4: چک کن .env وبهوک رو override نکنه
-cat ~/Ario/.env | grep N8N
-
-اگه URL قدیمی (localhost) داری، حذفش کن:
-nano ~/Ario/.env
-خط N8N_WEBHOOK_URL رو حذف کن (یا URL درست رو بذار)
-
-مرحله 5: بعد از هر تغییر
-صفحه Web → Reload بزن
-
-مرحله 6: چک کن n8n فعاله
+== مرحله 3: چک کن n8n ==
 1. وارد n8n.cloud بشو
 2. Workflow رو باز کن
-3. toggle بالای صفحه Active باشه
+3. toggle بالای صفحه Active باشه (سبز)
 4. روی تب "Executions" کلیک کن
 5. ببین آیا webhook دریافت شده
+6. اگه دریافت شده ولی خطا داره، روی نود خطا کلیک کن تا جزئیات رو ببینی
 
-مرحله 7: چک کن SMTP تنظیمه
+== مرحله 4: چک کن SMTP ==
 1. توی n8n روی نود "Send Verification Email" کلیک کن
-2. Credential روی "Gmail SMTP" باشه
-3. نه "Not set" و نه خالی
+2. بخش Credential باید "Gmail SMTP" باشه
+3. اگه "Not set" هست، روی انتخاب کن و "Gmail SMTP" رو بذار
+4. همین کار رو برای "Send Password Reset Email" و "Send Order Confirmation Email" هم بکن
 
-== اگه مرحله 2 خطا داد ==
-مشکل از PythonAnywhere هست. احتمالاً:
-- outbound HTTPS بلاک شده (پلن رایگان)
-- requests نصب نیست
-
-راه حل: از پنل PythonAnywhere → Account →勾选 "Run your own code"
-یا ارتقا به پلن Hacker
-
-== اگه مرحله 2 موفق بود ولی ثبت‌نام still خطا میده ==
-مشکل از کد Django هست. لاگ‌ها رو چک کن:
-tail -50 /var/log/AryaAbdi1850325.pythonanywhere.com.error.log
+== خروجی تست رو بفرست ==
+خروجی مرحله 1 رو بفرست تا دقیق بگم مشکل کجاست.
