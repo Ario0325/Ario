@@ -45,6 +45,10 @@ ALLOWED_HOSTS = [
     for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,::1,arya0325.pythonanywhere.com,aryaabdi1850325.pythonanywhere.com').split(',')
     if h.strip()
 ]
+# Always ensure PythonAnywhere domains are included
+for _pa_host in ['arya0325.pythonanywhere.com', 'aryaabdi1850325.pythonanywhere.com']:
+    if _pa_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_pa_host)
 
 # Application definition
 
