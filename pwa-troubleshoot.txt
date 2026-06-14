@@ -1,99 +1,127 @@
-=== راهنمای رفع مشکل PWA - آریو شاپ ===
-=== نسخه جدید - بدون collectstatic ===
+============================================================
+  راهنمای کامل رفع مشکل PWA - آریو شاپ
+  دامنه: aryaabdi1850325.pythonanywhere.com
+============================================================
 
-=== تغییرات انجام شده ===
-1. WhiteNoise حذف شد (نیازی به collectstatic نیست)
-2. manifest از طریق Django view سرو میشه با Content-Type درست
-3. service worker از فایل source خونده میشه (نه staticfiles)
+== مشکل اصلی ==
+کد روی PythonAnywhere هنوز آپدیت نشده.
+سایت زنده هنوز manifest قدیمی با اسم "molla" رو داره.
+یعنی git pull انجام نشده یا وب‌اپ ریلود نشده.
 
-=== مراحل دیپلوی روی PythonAnywhere ===
+== مراحل حل مشکل (به ترتیب اجرا کن) ==
 
-مرحله 1: کد رو pull کن
-وارد کنسول Bash بشو و اجرا کن:
+------------------------------------------------------------
+مرحله 1: وارد کنسول Bash بشو
+------------------------------------------------------------
+از منوی بالای PythonAnywhere روی "Consoles" کلیک کن
+روی "Bash" کلیک کن تا ترمینال باز بشه
+
+------------------------------------------------------------
+مرحله 2: کد رو آپدیت کن
+------------------------------------------------------------
+این دستورات رو یکی یکی تایپ کن و Enter بزن:
 
 cd ~/Ario
 git pull origin main
 
-مرحله 2: Static File Mapping تنظیم کن (مهم!)
-این مرحله خیلی مهمه. بدون اون فایل‌های استاتیک 404 میشن.
+خروجی باید شامل این کامیت‌ها باشه:
+  6ff9869 docs: update PWA troubleshoot guide
+  b8448d1 fix: remove WhiteNoise, serve manifest via Django view
+  86eaaf2 fix: add aryaabdi1850325.pythonanywhere.com to ALLOWED_HOSTS
+  8aa9234 docs: add PWA fix report
+  63cb34f fix: PWA manifest - add screenshots, fix icon purposes
+  f91097f fix: PWA not installable - add WhiteNoise, serve sw.js
 
-1. برو به صفحه "Web" توی پنل PythonAnywhere
+------------------------------------------------------------
+مرحله 3: چک کن فایل‌ها درست شدن
+------------------------------------------------------------
+
+این دستور رو اجرا کن:
+cat Ario_Shop/urls.py | grep manifest
+
+خروجی باید این باشه:
+  path('manifest.json', manifest, name='manifest'),
+
+اگه این خروجی رو ندیدی، یعنی git pull موفق نبوده.
+
+------------------------------------------------------------
+مرحله 4: Static File Mapping تنظیم کن
+------------------------------------------------------------
+1. برو به صفحه "Web" (از منوی بالا)
 2. بخش "Static files" رو پیدا کن
-3. روی "Add a new static file mapping" کلیک کن
-4. این مقادیر رو وارد کن:
+3. اگه قبلاً mapping اضافه کردی، اول حذفش کن (روی Delete بزن)
+4. روی "Add a new static file mapping" کلیک کن
+5. این مقادیر رو وارد کن:
    URL: /static/
    Directory: /home/aryaabdi1850325/Ario/static
-5. روی "Add" کلیک کن
+6. روی "Add" کلیک کن
 
-مرحله 3: وب‌اپ رو Reload کن
-از همون صفحه Web روی دکمه "Reload" بزن.
+------------------------------------------------------------
+مرحله 5: وب‌اپ رو Reload کن
+------------------------------------------------------------
+همون صفحه Web بالای صفحه روی دکمه "Reload" بزن
 
-مرحله 4: تست کن
-مرورگر رو باز کن و برو به:
-https://aryaabdi1850325.pythonanywhere.com/
+------------------------------------------------------------
+مرحله 6: تست کن
+------------------------------------------------------------
+مرورگر رو باز کن و این آدرس‌ها رو تست کن:
 
-=== نحوه تست PWA ===
-
-تست 1: فایل‌های استاتیک
-توی مرورگر این آدرس‌ها رو باز کن:
-https://aryaabdi1850325.pythonanywhere.com/static/assets/css/style.css
-باید کد CSS بیاد (نه 404)
-
-https://aryaabdi1850325.pythonanywhere.com/static/assets/images/icons/site.webmanifest
-باید JSON بیاد (نه 404)
-
-تست 2: Manifest
-توی مرورگر این آدرس رو باز کن:
+تست 1: مانیفست
 https://aryaabdi1850325.pythonanywhere.com/manifest.json
-باید JSON بیاد با اسم "آریو شاپ"
+باید JSON بیاد با این محتوا:
+  "name": "فروشگاه آریو شاپ"
+  "short_name": "آریو شاپ"
 
-تست 3: Service Worker
-توی مرورگر این آدرس رو باز کن:
+تست 2: سرویس ورکر
 https://aryaabdi1850325.pythonanywhere.com/sw.js
 باید کد JavaScript بیاد
 
-تست 4: Chrome DevTools
+تست 3: فایل استاتیک
+https://aryaabdi1850325.pythonanywhere.com/static/assets/css/style.css
+باید کد CSS بیاد
+
+تست 4: صفحه اصلی
+https://aryaabdi1850325.pythonanywhere.com/
+باید صفحه سایت بیاد
+
+------------------------------------------------------------
+مرحله 7: Chrome DevTools تست نهایی
+------------------------------------------------------------
 1. برو به سایت
-2. راست‌کلیک → Inspect → تب Application
-3. از سمت چپ روی "Manifest" کلیک کن
-4. باید اطلاعات زیر رو ببینی:
+2. Ctrl+Shift+I (یا F12) بزن
+3. تب Application رو انتخاب کن
+4. از سمت چپ روی Manifest کلیک کن
+5. باید اطلاعات زیر رو ببینی:
    - name: فروشگاه آریو شاپ
    - short_name: آریو شاپ
    - start_url: /
    - icons: 3 آیکون
-   - screenshots: 2 اسکرین‌شات
-5. از سمت چپ روی "Service Workers" کلیک کن
-6. باید Status: "activated and is running" باشه
+6. از سمت چپ روی Service Workers کلیک کن
+7. باید Status: "activated and is running" باشه
+8. اگه همه چیز درست باشه، آیکون نصب (+) توی نوار آدرس ظاهر میشه
 
-تست 5: نصب PWA
-اگه همه چیز درست باشه:
-- Chrome دسکتاپ: آیکون نصب (+) توی نوار آدرس ظاهر میشه
-- Chrome موبایل: منوی سه‌نقطه → "افزودن به صفحه اصلی"
+== اگه مشکلی پیش اومد ==
 
-=== اگه بازم ارور داشتی ===
+مشکل: git pull ارور میده
+→ اجرا کن: git stash
+→ بعد: git pull origin main
 
-از Chrome DevTools اسکرین‌شات بگیر و بفرست:
-1. تب Application → Manifest
-2. تب Application → Service Workers
-3. تب Console (ارورهای قرمز)
-4. تب Network (فایل‌هایی که 404 هستن)
+مشکل: manifest.json هنوز 404 میده
+→ چک کن وب‌اپ ریلود شده باشه (صفحه Web → Reload)
+→ چک کن ALLOWED_HOSTS دامنه درست رو داشته باشه
 
-=== ارورهای رایج و راه حل ===
+مشکل: فایل‌های استاتیک 404 میدن
+→ Static File Mapping رو چک کن
+→ مطمئن شو مسیر /home/aryaabdi1850325/Ario/static درسته
 
-ارور: "Icon failed to load"
-→ یعنی static file mapping تنظیم نشده
-→ مرحله 2 رو انجام بده
+مشکل: Service Worker ثبت نمیشه
+→ توی Chrome DevTools تب Console رو چک کن
+→ اگه ارور قرمز هست، اسکرین‌شات بگیر و بفرست
 
-ارور: "Manifest 'start_url' is not valid"
-→ git pull origin main رو اجرا کن
-
-ارور: "molla" (اسم قدیمی)
-→ git pull origin main رو اجرا کن
-
-ارور: Service Worker ثبت نمیشه
-→ مطمئن شو /sw.js 200 برمیگردونه
-→ static file mapping رو چک کن
-
-=== نکته مهم ===
-دامنه سایت شما: aryaabdi1850325.pythonanywhere.com
-توی settings.py این دامنه به ALLOWED_HOSTS و CSRF_TRUSTED_ORIGINS اضافه شده.
+== اسکرین‌شات بگیر و بفرست ==
+اگه بازم مشکل داشتی، از اینا اسکرین‌شات بگیر:
+1. Chrome DevTools → Application → Manifest
+2. Chrome DevTools → Application → Service Workers
+3. Chrome DevTools → Console (ارورهای قرمز)
+4. صفحه Web پنل PythonAnywhere (بخش Static files)
+5. خروجی git log --oneline -5 توی کنسول Bash
