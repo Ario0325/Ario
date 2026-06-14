@@ -1,27 +1,26 @@
 ============================================================
-  رفع مشکل loaddata - آریو شاپ
+  مشکل DisallowedHost حل شد
 ============================================================
 
 == مشکل ==
-UNIQUE constraint failed: Accounts_Module_userprofile.user_id
-signal پروفایل کاربر هنگام loaddata اجرا میشد و تکراری میساخت.
+DisallowedHost: Invalid HTTP_HOST header: 'aryaabdi1850325.pythonanywhere.com'
+یعنی دامنه شما توی ALLOWED_HOSTS نبود.
+
+== علت ==
+فایل .env که قبلاً ساختم، ALLOWED_HOSTS=localhost,127.0.0.1 داشت.
+این مقدار، مقدار پیش‌فرض settings.py رو override میکرد و دامنه شما حذف میشد.
 
 == راه حل ==
-signal اصلاح شد (raw=True رو نادیده میگیره).
-حالا این دستورات رو اجرا کن:
+1. ALLOWED_HOSTS از .env حذف شد
+2. settings.py طوری تنظیم شد که همیشه دامنه‌های PythonAnywhere رو داشته باشه
+   (حتی اگه .env مقدار متفاوتی بده)
 
+== دستورات روی PythonAnywhere ==
 cd ~/Ario
 git pull origin main
-rm -f db.sqlite3
-python3.13 manage.py migrate
-python3.13 manage.py loaddata db.json
 
-== توضیح ==
-1. git pull → کد جدید با signal اصلاح‌شده رو میگیره
-2. rm db.sqlite3 → دیتابیس قدیمی رو حذف میکنه
-3. migrate → جدول‌های خالی رو میسازه
-4. loaddata → داده‌ها رو بدون تداخل میریزه
+بعد از صفحه Web → Reload بزن.
 
-== بعد از اتمام ==
-از صفحه Web → Reload بزن
-سایت رو تست کن: https://aryaabdi1850325.pythonanywhere.com/
+== نتیجه ==
+سایت باید الان کار کنه.
+https://aryaabdi1850325.pythonanywhere.com/
