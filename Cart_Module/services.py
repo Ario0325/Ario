@@ -273,6 +273,7 @@ class N8nOrderService:
             "created_at": order.created_at.isoformat(),
             "shipping_address": order.address,
             "items": items,
+            "sender_email": settings.N8N_SENDER_EMAIL,
         }
 
         return cls._send_to_n8n(payload)

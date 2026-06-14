@@ -54,6 +54,7 @@ class N8nAuthService:
             "username": username or "کاربر",
             "code": code,
             "reset_link": "",
+            "sender_email": settings.N8N_SENDER_EMAIL,
         }
         return cls._send_to_n8n(payload)
 
@@ -65,5 +66,6 @@ class N8nAuthService:
             "username": username or "کاربر",
             "code": code,
             "reset_link": "",
+            "sender_email": settings.N8N_SENDER_EMAIL,
         }
         return cls._send_to_n8n(payload)

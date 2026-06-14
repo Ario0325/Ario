@@ -216,6 +216,7 @@ OTP_EXPIRY_MINUTES = 15
 
 N8N_ORDER_WEBHOOK_URL = os.environ.get('N8N_ORDER_WEBHOOK_URL', 'http://localhost:5678/webhook/order-paid')
 N8N_ORDER_WEBHOOK_SECRET = os.environ.get('N8N_ORDER_WEBHOOK_SECRET', N8N_WEBHOOK_SECRET)
+N8N_SENDER_EMAIL = os.environ.get('N8N_SENDER_EMAIL', 'bardiaabdi1393@gmail.com')
 
 # =============================================================================
 # SECURITY SETTINGS - PRODUCTION READY
