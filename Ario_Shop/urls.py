@@ -19,7 +19,20 @@ from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
+from django.http import HttpResponse, Http404
+from django.views.decorators.cache import cache_control
 from Products_Module.sitemaps import ProductSitemap, CategorySitemap
+
+
+@cache_control(max_age=0, no_cache=True, no_store=True)
+def service_worker(request):
+    sw_path = settings.STATIC_ROOT / 'sw.js'
+    if not sw_path.exists():
+        raise Http404
+    with open(sw_path, 'rb') as f:
+        response = HttpResponse(f.read(), content_type='application/javascript')
+    response['Service-Worker-Allowed'] = '/'
+    return response
 
 sitemaps = {
     'products': ProductSitemap,
@@ -27,6 +40,7 @@ sitemaps = {
 }
 
 urlpatterns = [
+    path('sw.js', service_worker, name='service_worker'),
     path('admin/core/', include('Core_Module.urls')),
     path('admin/', admin.site.urls),
     path('', include('Home_Module.urls')),
