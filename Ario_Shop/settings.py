@@ -287,6 +287,7 @@ if not DEBUG:
         font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: https:;
         connect-src 'self';
+        worker-src 'self';
         frame-ancestors 'none';
     """.replace('\n', ' ').strip()
 else:
