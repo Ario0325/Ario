@@ -9,4 +9,7 @@ User = get_user_model()
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         from .models import UserProfile
-        UserProfile.objects.get_or_create(user=instance)
+        UserProfile.objects.get_or_create(
+            user=instance,
+            defaults={'full_name': '', 'phone': '', 'address': '', 'postal_code': '', 'city': ''}
+        )
