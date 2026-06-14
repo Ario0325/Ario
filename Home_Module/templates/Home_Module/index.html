@@ -273,7 +273,7 @@
                         <a href="{% url 'products:category' category.slug %}">{{ category.name }}</a>
                     </h3>
                     <h4 class="banner-subtitle text-white text-center">
-                        <a href="{% url 'products:category' category.slug %}">{{ category.products_count }} محصول</a>
+                        <a href="{% url 'products:category' category.slug %}">{{ category.active_product_count|default:0 }} محصول</a>
                     </h4>
                     <a href="{% url 'products:category' category.slug %}" class="btn btn-outline-white banner-link">خرید</a>
                 </div>

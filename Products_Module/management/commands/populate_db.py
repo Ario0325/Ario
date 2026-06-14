@@ -3,6 +3,7 @@
 استفاده: python manage.py populate_db
 """
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from django.utils import timezone
 from Products_Module.models import Category, Brand, Product, ProductImage, ProductColor, ProductSize, ProductReview
 from Menu_Module.models import MenuItem
@@ -16,9 +17,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('شروع پر کردن دیتابیس...'))
 
-        # پاک کردن داده‌های قبلی (به جز کاربران)
-        self.stdout.write('پاک کردن داده‌های قبلی...')
-        self.stdout.write(self.style.WARNING('توجه: کاربران ادمین حفظ می‌شوند'))
+        with transaction.atomic():
+            # پاک کردن داده‌های قبلی (به جز کاربران)
+            self.stdout.write('پاک کردن داده‌های قبلی...')
+            self.stdout.write(self.style.WARNING('توجه: کاربران ادمین حفظ می‌شوند'))
         ProductReview.objects.all().delete()
         ProductSize.objects.all().delete()
         ProductColor.objects.all().delete()

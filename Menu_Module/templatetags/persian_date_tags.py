@@ -30,7 +30,7 @@ def _convert_to_jdatetime(value):
         
         if value:
             return jdatetime.datetime.frominstance(value)
-    except:
+    except Exception:
         pass
     
     return None

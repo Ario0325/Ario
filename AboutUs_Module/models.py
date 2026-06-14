@@ -127,6 +127,9 @@ class Brand(models.Model):
         verbose_name = 'برند'
         verbose_name_plural = 'برندها'
         ordering = ['order']
+        indexes = [
+            models.Index(fields=['is_active', 'order'], name='aboutbrand_active_order_idx'),
+        ]
 
     def __str__(self):
         return self.name
@@ -182,6 +185,9 @@ class TeamMember(models.Model):
         verbose_name = 'عضو تیم'
         verbose_name_plural = 'اعضای تیم'
         ordering = ['order']
+        indexes = [
+            models.Index(fields=['is_active', 'order'], name='teammember_active_order_idx'),
+        ]
 
     def __str__(self):
         return f'{self.name} - {self.position}'
@@ -226,6 +232,9 @@ class Testimonial(models.Model):
         verbose_name = 'نظر مشتری'
         verbose_name_plural = 'نظرات مشتریان'
         ordering = ['order']
+        indexes = [
+            models.Index(fields=['is_active', 'order'], name='testimonial_active_order_idx'),
+        ]
 
     def __str__(self):
         return f'نظر {self.customer_name}'

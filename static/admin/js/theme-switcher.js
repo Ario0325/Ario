@@ -380,8 +380,8 @@
             .theme-dropdown {
                 position: absolute;
                 top: calc(100% + 12px);
-                left: 50%;
-                transform: translateX(-50%) translateY(-10px) scale(0.95);
+                right: 0;
+                left: auto;
                 min-width: 260px;
                 background: linear-gradient(180deg, var(--ap-card, #1a1a24) 0%, var(--ap-surface, #18181f) 100%);
                 border: 1px solid var(--ap-border, rgba(255,255,255,0.08));
@@ -397,7 +397,7 @@
             .theme-selector-wrapper.open .theme-dropdown {
                 opacity: 1;
                 visibility: visible;
-                transform: translateX(-50%) translateY(0) scale(1);
+                transform: translateY(0) scale(1);
             }
             
             .theme-dropdown-title {

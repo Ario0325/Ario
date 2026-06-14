@@ -2,14 +2,16 @@ from django import forms
 from django.contrib import admin
 from django.db import models
 from django.db.models import Count
+from django.http import HttpResponse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils import timezone
+import csv
 import jdatetime
 
-# Use Core_Module utilities for date conversion
 from Core_Module.utils import gregorian_to_jalali, gregorian_to_jalali_long
 from Core_Module.admin_widgets import JalaliDateWidget, JalaliDateTimeWidget
+from Core_Module.admin_filters import DateRangeFilter
 
 from .models import DiscountCode, Order, OrderItem
 
@@ -299,7 +301,6 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    # Use Jalali date widgets for date fields
     formfield_overrides = {
         models.DateTimeField: {'widget': JalaliDateTimeWidget},
         models.DateField: {'widget': JalaliDateWidget},
@@ -312,13 +313,53 @@ class OrderAdmin(admin.ModelAdmin):
         'discount_code',
         'discount_amount_display',
         'total',
-        'status',
+        'status_badge',
         'created_at_persian',
     )
-    list_filter = ('status', 'created_at')
+    list_filter = ('status', DateRangeFilter)
     search_fields = ('order_number', 'full_name', 'phone')
     inlines = [OrderItemInline]
     readonly_fields = ('order_number', 'created_at', 'updated_at')
+    actions = ['bulk_mark_shipped', 'bulk_mark_delivered', 'export_orders_csv']
+
+    STATUS_COLORS = {
+        'pending':    ('#fff3e0', '#e65100', '⏳ در انتظار'),
+        'paid':       ('#e8f5e9', '#2e7d32', '💳 پرداخت شده'),
+        'processing': ('#e3f2fd', '#1565c0', '⚙️ در حال پردازش'),
+        'shipped':    ('#f3e5f5', '#6a1b9a', '🚚 ارسال شده'),
+        'delivered':  ('#e8f5e9', '#1b5e20', '✅ تحویل داده شده'),
+        'cancelled':  ('#ffebee', '#c62828', '❌ لغو شده'),
+    }
+
+    @admin.display(description='وضعیت')
+    def status_badge(self, obj):
+        bg, color, label = self.STATUS_COLORS.get(obj.status, ('#f5f5f5', '#666', obj.status))
+        return mark_safe(
+            f'<span style="background:{bg};color:{color};padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">{label}</span>'
+        )
+
+    @admin.action(description='🚚 علامت‌گذاری ارسال شده')
+    def bulk_mark_shipped(self, request, queryset):
+        count = queryset.filter(status__in=['paid', 'processing']).update(status='shipped')
+        self.message_user(request, f'{count} سفارش ارسال شد.')
+
+    @admin.action(description='📦 علامت‌گذاری تحویل داده شده')
+    def bulk_mark_delivered(self, request, queryset):
+        count = queryset.filter(status='shipped').update(status='delivered')
+        self.message_user(request, f'{count} سفارش تحویل داده شد.')
+
+    @admin.action(description='📥 خروجی CSV سفارشات')
+    def export_orders_csv(self, request, queryset):
+        response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+        response['Content-Disposition'] = 'attachment; filename=orders.csv'
+        writer = csv.writer(response)
+        writer.writerow(['شماره سفارش', 'نام مشتری', 'تلفن', 'مبلغ کل', 'وضعیت', 'تاریخ'])
+        for o in queryset:
+            writer.writerow([o.order_number, o.full_name, o.phone, o.total, o.get_status_display(), o.created_at])
+        return response
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'discount_code')
 
     @admin.display(description='تاریخ ثبت', ordering='created_at')
     def created_at_persian(self, obj):
@@ -333,7 +374,6 @@ class OrderAdmin(admin.ModelAdmin):
     @admin.display(description='مبلغ تخفیف')
     def discount_amount_display(self, obj):
         if obj.discount_amount and float(obj.discount_amount) > 0:
-            # Format as string first to avoid Decimal formatting issues
             formatted_amount = f'{int(obj.discount_amount):,}'
             return format_html(
                 '<span style="color:#c62828;">- {} تومان</span>',

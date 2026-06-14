@@ -164,6 +164,9 @@ class ProductImage(models.Model):
         verbose_name = 'تصویر محصول'
         verbose_name_plural = 'تصاویر محصول'
         ordering = ['order', 'created_at']
+        indexes = [
+            models.Index(fields=['product', 'order'], name='productimage_product_order_idx'),
+        ]
 
     def __str__(self):
         return f'{self.product.name} - تصویر {self.order}'
@@ -179,6 +182,7 @@ class ProductColor(models.Model):
     class Meta:
         verbose_name = 'رنگ محصول'
         verbose_name_plural = 'رنگ‌های محصول'
+        unique_together = ['product', 'name']
 
     def __str__(self):
         return f'{self.product.name} - {self.name}'

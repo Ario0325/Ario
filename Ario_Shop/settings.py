@@ -11,50 +11,40 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 
 # =============================================================================
 # ENVIRONMENT CONFIGURATION
 # =============================================================================
 
-# Detect if running in production by checking if DEBUG is explicitly set
-# Default to True for local development, False for production
-DEBUG = True  # تغییر به False برای محیط production
+# Read DEBUG from environment variable, default to False for safety
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-# Generate a secure secret key based on environment detection
-# In production, use a fixed key. For development, use a default.
-def get_secret_key():
-    """
-    Generate or retrieve a secure secret key.
-    For production, this should be a strong, random key.
-    For development, we use a fixed key for convenience.
-    """
-    # In production (DEBUG=False), use a strong static key
-    # Change this in production to a truly random key!
-    if not DEBUG:
-        return 'prod-secret-key-change-this-in-production-use-openssl-rand-hex-32'
-    # For development, use a fixed key
-    return 'django-insecure-dev-key-for-local-development-only-change-in-prod'
-
-SECRET_KEY = get_secret_key()
+# SECRET_KEY: Read from environment. Fail loudly if missing in production.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-dev-key-for-local-development-only-change-in-prod'
+    else:
+        raise ValueError(
+            'DJANGO_SECRET_KEY environment variable is required in production. '
+            'Generate one with: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"'
+        )
 
 # Allowed hosts configuration
-# For production, add your actual domain names
+# Read from environment or use defaults for development
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '::1',
-    'arya0325.pythonanywhere.com',  # PythonAnywhere production domain
+    h.strip()
+    for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,::1,arya0325.pythonanywhere.com').split(',')
+    if h.strip()
 ]
-
-# Add production domains if not in debug mode
-if not DEBUG:
-    # Add your production domains here
-    # ALLOWED_HOSTS.extend(['your-domain.com', 'www.your-domain.com'])
-    pass
 
 # Application definition
 
@@ -65,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     # Local apps
     'Core_Module',
     'Home_Module',
@@ -181,6 +172,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
     BASE_DIR / "Core_Module/admin",
@@ -199,8 +191,31 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # برای بازیابی رمز عبور (در حالت توسعه ایمیل در کنسول چاپ می‌شود)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'noreply@arioshop.local'
+
+# =============================================================================
+# N8N AUTHENTICATION WEBHOOK
+# =============================================================================
+
+N8N_WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL', 'http://localhost:5678/webhook/django-auth-event')
+N8N_WEBHOOK_SECRET = os.environ.get('N8N_WEBHOOK_SECRET', 'ario-shop-secret-token')
+OTP_EXPIRY_MINUTES = 15
+
+# =============================================================================
+# N8N ORDER CONFIRMATION WEBHOOK
+# =============================================================================
+
+N8N_ORDER_WEBHOOK_URL = os.environ.get('N8N_ORDER_WEBHOOK_URL', 'http://localhost:5678/webhook/order-paid')
+N8N_ORDER_WEBHOOK_SECRET = os.environ.get('N8N_ORDER_WEBHOOK_SECRET', N8N_WEBHOOK_SECRET)
 
 # =============================================================================
 # SECURITY SETTINGS - PRODUCTION READY
@@ -214,10 +229,10 @@ SECURE_HSTS_PRELOAD = not DEBUG
 SECURE_REDIRECT_EXEMPT = []
 
 # Cookie Security - Always secure, regardless of DEBUG
-SESSION_COOKIE_SECURE = True  # Always use secure cookies
+SESSION_COOKIE_SECURE = not DEBUG  # Secure cookies only in production (HTTPS)
 SESSION_COOKIE_HTTPONLY = True  # Always safe - prevents XSS from reading cookies
 SESSION_COOKIE_SAMESITE = 'Lax'  # Balance between security and usability
-CSRF_COOKIE_SECURE = True  # Always use secure CSRF cookies
+CSRF_COOKIE_SECURE = not DEBUG  # Secure CSRF cookies only in production (HTTPS)
 CSRF_COOKIE_HTTPONLY = True  # Prevents CSRF token theft via JavaScript
 CSRF_COOKIE_SAMESITE = 'Lax'
 
@@ -340,12 +355,9 @@ LOGIN_RATE_LIMIT_USER = '10/m'  # Per user limit
 # =============================================================================
 
 # Session configuration
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days in seconds
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 2  # 2 days in seconds
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-
-# Regenerate session key on login for session fixation protection
-SESSION_KEY_REGENERATE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # =============================================================================
 # FILE UPLOAD SECURITY
@@ -362,3 +374,9 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # =============================================================================
 
 CACHE_KEY_PREFIX = 'ario_shop_'
+
+# =============================================================================
+# DEFAULT AUTO FIELD
+# =============================================================================
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

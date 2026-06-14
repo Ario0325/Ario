@@ -207,7 +207,10 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <a href="{% url 'cart:checkout' %}" class="btn btn-outline-primary-2 btn-order btn-block">رفتن به صفحه پرداخت</a>
+                        <form method="post" action="{% url 'cart:checkout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">رفتن به صفحه پرداخت</button>
+                        </form>
                     </div>
                     <a href="{% url 'products:list' %}" class="btn btn-outline-dark-2 btn-block mb-3"><span>ادامه خرید</span><i class="icon-refresh"></i></a>
                 </aside>

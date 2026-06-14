@@ -12,7 +12,7 @@ from .forms import ProductReviewForm
 def product_list(request):
     """نمایش لیست محصولات با فیلترینگ - بهینه شده"""
 
-    products = Product.objects.filter(is_active=True).select_related('category', 'brand').prefetch_related('images')
+    products = Product.objects.filter(is_active=True).select_related('category', 'brand').prefetch_related('images', 'colors')
 
     # فیلتر دسته‌بندی
     category_slug = request.GET.get('category')
@@ -68,7 +68,6 @@ def product_list(request):
     page_obj = paginator.get_page(page_number)
 
     # دریافت تمام دسته‌بندی‌ها برای سایدبار - با کشینگ
-    from django.core.cache import cache
     categories_cache_key = 'all_active_categories_with_count'
     categories = cache.get(categories_cache_key)
     if categories is None:
@@ -162,6 +161,9 @@ def product_detail(request, slug):
                 review.email = review.email or getattr(request.user, 'email', '') or review.email
                 review.is_approved = False
                 review.save()
+
+                # پاک کردن کش نظرات این محصول
+                cache.delete(f'product_{product.id}_approved_reviews')
                 
                 # Set rate limit cache
                 cache.set(recent_review_key, True, 60 * 5)  # 5 minute cooldown
@@ -212,7 +214,7 @@ def category_products(request, slug):
     products = Product.objects.filter(
         category=category,
         is_active=True
-    ).select_related('category', 'brand').prefetch_related('images')
+    ).select_related('category', 'brand').prefetch_related('images', 'colors')
 
     # مرتب‌سازی
     sort = request.GET.get('sort', 'popularity')
@@ -230,15 +232,23 @@ def category_products(request, slug):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    # دریافت تمام دسته‌بندی‌ها
-    categories = Category.objects.filter(is_active=True).annotate(
-        product_count=Count('products', filter=Q(products__is_active=True))
-    )
+    # دریافت تمام دسته‌بندی‌ها برای سایدبار - با کشینگ
+    categories_cache_key = 'all_active_categories_with_count'
+    categories = cache.get(categories_cache_key)
+    if categories is None:
+        categories = list(Category.objects.filter(is_active=True).annotate(
+            product_count=Count('products', filter=Q(products__is_active=True))
+        ))
+        cache.set(categories_cache_key, categories, 60 * 15)
 
-    # دریافت برندها
-    brands = Brand.objects.filter(is_active=True, products__category=category).distinct().annotate(
-        product_count=Count('products', filter=Q(products__is_active=True, products__category=category))
-    )
+    # دریافت برندها برای سایدبار - با کشینگ
+    brands_cache_key = f'brands_category_{category.id}'
+    brands = cache.get(brands_cache_key)
+    if brands is None:
+        brands = list(Brand.objects.filter(is_active=True, products__category=category).distinct().annotate(
+            product_count=Count('products', filter=Q(products__is_active=True, products__category=category))
+        ))
+        cache.set(brands_cache_key, brands, 60 * 15)
 
     # حفظ پارامترهای GET برای pagination و sort
     get_params = request.GET.copy()
@@ -274,7 +284,7 @@ def search_products(request):
             Q(description__icontains=query) |
             Q(category__name__icontains=query) |
             Q(brand__name__icontains=query)
-        ).select_related('category', 'brand').prefetch_related('images').distinct()
+        ).select_related('category', 'brand').prefetch_related('images', 'colors').distinct()
 
     # مرتب‌سازی
     sort = request.GET.get('sort', 'popularity')
@@ -292,13 +302,22 @@ def search_products(request):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    # دریافت دسته‌بندی‌ها و برندها برای سایدبار
-    categories = Category.objects.filter(is_active=True).annotate(
-        product_count=Count('products', filter=Q(products__is_active=True))
-    )
-    brands = Brand.objects.filter(is_active=True).annotate(
-        product_count=Count('products', filter=Q(products__is_active=True))
-    )
+    # دریافت دسته‌بندی‌ها و برندها برای سایدبار - با کشینگ
+    categories_cache_key = 'all_active_categories_with_count'
+    categories = cache.get(categories_cache_key)
+    if categories is None:
+        categories = list(Category.objects.filter(is_active=True).annotate(
+            product_count=Count('products', filter=Q(products__is_active=True))
+        ))
+        cache.set(categories_cache_key, categories, 60 * 15)
+
+    brands_cache_key = 'all_active_brands_with_count'
+    brands = cache.get(brands_cache_key)
+    if brands is None:
+        brands = list(Brand.objects.filter(is_active=True).annotate(
+            product_count=Count('products', filter=Q(products__is_active=True))
+        ))
+        cache.set(brands_cache_key, brands, 60 * 15)
 
     # حفظ پارامترهای GET برای pagination و sort
     get_params = request.GET.copy()

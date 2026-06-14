@@ -111,6 +111,10 @@ body {
     position: sticky !important;
     top: 0 !important;
     z-index: 1000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    overflow: visible !important;
 }
 
 #header a:link,
@@ -208,9 +212,30 @@ body {
 }
 
 /* ── محتوای اصلی ──────────────────────────────────────────────────────────── */
+#container {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#content-wrapper {
+    display: flex !important;
+    flex: 1 !important;
+    width: 100% !important;
+}
+
 #content {
+    flex: 1 !important;
     padding: 28px 32px 48px !important;
     background: transparent !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 #content h1 {
@@ -218,6 +243,22 @@ body {
     font-size: 22px !important;
     font-weight: 700 !important;
     margin-bottom: 20px !important;
+}
+
+#content-main {
+    float: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+#content-related {
+    float: none !important;
+    width: 280px !important;
+    min-width: 280px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
 }
 
 /* ── ماژول‌ها (کارت‌ها) ───────────────────────────────────────────────────── */
@@ -992,9 +1033,18 @@ a:hover {
 }
 
 /* ── ریسپانسیو ────────────────────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+    #content {
+        padding: 24px 24px 40px !important;
+    }
+}
+
 @media (max-width: 1024px) {
     #content {
         padding: 20px 20px 40px !important;
+    }
+    #content-related {
+        display: none !important;
     }
 }
 

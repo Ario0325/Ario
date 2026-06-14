@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
 from .models import ContactMessage, ContactInfo
-from .Forms import ContactForm
+from .forms import ContactForm
 
 
 @ratelimit(key='ip', rate='5/m', block=True)

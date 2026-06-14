@@ -19,6 +19,9 @@ class MenuItem(models.Model):
         verbose_name = 'آیتم منو'
         verbose_name_plural = 'آیتم های منو'
         ordering = ['order', 'id']
+        indexes = [
+            models.Index(fields=['menu_type', 'is_active', 'parent'], name='menu_type_active_par_idx'),
+        ]
 
     def __str__(self):
         return self.title

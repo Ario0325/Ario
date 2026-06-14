@@ -18,10 +18,16 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
+from Products_Module.sitemaps import ProductSitemap, CategorySitemap
 
-from Products_Module import views
+sitemaps = {
+    'products': ProductSitemap,
+    'categories': CategorySitemap,
+}
 
 urlpatterns = [
+    path('admin/core/', include('Core_Module.urls')),
     path('admin/', admin.site.urls),
     path('', include('Home_Module.urls')),
     path('Contact_us/', include('Contact_Module.urls')),
@@ -30,6 +36,7 @@ urlpatterns = [
     path('shop/', include('Products_Module.urls')),
     path('accounts/', include('Accounts_Module.urls')),
     path('cart/', include('Cart_Module.urls')),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

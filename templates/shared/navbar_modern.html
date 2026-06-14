@@ -109,7 +109,10 @@
                     <div class="az-popup az-popup-user">
                         <div class="az-popup-head">{{ user.get_full_name|default:user.username }}</div>
                         <a href="{% url 'accounts:dashboard' %}"><i class="icon-user"></i> داشبورد</a>
-                        <a href="{% url 'accounts:logout' %}" class="az-logout"><i class="icon-sign-out"></i> خروج</a>
+                        <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;margin:0;padding:0;">
+                            {% csrf_token %}
+                            <button type="submit" class="az-logout" style="background:none;border:none;cursor:pointer;width:100%;text-align:right;padding:8px 16px;"><i class="icon-sign-out"></i> خروج</button>
+                        </form>
                     </div>
                 </div>
                 {% else %}
@@ -203,7 +206,12 @@
             <li><a href="{% url 'contact' %}"><i class="icon-envelop"></i> تماس با ما</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'accounts:dashboard' %}"><i class="icon-user"></i> داشبورد</a></li>
-            <li><a href="{% url 'accounts:logout' %}"><i class="icon-sign-out"></i> خروج</a></li>
+            <li>
+                <form action="{% url 'accounts:logout' %}" method="post" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" style="background:none;border:none;cursor:pointer;padding:10px 16px;width:100%;text-align:right;"><i class="icon-sign-out"></i> خروج</button>
+                </form>
+            </li>
             {% else %}
             <li><a href="{% url 'accounts:login_register' %}"><i class="icon-user"></i> ورود / ثبت‌نام</a></li>
             {% endif %}

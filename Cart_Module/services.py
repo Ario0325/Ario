@@ -1,12 +1,17 @@
 """
 سرویس‌های سبد خرید و کد تخفیف
 """
+import logging
 from decimal import Decimal
 
+import requests
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
 from .models import CartItem
+
+logger = logging.getLogger(__name__)
 
 CART_SESSION_KEY = 'cart'
 DISCOUNT_SESSION_KEY = 'discount_code'
@@ -193,3 +198,81 @@ def calculate_cart_with_discount(cart_items, discount_code):
         'total_payable': total_payable,
         'discounted_product_id': discounted_product_id,
     }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# سرویس ارسال ایمیل تأیید سفارش به n8n
+# ─────────────────────────────────────────────────────────────────────────────
+
+class N8nOrderService:
+    """سرویس ارسال رویداد تأیید سفارش به n8n برای ارسال ایمیل فاکتور"""
+
+    WEBHOOK_URL = settings.N8N_ORDER_WEBHOOK_URL
+    WEBHOOK_SECRET = settings.N8N_ORDER_WEBHOOK_SECRET
+    TIMEOUT_SECONDS = 10
+
+    @classmethod
+    def _build_headers(cls):
+        return {'Content-Type': 'application/json'}
+
+    @classmethod
+    def _send_to_n8n(cls, payload):
+        try:
+            response = requests.post(
+                cls.WEBHOOK_URL,
+                json=payload,
+                headers=cls._build_headers(),
+                timeout=cls.TIMEOUT_SECONDS,
+            )
+            response.raise_for_status()
+            logger.info(
+                f"[n8n] ایمیل تأیید سفارش ارسال شد: order={payload.get('order_number')}"
+            )
+            return True
+        except requests.exceptions.ConnectionError:
+            logger.error(f"[n8n] اتصال به n8n برقرار نشد: {cls.WEBHOOK_URL}")
+            return False
+        except requests.exceptions.Timeout:
+            logger.error(f"[n8n] timeout ارسال وبهوک سفارش (>{cls.TIMEOUT_SECONDS}s)")
+            return False
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"[n8n] خطای HTTP از n8n: {e.response.status_code}")
+            return False
+        except Exception as e:
+            logger.error(f"[n8n] خطای ناشناخته در ارسال وبهوک سفارش: {e}")
+            return False
+
+    @classmethod
+    def send_order_confirmation(cls, order):
+        customer_name = order.full_name
+        if not customer_name and order.user:
+            customer_name = order.user.get_full_name() or order.user.username
+        customer_email = order.email
+        if not customer_email and order.user:
+            customer_email = order.user.email
+
+        items = []
+        for item in order.items.select_related('product').all():
+            items.append({
+                "name": item.product_name,
+                "quantity": item.quantity,
+                "unit_price": int(item.price),
+                "total_price": int(item.total),
+            })
+
+        payload = {
+            "secret_token": cls.WEBHOOK_SECRET,
+            "order_id": order.id,
+            "order_number": order.order_number,
+            "customer_name": customer_name or "مشتری",
+            "customer_email": customer_email or "",
+            "payment_status": "paid",
+            "total_price": int(order.subtotal),
+            "shipping_cost": int(order.shipping_cost),
+            "discount": int(order.discount_amount),
+            "created_at": order.created_at.isoformat(),
+            "shipping_address": order.address,
+            "items": items,
+        }
+
+        return cls._send_to_n8n(payload)

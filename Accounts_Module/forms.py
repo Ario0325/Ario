@@ -23,7 +23,7 @@ class LoginForm(AuthenticationForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'singin-email-2',
-            'placeholder': 'نام کاربری یا ایمیل',
+            'placeholder': ' ',
             'autocomplete': 'username',
         }),
     )
@@ -32,7 +32,7 @@ class LoginForm(AuthenticationForm):
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'id': 'singin-password-2',
-            'placeholder': 'رمز عبور',
+            'placeholder': ' ',
             'autocomplete': 'current-password',
         }),
     )
@@ -51,7 +51,7 @@ class RegisterForm(UserCreationForm):
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
             'id': 'register-email-2',
-            'placeholder': 'example@email.com',
+            'placeholder': ' ',
             'autocomplete': 'email',
         }),
     )
@@ -60,7 +60,7 @@ class RegisterForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'id': 'register-password-2',
-            'placeholder': 'حداقل ۸ کاراکتر',
+            'placeholder': ' ',
             'autocomplete': 'new-password',
         }),
     )
@@ -69,7 +69,7 @@ class RegisterForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'id': 'register-password2-2',
-            'placeholder': 'تکرار رمز عبور',
+            'placeholder': ' ',
             'autocomplete': 'new-password',
         }),
     )
@@ -158,3 +158,85 @@ class ProfileForm(forms.ModelForm):
             'postal_code': 'کد پستی',
             'city': 'شهر',
         }
+
+
+class VerifyCodeForm(forms.Form):
+    """فرم ورود کد تأیید ۶ رقمی"""
+
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        label='کد تأیید',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control text-center',
+            'placeholder': '------',
+            'autocomplete': 'one-time-code',
+            'dir': 'ltr',
+            'style': 'font-size: 24px; letter-spacing: 12px; font-weight: bold;',
+        }),
+    )
+
+    def clean_code(self):
+        code = self.cleaned_data.get('code', '')
+        if not code.isdigit():
+            raise forms.ValidationError('کد تأیید باید فقط شامل اعداد باشد.')
+        return code
+
+
+class ResetPasswordWithCodeForm(forms.Form):
+    """فرم بازیابی رمز عبور با کد OTP"""
+
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        label='کد تأیید',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control text-center',
+            'placeholder': '------',
+            'dir': 'ltr',
+            'style': 'font-size: 20px; letter-spacing: 10px; font-weight: bold;',
+        }),
+    )
+    new_password1 = forms.CharField(
+        label='رمز عبور جدید',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': ' ',
+            'autocomplete': 'new-password',
+        }),
+    )
+    new_password2 = forms.CharField(
+        label='تکرار رمز عبور جدید',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': ' ',
+            'autocomplete': 'new-password',
+        }),
+    )
+
+    def clean_code(self):
+        code = self.cleaned_data.get('code', '')
+        if not code.isdigit():
+            raise forms.ValidationError('کد تأیید باید فقط شامل اعداد باشد.')
+        return code
+
+    def clean(self):
+        cleaned_data = super().clean()
+        p1 = cleaned_data.get('new_password1')
+        p2 = cleaned_data.get('new_password2')
+        if p1 and p2 and p1 != p2:
+            self.add_error('new_password2', 'رمزهای عبور مطابقت ندارند.')
+        return cleaned_data
+
+
+class ForgetPasswordEmailForm(forms.Form):
+    """فرم ورود ایمیل برای بازیابی رمز عبور"""
+
+    email = forms.EmailField(
+        label='آدرس ایمیل',
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': ' ',
+            'autocomplete': 'email',
+        }),
+    )

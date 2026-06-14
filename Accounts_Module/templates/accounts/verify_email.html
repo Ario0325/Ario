@@ -1,0 +1,107 @@
+{% extends 'shared/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}تأیید ایمیل | آریو شاپ{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'assets/css/auth-modern.css' %}">
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:login_register' %}">ورود</a></li>
+            <li class="breadcrumb-item active" aria-current="page">تأیید ایمیل</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="auth-page-modern login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17"
+     style="background-image: url('{% static 'assets/images/backgrounds/login-bg.jpg' %}')">
+    <div class="container">
+        <div class="form-box">
+            <div class="auth-icon-wrap">
+                <div class="auth-icon"><i class="icon-envelope"></i></div>
+            </div>
+            <h3 class="auth-title">تأیید ایمیل</h3>
+            <p class="auth-subtitle">
+                کد ۶ رقمی ارسال‌شده به ایمیل<br>
+                <strong style="color:#cc9966;">{{ email }}</strong> را وارد کنید.
+            </p>
+
+            {% if expired %}
+            <div class="alert alert-warning text-center">
+                <i class="icon-exclamation-circle ml-1"></i>
+                کد تأیید منقضی شده است. لطفاً کد جدید دریافت کنید.
+            </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'accounts:verify_email' %}?email={{ email }}" id="verify-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="font-weight-bold" style="display:block; text-align:center; margin-bottom:0.5rem;">کد تأیید</label>
+                    {{ form.code }}
+                    {% if form.code.errors %}
+                        <div class="text-danger small text-center mt-1">{{ form.code.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="auth-btn mt-3" id="verify-btn">
+                    <span class="auth-btn-text">تأیید و ورود</span>
+                    <span class="auth-spinner"></span>
+                    <i class="icon-check"></i>
+                </button>
+            </form>
+
+            <div class="auth-notice">
+                <div class="auth-notice-icon"><i class="icon-info-circle"></i></div>
+                <div class="auth-notice-text">
+                    ایمیل کد تأیید ممکن است در <strong>پوشه اسپم (Spam)</strong> شما باشد.
+                    لطفاً پوشه Spam یا Junk را نیز بررسی کنید.
+                </div>
+            </div>
+
+            <div class="auth-resend">
+                <form method="post" action="{% url 'accounts:resend_verification' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="email" value="{{ email }}">
+                    <button type="submit" class="btn-link">
+                        <i class="icon-refresh ml-1"></i>ارسال مجدد کد
+                    </button>
+                </form>
+            </div>
+
+            <div class="auth-back-link">
+                <a href="{% url 'accounts:login_register' %}">
+                    <i class="icon-long-arrow-right ml-1"></i>بازگشت به ورود
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'assets/js/auth-modern.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var codeInput = document.querySelector('#verify-form input[name="code"]');
+    if (codeInput) {
+        codeInput.setAttribute('inputmode', 'numeric');
+        codeInput.setAttribute('pattern', '[0-9]*');
+        codeInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+    var form = document.getElementById('verify-form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            var btn = document.getElementById('verify-btn');
+            if (btn) btn.classList.add('loading');
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -23,6 +23,9 @@
      style="background-image: url('{% static 'assets/images/backgrounds/login-bg.jpg' %}')">
     <div class="container">
         <div class="form-box">
+            <div class="auth-icon-wrap">
+                <div class="auth-icon"><i class="icon-user"></i></div>
+            </div>
             <div class="form-tab">
                 <ul class="nav nav-pills nav-fill" role="tablist">
                     <li class="nav-item">
@@ -40,102 +43,99 @@
                     <!-- تب ورود -->
                     <div class="tab-pane fade {% if not active_tab or active_tab == 'login' %}show active{% endif %}"
                          id="signin-2" role="tabpanel" aria-labelledby="signin-tab-2">
-                        <form action="{% url 'accounts:login_register' %}" method="post">
+                        <p class="auth-subtitle">خوش آمدید! برای ورود به حساب کاربری خود اطلاعات زیر را وارد کنید.</p>
+                        <form action="{% url 'accounts:login_register' %}" method="post" id="login-form">
                             {% csrf_token %}
                             <input type="hidden" name="login" value="1">
                             {% if login_form.non_field_errors %}
                                 <div class="alert alert-danger">{{ login_form.non_field_errors }}</div>
                             {% endif %}
-                            <div class="form-group">
-                                <label for="singin-email-2">نام کاربری یا آدرس ایمیل *</label>
+                            <div class="auth-input-group">
                                 {{ login_form.username }}
+                                <label class="auth-float-label" for="singin-email-2">نام کاربری یا ایمیل</label>
+                                <span class="auth-input-icon"><i class="icon-user"></i></span>
                                 {% if login_form.username.errors %}
-                                    <div class="text-danger small">{{ login_form.username.errors.0 }}</div>
+                                    <div class="text-danger small mt-1">{{ login_form.username.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            <div class="form-group">
-                                <label for="singin-password-2">رمز عبور *</label>
+                            <div class="auth-input-group">
                                 {{ login_form.password }}
+                                <label class="auth-float-label" for="singin-password-2">رمز عبور</label>
+                                <span class="auth-input-icon"><i class="icon-lock"></i></span>
                                 {% if login_form.password.errors %}
-                                    <div class="text-danger small">{{ login_form.password.errors.0 }}</div>
+                                    <div class="text-danger small mt-1">{{ login_form.password.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            <div class="form-footer">
-                                <button type="submit" class="btn btn-outline-primary-2">
-                                    <span>ورود</span>
-                                    <i class="icon-long-arrow-left"></i>
-                                </button>
+                            <div class="form-footer mb-3">
                                 <div class="custom-control custom-checkbox">
                                     {{ login_form.remember_me }}
                                     <label class="custom-control-label" for="signin-remember-2">مرا به خاطر بسپار</label>
                                 </div>
                                 <a href="{% url 'accounts:forget_password' %}" class="forgot-link">رمز عبور خود را فراموش کرده‌اید؟</a>
                             </div>
+                            <button type="submit" class="auth-btn" id="login-btn">
+                                <span class="auth-btn-text">ورود به حساب</span>
+                                <span class="auth-spinner"></span>
+                                <i class="icon-long-arrow-left"></i>
+                            </button>
                         </form>
-                        <div class="form-choice">
-                            <p class="text-center">یا ورود با</p>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <a href="#" class="btn btn-login btn-g"><i class="icon-google"></i>حساب کاربری گوگل</a>
-                                </div>
-                                <div class="col-sm-6">
-                                    <a href="#" class="btn btn-login btn-f"><i class="icon-facebook-f"></i>حساب کاربری فیسبوک</a>
-                                </div>
-                            </div>
+                        <div class="auth-divider">یا</div>
+                        <div class="auth-social-btns">
+                            <a href="#" class="auth-social-btn"><i class="icon-google"></i>گوگل</a>
+                            <a href="#" class="auth-social-btn"><i class="icon-facebook-f"></i>فیسبوک</a>
                         </div>
                     </div>
 
                     <!-- تب ثبت نام -->
                     <div class="tab-pane fade {% if active_tab == 'register' %}show active{% endif %}"
                          id="register-2" role="tabpanel" aria-labelledby="register-tab-2">
-                        <form action="{% url 'accounts:login_register' %}" method="post">
+                        <p class="auth-subtitle">حساب کاربری خود را بسازید و از خرید آسان لذت ببرید.</p>
+                        <form action="{% url 'accounts:login_register' %}" method="post" id="register-form">
                             {% csrf_token %}
                             <input type="hidden" name="register" value="1">
-                            <div class="form-group">
-                                <label for="register-email-2">آدرس ایمیل شما *</label>
+                            <div class="auth-input-group">
                                 {{ register_form.email }}
+                                <label class="auth-float-label" for="register-email-2">آدرس ایمیل</label>
+                                <span class="auth-input-icon"><i class="icon-envelope"></i></span>
                                 {% if register_form.email.errors %}
-                                    <div class="text-danger small">{{ register_form.email.errors.0 }}</div>
+                                    <div class="text-danger small mt-1">{{ register_form.email.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            <div class="form-group">
-                                <label for="register-password-2">رمز عبور *</label>
+                            <div class="auth-input-group">
                                 {{ register_form.password1 }}
+                                <label class="auth-float-label" for="register-password-2">رمز عبور</label>
+                                <span class="auth-input-icon"><i class="icon-lock"></i></span>
                                 {% if register_form.password1.errors %}
-                                    <div class="text-danger small">{{ register_form.password1.errors.0 }}</div>
+                                    <div class="text-danger small mt-1">{{ register_form.password1.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            <div class="form-group">
-                                <label for="register-password2-2">تکرار رمز عبور *</label>
+                            <div class="auth-input-group">
                                 {{ register_form.password2 }}
+                                <label class="auth-float-label" for="register-password2-2">تکرار رمز عبور</label>
+                                <span class="auth-input-icon"><i class="icon-lock"></i></span>
                                 {% if register_form.password2.errors %}
-                                    <div class="text-danger small">{{ register_form.password2.errors.0 }}</div>
+                                    <div class="text-danger small mt-1">{{ register_form.password2.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            <div class="form-footer">
-                                <button type="submit" class="btn btn-outline-primary-2">
-                                    <span>ثبت نام</span>
-                                    <i class="icon-long-arrow-left"></i>
-                                </button>
+                            <div class="form-footer mb-3">
                                 <div class="custom-control custom-checkbox">
                                     {{ register_form.accept_terms }}
-                                    <label class="custom-control-label" for="register-policy-2">من با <a href="#">قوانین و مقررات</a> موافقم *</label>
+                                    <label class="custom-control-label" for="register-policy-2">من با <a href="#">قوانین و مقررات</a> موافقم</label>
                                 </div>
                                 {% if register_form.accept_terms.errors %}
                                     <div class="text-danger small w-100 mt-1">{{ register_form.accept_terms.errors.0 }}</div>
                                 {% endif %}
                             </div>
+                            <button type="submit" class="auth-btn" id="register-btn">
+                                <span class="auth-btn-text">ایجاد حساب کاربری</span>
+                                <span class="auth-spinner"></span>
+                                <i class="icon-long-arrow-left"></i>
+                            </button>
                         </form>
-                        <div class="form-choice">
-                            <p class="text-center">یا ورود با</p>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <a href="#" class="btn btn-login btn-g"><i class="icon-google"></i>حساب کاربری گوگل</a>
-                                </div>
-                                <div class="col-sm-6">
-                                    <a href="#" class="btn btn-login btn-f"><i class="icon-facebook-f"></i>حساب کاربری فیسبوک</a>
-                                </div>
-                            </div>
+                        <div class="auth-divider">یا</div>
+                        <div class="auth-social-btns">
+                            <a href="#" class="auth-social-btn"><i class="icon-google"></i>گوگل</a>
+                            <a href="#" class="auth-social-btn"><i class="icon-facebook-f"></i>فیسبوک</a>
                         </div>
                     </div>
                 </div>
@@ -147,4 +147,23 @@
 
 {% block extra_js %}
 <script src="{% static 'assets/js/auth-modern.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-detect filled inputs for floating label
+    document.querySelectorAll('.auth-input-group .form-control').forEach(function(input) {
+        if (input.value) input.classList.add('has-value');
+        input.addEventListener('input', function() {
+            this.classList.toggle('has-value', this.value.length > 0);
+        });
+    });
+
+    // Button loading state on submit
+    document.querySelectorAll('form').forEach(function(form) {
+        form.addEventListener('submit', function() {
+            var btn = form.querySelector('.auth-btn');
+            if (btn) btn.classList.add('loading');
+        });
+    });
+});
+</script>
 {% endblock %}

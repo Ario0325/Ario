@@ -111,14 +111,13 @@ class DiscountCodeFlowTests(TestCase):
         session.save()
 
     def _create_profile(self):
-        UserProfile.objects.create(
-            user=self.user,
-            full_name='Test User',
-            phone='09120000000',
-            address='Tehran, Test St',
-            postal_code='1111111111',
-            city='Tehran',
-        )
+        profile, _ = UserProfile.objects.get_or_create(user=self.user)
+        profile.full_name = 'Test User'
+        profile.phone = '09120000000'
+        profile.address = 'Tehran, Test St'
+        profile.postal_code = '1111111111'
+        profile.city = 'Tehran'
+        profile.save()
 
     def _create_discount(self, **overrides):
         payload = {
@@ -237,7 +236,7 @@ class DiscountCodeFlowTests(TestCase):
         )
         self._set_cart({self.product.id: 1}, discount_code_value='FIX20')
 
-        response = self.client.get(reverse('cart:checkout'))
+        response = self.client.post(reverse('cart:checkout'))
 
         self.assertEqual(response.status_code, 302)
         order = Order.objects.get()
@@ -272,7 +271,7 @@ class DiscountCodeFlowTests(TestCase):
         )
         self._set_cart({self.product.id: 1}, discount_code_value='MIN200')
 
-        response = self.client.get(reverse('cart:checkout'))
+        response = self.client.post(reverse('cart:checkout'))
 
         self.assertEqual(response.status_code, 302)
         order = Order.objects.get()

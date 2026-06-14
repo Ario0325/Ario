@@ -1,40 +1,67 @@
-/**
- * صفحه ورود و ثبت‌نام مدرن - هماهنگ با رنگ و استایل قالب (#cc9966)
- * انیمیشن‌های ظاهر شدن، تب‌ها و فوکوس
- */
+/* ================================================================
+   Ario Shop — Modern Auth Pages
+   Glassmorphism + floating labels + animations + responsive
+   ================================================================ */
 
-/* ---- پس‌زمینه با لایه تیره ---- */
+/* ---- Background with animated gradient overlay ---- */
 .auth-page-modern.login-page.bg-image {
   position: relative;
   background-size: cover;
   background-position: center;
+  min-height: 100vh;
 }
 .auth-page-modern.login-page.bg-image::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(51, 51, 51, 0.85) 0%, rgba(0, 0, 0, 0.75) 100%);
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: linear-gradient(135deg, rgba(30,30,30,0.88) 0%, rgba(60,40,20,0.82) 50%, rgba(30,30,30,0.88) 100%);
   z-index: 0;
+}
+.auth-page-modern.login-page.bg-image::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(204,153,102,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(204,153,102,0.1) 0%, transparent 50%);
+  z-index: 0;
+  animation: authGlow 8s ease-in-out infinite alternate;
+}
+@keyframes authGlow {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
 }
 .auth-page-modern .container {
   position: relative;
   z-index: 1;
 }
 
-/* ---- کارت فرم با انیمیشن ورود ---- */
+/* ---- Glass Card ---- */
 .auth-page-modern .form-box {
-  background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
-  padding: 2.5rem 2rem 3.5rem;
-  max-width: 520px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 28px;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  padding: 3rem 2.5rem 3.5rem;
+  max-width: 560px;
   margin-left: auto;
   margin-right: auto;
-  animation: authCardEnter 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
-  opacity: 0;
-  transform: translateY(30px);
   position: relative;
   overflow: hidden;
+  /* Default visible state — animation enhances but doesn't gate */
+  opacity: 1;
+  transform: none;
+}
+@supports (animation: authCardEnter 0.7s ease forwards) {
+  .auth-page-modern .form-box {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: authCardEnter 0.7s cubic-bezier(0.34, 1.1, 0.64, 1) forwards;
+  }
 }
 .auth-page-modern .form-box::before {
   content: '';
@@ -43,9 +70,9 @@
   right: 0;
   left: 0;
   height: 4px;
-  background: linear-gradient(90deg, transparent, #cc9966, #b8864a, #cc9966, transparent);
-  background-size: 200% 100%;
-  animation: authShine 3s ease-in-out 0.5s;
+  background: linear-gradient(90deg, #b8864a, #cc9966, #e0b87a, #cc9966, #b8864a);
+  background-size: 300% 100%;
+  animation: authShine 4s ease-in-out infinite;
 }
 @keyframes authShine {
   0% { background-position: 100% 0; }
@@ -55,28 +82,96 @@
 @keyframes authCardEnter {
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-/* ---- تب‌ها با خط زیر متحرک ---- */
+/* ---- Logo / Icon area inside card ---- */
+.auth-page-modern .auth-icon-wrap {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+.auth-page-modern .auth-icon-wrap .auth-icon {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #cc9966, #b8864a);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 2rem; box-shadow: 0 8px 24px rgba(204,153,102,0.35);
+  animation: authIconPulse 2s ease-in-out infinite;
+}
+@keyframes authIconPulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(204,153,102,0.35); }
+  50% { box-shadow: 0 8px 32px rgba(204,153,102,0.55); }
+}
+
+/* ---- Card Title ---- */
+.auth-page-modern .auth-title { text-align: center; font-size: 1.85rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.35rem;
+}
+.auth-page-modern .auth-subtitle { text-align: center; color: #777; font-size: 1.05rem;
+  margin-bottom: 1.75rem;
+  line-height: 1.6;
+}
+
+/* ---- Override mobile-overrides.css generic rules inside auth cards ---- */
+.auth-page-modern .form-box .nav-pills {
+  gap: 0 !important;
+  flex-wrap: nowrap !important;
+}
+.auth-page-modern .form-box .nav-link {
+  padding: 1rem 1.5rem !important; font-size: 1.35rem !important;
+  white-space: nowrap;
+}
+@media (max-width: 575px) {
+  .auth-page-modern .form-box .nav-link {
+    padding: 0.85rem 0.85rem !important;
+    font-size: 1.15rem !important;
+  }
+}
+@media (max-width: 420px) {
+  .auth-page-modern .form-box .nav-link {
+    padding: 0.75rem 0.6rem !important;
+    font-size: 1rem !important;
+  }
+}
+@media (max-width: 360px) {
+  .auth-page-modern .form-box .nav-link {
+    padding: 0.65rem 0.5rem !important;
+    font-size: 0.95rem !important;
+  }
+}
+
+/* ---- Tabs with animated underline ---- */
 .auth-page-modern .form-tab .nav.nav-pills {
-  border-bottom: 2px solid #eee;
+  border-bottom: 2px solid #f0f0f0;
   margin-bottom: 0;
 }
 .auth-page-modern .form-tab .nav.nav-pills .nav-item {
   position: relative;
 }
 .auth-page-modern .form-tab .nav.nav-pills .nav-link {
-  font-size: 1.35rem;
-  font-weight: 600;
-  color: #666;
-  border: none;
-  padding: 1rem 1.25rem;
+  font-size: 1.35rem; font-weight: 700; color: #999; border: none; padding: 1rem 1.5rem;
   transition: color 0.3s ease;
   border-radius: 0;
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
+  position: relative;
+}
+.auth-page-modern .form-tab .nav.nav-pills .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #cc9966, #e0b87a);
+  border-radius: 3px 3px 0 0;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .auth-page-modern .form-tab .nav.nav-pills .nav-link:hover {
   color: #cc9966;
@@ -84,176 +179,425 @@
 .auth-page-modern .form-tab .nav.nav-pills .nav-link.active {
   color: #cc9966;
   background: transparent;
-  border-bottom-color: #cc9966;
+  border-bottom-color: transparent;
 }
+.auth-page-modern .form-tab .nav.nav-pills .nav-link.active::after {
+  width: 100%;
+}
+
 .auth-page-modern .form-tab .tab-content .tab-pane {
-  padding: 2rem 0 0;
-  animation: authTabFade 0.35s ease;
+  padding: 1.75rem 0 0;
+  animation: authTabFade 0.4s ease;
 }
 @keyframes authTabFade {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---- فیلدها و لیبل ---- */
+/* ---- Floating Label Input Groups ---- */
+.auth-page-modern .auth-input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+.auth-page-modern .auth-input-group .form-control { border: 2px solid #e8e8e8; border-radius: 14px; padding: 1.25rem 1.15rem 0.6rem; font-size: 1.05rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: #fafafa;
+  width: 100%;
+  height: auto;
+}
+.auth-page-modern .auth-input-group .form-control:hover {
+  border-color: #d0d0d0;
+  background: #fff;
+}
+.auth-page-modern .auth-input-group .form-control:focus {
+  border-color: #cc9966;
+  box-shadow: 0 0 0 4px rgba(204, 153, 102, 0.15);
+  outline: none;
+  background: #fff;
+}
+.auth-page-modern .auth-input-group .form-control:focus + .auth-float-label,
+.auth-page-modern .auth-input-group .form-control:not(:placeholder-shown) + .auth-float-label,
+.auth-page-modern .auth-input-group .form-control.has-value + .auth-float-label {
+  top: 6px;
+  font-size: 0.8rem; color: #cc9966; font-weight: 600;
+}
+.auth-page-modern .auth-input-group .auth-float-label { position: absolute; top: 50%; right: 1rem; transform: translateY(-50%); color: #aaa; font-size: 1rem;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  padding: 0 4px;
+}
+.auth-page-modern .auth-input-group .auth-input-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #ccc; font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+.auth-page-modern .auth-input-group .form-control:focus ~ .auth-input-icon {
+  color: #cc9966;
+}
+
+/* ---- Standard form-group fallback (no float) ---- */
 .auth-page-modern .form-tab .form-group {
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.35rem;
 }
-.auth-page-modern .form-tab .form-group label {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.45rem;
-  font-size: 0.95rem;
+.auth-page-modern .form-tab .form-group label { font-weight: 600; color: #444; margin-bottom: 0.4rem; font-size: 1rem;
 }
-
-/* ---- اینپوت‌های مدرن با انیمیشن فوکوس ---- */
-.auth-page-modern .form-tab .form-control {
-  border: 2px solid #e5e5e5;
-  border-radius: 12px;
-  padding: 0.85rem 1rem;
-  font-size: 1rem;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+.auth-page-modern .form-tab .form-control { border: 2px solid #e8e8e8; border-radius: 14px; padding: 1rem 1.15rem; font-size: 1.05rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  background: #fafafa;
 }
 .auth-page-modern .form-tab .form-control:hover {
   border-color: #d0d0d0;
+  background: #fff;
 }
 .auth-page-modern .form-tab .form-control:focus {
   border-color: #cc9966;
-  box-shadow: 0 0 0 4px rgba(204, 153, 102, 0.2);
+  box-shadow: 0 0 0 4px rgba(204, 153, 102, 0.15);
   outline: none;
+  background: #fff;
 }
 
-/* ---- چک‌باکس ---- */
+/* ---- Checkbox ---- */
 .auth-page-modern .form-tab .custom-control-input:checked ~ .custom-control-label::before {
   background-color: #cc9966;
   border-color: #cc9966;
 }
-.auth-page-modern .form-tab .custom-control-label {
-  color: #555;
-  font-weight: 500;
+.auth-page-modern .form-tab .custom-control-label { color: #666; font-weight: 500; font-size: 0.95rem;
+}
+.auth-page-modern .form-tab .custom-control-label a {
+  color: #cc9966;
+  text-decoration: underline;
 }
 
-/* ---- دکمه ارسال با انیمیشن ---- */
+/* ---- Primary Button with gradient + ripple ---- */
+.auth-page-modern .auth-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 1.1rem 1.75rem; border: none; border-radius: 14px; background: linear-gradient(135deg, #cc9966 0%, #b8864a 100%); color: #fff; font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(204, 153, 102, 0.3);
+}
+.auth-page-modern .auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(204, 153, 102, 0.45);
+  background: linear-gradient(135deg, #d4a56a 0%, #cc9966 100%);
+}
+.auth-page-modern .auth-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(204, 153, 102, 0.3);
+}
+.auth-page-modern .auth-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  transform: scale(0);
+  transition: transform 0.5s ease;
+  border-radius: inherit;
+}
+.auth-page-modern .auth-btn:active::after {
+  transform: scale(2.5);
+  transition: transform 0s;
+}
+
+/* ---- Outline Button (secondary) ---- */
 .auth-page-modern .form-tab .form-footer .btn-outline-primary-2 {
   border: 2px solid #cc9966;
   color: #cc9966;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 0.85rem 1.75rem;
-  font-weight: 600;
+  font-weight: 700;
   transition: all 0.3s ease;
   min-width: 130px;
 }
 .auth-page-modern .form-tab .form-footer .btn-outline-primary-2:hover {
-  background: #cc9966;
+  background: linear-gradient(135deg, #cc9966, #b8864a);
   color: #fff;
+  border-color: transparent;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(204, 153, 102, 0.35);
-}
-.auth-page-modern .form-tab .form-footer .btn-outline-primary-2:active {
-  transform: translateY(0);
+  box-shadow: 0 8px 24px rgba(204, 153, 102, 0.35);
 }
 
-/* ---- لینک فراموشی رمز ---- */
-.auth-page-modern .form-tab .form-footer .forgot-link {
-  color: #666;
+/* ---- Forgot Link ---- */
+.auth-page-modern .form-tab .form-footer .forgot-link { color: #888; font-size: 0.95rem;
   transition: color 0.2s ease;
 }
 .auth-page-modern .form-tab .form-footer .forgot-link:hover {
   color: #cc9966;
 }
 
-/* ---- خط جدا و متن «یا ورود با» ---- */
-.auth-page-modern .form-choice {
-  margin-top: 1.75rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #eee;
+/* ---- Divider with text ---- */
+.auth-page-modern .auth-divider { display: flex; align-items: center; gap: 1rem; margin: 1.75rem 0; color: #bbb; font-size: 0.95rem;
 }
-.auth-page-modern .form-choice p {
-  margin-bottom: 1rem;
-  color: #666;
-  font-size: 0.95rem;
+.auth-page-modern .auth-divider::before,
+.auth-page-modern .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
 }
 
-/* ---- دکمه‌های شبکه اجتماعی ---- */
-.auth-page-modern .form-choice .btn-login {
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
-  font-weight: 500;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* ---- Social buttons ---- */
+.auth-page-modern .auth-social-btns {
+  display: flex;
+  gap: 0.75rem;
 }
-.auth-page-modern .form-choice .btn-login:hover {
+.auth-page-modern .auth-social-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.9rem; border: 2px solid #eee; border-radius: 14px; background: #fff; color: #555; font-weight: 600; font-size: 0.95rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.auth-page-modern .auth-social-btn:hover {
+  border-color: #cc9966;
+  color: #cc9966;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* ---- پیام خطا ---- */
-.auth-page-modern .form-tab .alert-danger {
-  border-radius: 12px;
-  border: none;
-  background: rgba(220, 53, 69, 0.1);
-  color: #c82333;
+/* ---- Alerts ---- */
+.auth-page-modern .form-tab .alert-danger { border-radius: 14px; border: none; background: rgba(220, 53, 69, 0.08); color: #c82333; font-size: 1rem;
+  padding: 0.85rem 1rem;
 }
-.auth-page-modern .form-tab .text-danger {
-  font-size: 0.875rem;
-  margin-top: 0.35rem;
+.auth-page-modern .form-tab .text-danger { font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+.auth-page-modern .alert-warning { border-radius: 14px; border: none; background: rgba(255, 193, 7, 0.1); color: #856404; font-size: 1rem;
+  padding: 0.85rem 1rem;
 }
 
-/* ---- Breadcrumb روی پس‌زمینه تیره ---- */
+/* ---- Spam / Info Notice ---- */
+.auth-page-modern .auth-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(204,153,102,0.08), rgba(204,153,102,0.03));
+  border: 1px solid rgba(204,153,102,0.2);
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  margin: 1.25rem 0;
+  animation: authNoticeSlide 0.5s ease 0.3s both;
+}
+@keyframes authNoticeSlide {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.auth-page-modern .auth-notice .auth-notice-icon { flex-shrink: 0; width: 40px; height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #cc9966, #b8864a);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.auth-page-modern .auth-notice .auth-notice-text { font-size: 0.95rem;
+  color: #666;
+  line-height: 1.65;
+}
+.auth-page-modern .auth-notice .auth-notice-text strong {
+  color: #cc9966;
+}
+
+/* ---- OTP Code Input (large, centered) ---- */
+.auth-page-modern .otp-input-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+.auth-page-modern .otp-input-wrap .otp-digit {
+  width: 52px;
+  height: 62px;
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  border: 2px solid #e8e8e8;
+  border-radius: 14px;
+  background: #fafafa;
+  transition: all 0.3s ease;
+  caret-color: #cc9966;
+}
+.auth-page-modern .otp-input-wrap .otp-digit:focus {
+  border-color: #cc9966;
+  box-shadow: 0 0 0 4px rgba(204,153,102,0.15);
+  background: #fff;
+  outline: none;
+}
+.auth-page-modern .otp-input-wrap .otp-digit.filled {
+  border-color: #cc9966;
+  background: rgba(204,153,102,0.05);
+  animation: authOtpBounce 0.3s ease;
+}
+@keyframes authOtpBounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* ---- Resend button ---- */
+.auth-page-modern .auth-resend {
+  text-align: center;
+  margin-top: 1rem;
+}
+.auth-page-modern .auth-resend .btn-link { color: #cc9966; font-weight: 600; font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+}
+.auth-page-modern .auth-resend .btn-link:hover {
+  background: rgba(204,153,102,0.08);
+  color: #b8864a;
+}
+
+/* ---- Back link ---- */
+.auth-page-modern .auth-back-link {
+  text-align: center;
+  margin-top: 1.25rem;
+}
+.auth-page-modern .auth-back-link a { color: #999; font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+.auth-page-modern .auth-back-link a:hover {
+  color: #cc9966;
+}
+
+/* ---- Success checkmark (for complete page) ---- */
+.auth-page-modern .auth-success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 2.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 8px 24px rgba(40,167,69,0.3);
+  animation: authSuccessPop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes authSuccessPop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---- Footer inside card ---- */
+.auth-page-modern .form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* ---- Breadcrumb on dark background ---- */
 .auth-page-modern .breadcrumb-nav .breadcrumb-item a,
-.auth-page-modern .breadcrumb-nav .breadcrumb-item {
-  color: rgba(255, 255, 255, 0.9);
+.auth-page-modern .breadcrumb-nav .breadcrumb-item { color: rgba(255, 255, 255, 0.85); font-size: 1rem;
 }
 .auth-page-modern .breadcrumb-nav .breadcrumb-item.active {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
 }
 .auth-page-modern .breadcrumb-nav .breadcrumb-item a:hover {
   color: #cc9966;
 }
 
-/* ---- ریسپانسیو ---- */
+/* ---- Loading spinner for buttons ---- */
+.auth-page-modern .auth-btn .auth-spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: authSpin 0.6s linear infinite;
+}
+.auth-page-modern .auth-btn.loading .auth-spinner {
+  display: inline-block;
+}
+.auth-page-modern .auth-btn.loading .auth-btn-text {
+  opacity: 0.7;
+}
+@keyframes authSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
 @media (max-width: 575px) {
   .auth-page-modern .form-box {
-    padding: 1.75rem 1.25rem 2.5rem;
+    padding: 2rem 1.5rem 2.5rem;
     margin-left: 0.75rem;
     margin-right: 0.75rem;
-    border-radius: 20px;
+    border-radius: 22px;
+    max-width: 100%;
   }
+  .auth-page-modern .auth-title {
+    font-size: 1.5rem; }
   .auth-page-modern .form-tab .nav.nav-pills .nav-link {
-    font-size: 1.15rem;
-    padding: 0.8rem 0.75rem;
+    font-size: 1.05rem;
+    padding: 0.75rem 0.75rem;
   }
   .auth-page-modern .form-tab .tab-content .tab-pane {
-    padding: 1.5rem 0 0;
+    padding: 1.25rem 0 0;
+  }
+  .auth-page-modern .auth-social-btns {
+    flex-direction: column;
+  }
+  .auth-page-modern .auth-icon-wrap .auth-icon {
+    width: 60px; height: 60px; font-size: 1.6rem;
+  }
+  .auth-page-modern .auth-notice {
+    padding: 0.85rem 1rem;
+  }
+  .auth-page-modern .auth-input-group .form-control {
+    padding: 1.1rem 1rem 0.5rem; font-size: 1rem;
+  }
+  .auth-page-modern .auth-input-group .auth-float-label {
+    font-size: 0.9rem;
+  }
+  .auth-page-modern .auth-input-group .form-control:focus + .auth-float-label,
+  .auth-page-modern .auth-input-group .form-control:not(:placeholder-shown) + .auth-float-label,
+  .auth-page-modern .auth-input-group .form-control.has-value + .auth-float-label {
+    font-size: 0.72rem;
+  }
+}
+@media (min-width: 576px) and (max-width: 767px) {
+  .auth-page-modern .form-box {
+    padding: 2.5rem 2rem 3rem; max-width: 520px;
   }
 }
 @media (min-width: 768px) {
   .auth-page-modern .form-box {
-    padding: 3rem 3.5rem 4rem;
+    padding: 3rem 3rem 3.5rem;
+    max-width: 560px;
   }
 }
 
-/* ---- کاهش حرکت (دسترسی) ---- */
+/* ================================================================
+   ACCESSIBILITY: reduced motion
+   ================================================================ */
 @media (prefers-reduced-motion: reduce) {
   .auth-page-modern .form-box,
-  .auth-page-modern .form-tab .tab-content .tab-pane {
+  .auth-page-modern .form-tab .tab-content .tab-pane,
+  .auth-page-modern .auth-notice,
+  .auth-page-modern .auth-success-icon {
     animation: none;
   }
   .auth-page-modern .form-box {
     opacity: 1;
     transform: none;
   }
-  .auth-page-modern .form-box::before {
+  .auth-page-modern .form-box::before,
+  .auth-page-modern .login-page.bg-image::after {
     animation: none;
   }
-  .auth-page-modern .form-tab .form-control,
-  .auth-page-modern .form-tab .form-footer .btn-outline-primary-2,
-  .auth-page-modern .form-choice .btn-login {
+  .auth-page-modern .auth-icon-wrap .auth-icon {
+    animation: none;
+  }
+  .auth-page-modern .form-tab .nav.nav-pills .nav-link::after {
     transition: none;
   }
 }

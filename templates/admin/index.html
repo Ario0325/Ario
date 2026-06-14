@@ -1,56 +1,168 @@
 {% extends "admin/index.html" %}
 {% load static %}
 {% load i18n %}
+{% load admin_dashboard %}
 
 {% block extrastyle %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
 {% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
-<script src="{% static 'admin/js/theme-switcher.js' %}" defer></script>
+<script src="{% static 'admin/js/dashboard.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
+{% dashboard_stats as stats %}
+{% dashboard_recent_orders as recent_orders %}
+
 <div id="content-main">
-    {% if app_list %}
-        {% for app in app_list %}
-            <div class="app-{{ app.app_label }} module">
-                <table>
-                    <caption>
-                        <a href="{{ app.app_url }}" class="section">{{ app.name }}</a>
-                    </caption>
-                    {% for model in app.models %}
-                        <tr class="model-{{ model.object_name|lower }}">
-                            {% if model.admin_url %}
-                                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                            {% else %}
-                                <th scope="row">{{ model.name }}</th>
-                            {% endif %}
 
-                            {% if model.add_url %}
-                                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-                            {% else %}
-                                <td></td>
-                            {% endif %}
-
-                            {% if model.admin_url %}
-                                {% if model.view_only %}
-                                <td><a href="{{ model.admin_url }}" class="viewlink">{% trans 'View' %}</a></td>
-                                {% else %}
-                                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-                                {% endif %}
-                            {% else %}
-                                <td></td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                </table>
+    {# ── کارت‌های آماری ────────────────────────────────────────────── #}
+    <div class="dashboard-stats-grid">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--orders">📦</div>
+            <div class="stat-card__info">
+                <div class="stat-card__value">{{ stats.total_orders }}</div>
+                <div class="stat-card__label">کل سفارشات</div>
             </div>
-        {% endfor %}
-    {% else %}
-        <p>{% trans "You don't have permission to view or edit anything." %}</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--revenue">💰</div>
+            <div class="stat-card__info">
+                <div class="stat-card__value">{{ stats.month_revenue|floatformat:0 }} ت</div>
+                <div class="stat-card__label">درآمد ۳۰ روز اخیر</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--products">🛍️</div>
+            <div class="stat-card__info">
+                <div class="stat-card__value">{{ stats.total_products }}</div>
+                <div class="stat-card__label">محصولات فعال</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--reviews">💬</div>
+            <div class="stat-card__info">
+                <div class="stat-card__value">{{ stats.pending_reviews }}</div>
+                <div class="stat-card__label">نظرات در انتظار</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── دکمه‌های اکشن سریع ───────────────────────────────────────── #}
+    <div class="quick-actions">
+        <a href="/admin/Products_Module/product/add/" class="quick-action-btn">➕ محصول جدید</a>
+        <a href="/admin/Cart_Module/order/" class="quick-action-btn">📋 سفارشات</a>
+        <a href="/admin/Products_Module/productreview/" class="quick-action-btn">💬 نظرات</a>
+        <a href="/admin/Cart_Module/discountcode/" class="quick-action-btn">🏷️ کدهای تخفیف</a>
+        <a href="/admin/Accounts_Module/userprofile/" class="quick-action-btn">👥 کاربران</a>
+        <a href="/shop/" class="quick-action-btn" target="_blank">🌐 مشاهده سایت</a>
+    </div>
+
+    {# ── نمودارها ──────────────────────────────────────────────────── #}
+    <div class="dashboard-charts-grid">
+        <div class="dashboard-card">
+            <div class="dashboard-card__title">📈 فروش ۳۰ روز اخیر</div>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+        <div class="dashboard-card">
+            <div class="dashboard-card__title">📊 وضعیت سفارشات</div>
+            <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {# ── جداول ─────────────────────────────────────────────────────── #}
+    <div class="dashboard-tables-grid">
+        <div class="dashboard-card">
+            <div class="dashboard-card__title">🕐 سفارشات اخیر</div>
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>شماره</th>
+                        <th>مشتری</th>
+                        <th>مبلغ</th>
+                        <th>وضعیت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><a href="/admin/Cart_Module/order/{{ order.id }}/change/">{{ order.order_number }}</a></td>
+                        <td>{{ order.full_name }}</td>
+                        <td>{{ order.total|floatformat:0 }} ت</td>
+                        <td>
+                            {% if order.status == 'pending' %}
+                                <span class="badge-status badge-status--pending">⏳ در انتظار</span>
+                            {% elif order.status == 'paid' %}
+                                <span class="badge-status badge-status--paid">💳 پرداخت شده</span>
+                            {% elif order.status == 'processing' %}
+                                <span class="badge-status badge-status--processing">⚙️ پردازش</span>
+                            {% elif order.status == 'shipped' %}
+                                <span class="badge-status badge-status--shipped">🚚 ارسال شده</span>
+                            {% elif order.status == 'delivered' %}
+                                <span class="badge-status badge-status--delivered">✅ تحویل شده</span>
+                            {% elif order.status == 'cancelled' %}
+                                <span class="badge-status badge-status--cancelled">❌ لغو شده</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="dashboard-empty">سفارشی ثبت نشده</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="dashboard-card__title">🏆 محصولات پرفروش</div>
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:center;">#</th>
+                        <th>محصول</th>
+                        <th style="text-align:center;">فروش</th>
+                        <th>درآمد</th>
+                    </tr>
+                </thead>
+                <tbody id="topProductsBody">
+                    <tr><td colspan="4" class="dashboard-empty">در حال بارگذاری...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# ── لینک‌های سریع اپ‌ها ──────────────────────────────────────── #}
+    {% if app_list %}
+    <div class="dashboard-card">
+        <div class="dashboard-card__title">📂 دسترسی سریع به ماژول‌ها</div>
+        <div class="dashboard-apps-grid">
+            {% for app in app_list %}
+            <div class="dashboard-app-card">
+                <div class="dashboard-app-card__title">{{ app.name }}</div>
+                {% for model in app.models %}
+                <div class="dashboard-app-card__link">
+                    {% if model.admin_url %}
+                    <a href="{{ model.admin_url }}">{{ model.name }}</a>
+                    {% else %}
+                    <span>{{ model.name }}</span>
+                    {% endif %}
+                    {% if model.add_url %}
+                    <a href="{{ model.add_url }}" class="add-link">+</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
     {% endif %}
+
 </div>
 {% endblock %}

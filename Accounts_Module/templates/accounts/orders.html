@@ -57,10 +57,13 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'accounts:logout' %}">
-                                    <i class="icon-logout"></i>
-                                    <span>خروج</span>
-                                </a>
+                                <form action="{% url 'accounts:logout' %}" method="post" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="nav-link" style="background:none;border:none;cursor:pointer;width:100%;text-align:right;">
+                                        <i class="icon-logout"></i>
+                                        <span>خروج</span>
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>

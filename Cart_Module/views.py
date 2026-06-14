@@ -12,8 +12,10 @@ from django.utils import timezone
 from django_ratelimit.decorators import ratelimit
 from django.core.cache import cache
 
+from django.db import transaction
+
 from Products_Module.models import Product
-from .models import Order, OrderItem
+from .models import Order, OrderItem, CartItem
 from .services import (
     sync_cart_to_db,
     load_cart_from_db,
@@ -24,14 +26,16 @@ from .services import (
     apply_discount_to_session,
     remove_discount_from_session,
     calculate_cart_with_discount,
+    N8nOrderService,
 )
 
 
 def _get_cart(request):
-    if request.user.is_authenticated:
-        load_cart_from_db(request)
-
     """دیکشنری سبد از سشن: { product_id: quantity }"""
+    if request.user.is_authenticated and not request.session.get('_cart_loaded'):
+        load_cart_from_db(request)
+        request.session['_cart_loaded'] = True
+
     cart = request.session.get(CART_SESSION_KEY)
     if cart is None:
         request.session[CART_SESSION_KEY] = {}
@@ -53,10 +57,23 @@ def _cart_item_list(request):
     cart = _get_cart(request)
     items = []
     total = Decimal('0')
-    for product_id_str, qty in list(cart.items()):
+    if not cart:
+        return items, total
+
+    try:
+        product_ids = [int(pid) for pid in cart.keys()]
+    except (ValueError, TypeError):
+        return items, total
+
+    products = Product.objects.filter(
+        pk__in=product_ids, is_active=True, is_available=True
+    ).select_related('category', 'brand')
+    products_map = {p.pk: p for p in products}
+
+    for product_id_str, qty in cart.items():
         try:
             product_id = int(product_id_str)
-            product = Product.objects.filter(pk=product_id, is_active=True, is_available=True).first()
+            product = products_map.get(product_id)
             if product and qty > 0:
                 price = product.price
                 line_total = price * qty
@@ -282,14 +299,10 @@ def discount_remove(request):
 # ─────────────────────────────────────────────────────────────────────────────
 
 @login_required
+@require_POST
 @ratelimit(key='user', rate='5/m', block=True)
 def checkout_view(request):
     """ثبت سفارش از سبد و هدایت به صفحه پرداخت (ساده - بدون درگاه) - با Rate Limiting"""
-    from django.urls import reverse
-    if not request.user.is_authenticated:
-        from django.urls import reverse
-        messages.info(request, 'برای ثبت سفارش وارد حساب کاربری شوید.')
-        return redirect(reverse('accounts:login_register') + '?next=' + reverse('cart:checkout'))
 
     items, cart_total = _cart_item_list(request)
     if not items:
@@ -339,45 +352,46 @@ def checkout_view(request):
 
     final_total = max(subtotal - discount_amount, Decimal('0'))
 
-    order = Order(
-        user=request.user if request.user.is_authenticated else None,
-        full_name=full_name,
-        phone=phone,
-        email=email,
-        address=address,
-        postal_code=postal_code,
-        city=city,
-        subtotal=subtotal,
-        discount_code=discount_code_obj,
-        discount_amount=discount_amount,
-        total=final_total,
-        shipping_cost=Decimal('0'),
-        tax=Decimal('0'),
-        status='pending',
-    )
-    order.save()
-
-    for item in items:
-        OrderItem.objects.create(
-            order=order,
-            product=item['product'],
-            product_name=item['product'].name,
-            quantity=item['quantity'],
-            price=item['price'],
-            total=item['total'],
+    with transaction.atomic():
+        order = Order(
+            user=request.user if request.user.is_authenticated else None,
+            full_name=full_name,
+            phone=phone,
+            email=email,
+            address=address,
+            postal_code=postal_code,
+            city=city,
+            subtotal=subtotal,
+            discount_code=discount_code_obj,
+            discount_amount=discount_amount,
+            total=final_total,
+            shipping_cost=Decimal('0'),
+            tax=Decimal('0'),
+            status='pending',
         )
+        order.save()
 
-    # افزایش شمارنده استفاده از کد تخفیف
-    if discount_code_obj:
-        from django.db.models import F
-        from .models import DiscountCode
-        DiscountCode.objects.filter(pk=discount_code_obj.pk).update(used_count=F('used_count') + 1)
+        for item in items:
+            OrderItem.objects.create(
+                order=order,
+                product=item['product'],
+                product_name=item['product'].name,
+                quantity=item['quantity'],
+                price=item['price'],
+                total=item['total'],
+            )
+
+        # افزایش شمارنده استفاده از کد تخفیف
+        if discount_code_obj:
+            from django.db.models import F
+            from .models import DiscountCode
+            DiscountCode.objects.filter(pk=discount_code_obj.pk).update(used_count=F('used_count') + 1)
 
     # خالی کردن سبد و کد تخفیف
     request.session[CART_SESSION_KEY] = {}
     remove_discount_from_session(request)
     request.session.modified = True
-    sync_cart_to_db(request)
+    CartItem.objects.filter(user=request.user).delete()
 
     messages.success(request, 'سفارش با موفقیت ثبت شد. لطفاً پرداخت را انجام دهید.')
     return redirect('cart:payment', order_id=order.id)
@@ -392,7 +406,10 @@ def payment_view(request, order_id):
         from django.urls import reverse
         return redirect(reverse('accounts:login_register') + '?next=' + reverse('cart:payment', args=[order_id]))
     
-    order = get_object_or_404(Order, pk=order_id)
+    order = get_object_or_404(
+        Order.objects.prefetch_related('items__product'),
+        pk=order_id
+    )
     # SECURE: Properly verify ownership - user can only see their own payment page
     if order.user_id != request.user.id:
         from django.http import HttpResponseForbidden
@@ -400,11 +417,10 @@ def payment_view(request, order_id):
 
     if request.method == 'POST':
         # Reduce product stock
-        from django.db import transaction
         try:
             with transaction.atomic():
                 for item in order.items.all():
-                    product = item.product
+                    product = Product.objects.select_for_update().get(pk=item.product_id)
                     if product.stock >= item.quantity:
                         product.stock -= item.quantity
                         if product.stock <= 0:
@@ -416,6 +432,12 @@ def payment_view(request, order_id):
 
                 order.status = 'paid'
                 order.save(update_fields=['status', 'updated_at'])
+
+                try:
+                    N8nOrderService.send_order_confirmation(order)
+                except Exception:
+                    pass
+
                 messages.success(request, 'پرداخت با موفقیت انجام شد. فاکتور شما آماده است.')
                 return redirect('cart:invoice', order_id=order.id)
         except Exception as e:
@@ -469,7 +491,7 @@ def to_persian_datetime(dt):
             'day_name': jdate.strftime('%A'),
             'timestamp': dt.isoformat()
         }
-    except:
+    except Exception:
         return {
             'full': str(dt),
             'date': str(dt.date()),
@@ -559,7 +581,10 @@ def api_new_orders(request):
         })
         
     except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'api_new_orders error: {e}')
         return JsonResponse({
             'success': False,
-            'error': str(e),
+            'error': 'خطای داخلی سرور',
         }, status=500)

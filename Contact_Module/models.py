@@ -14,6 +14,9 @@ class ContactMessage(models.Model):
         verbose_name = 'پیام تماس'
         verbose_name_plural = 'پیام های تماس'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['is_read', '-created_at'], name='contact_read_date_idx'),
+        ]
 
     def __str__(self):
         return f"{self.name} - {self.subject}"
