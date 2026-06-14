@@ -42,7 +42,7 @@ if not SECRET_KEY:
 # Read from environment or use defaults for development
 ALLOWED_HOSTS = [
     h.strip()
-    for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,::1,arya0325.pythonanywhere.com').split(',')
+    for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,::1,arya0325.pythonanywhere.com,aryaabdi1850325.pythonanywhere.com').split(',')
     if h.strip()
 ]
 
@@ -250,6 +250,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://[::1]',
     'http://[::1]:8000',
     'https://arya0325.pythonanywhere.com',  # PythonAnywhere production
+    'https://aryaabdi1850325.pythonanywhere.com',  # PythonAnywhere production (2nd domain)
 ]
 
 # Add production CSRF origins if not in debug mode

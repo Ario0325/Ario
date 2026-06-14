@@ -1,0 +1,90 @@
+=== راهنمای رفع مشکل PWA - آریو شاپ ===
+
+=== مشکل اصلی ===
+سایت شما روی PythonAnywhere هنوز کد قدیمی رو داره!
+manifest قدیمی با اسم "molla" هنوز سرو میشه.
+یعنی git pull انجام نشده یا collectstatic اجرا نشده.
+
+=== مراحل رفع مشکل (به ترتیب) ===
+
+مرحله 1: وارد کنسول Bash پنل PythonAnywhere بشو
+از منوی بالا روی "Consoles" کلیک کن و "Bash" رو باز کن.
+
+مرحله 2: دستورات زیر رو یکی یکی اجرا کن:
+
+cd ~/Ario
+git pull origin main
+pip install whitenoise
+python manage.py collectstatic --noinput
+
+مرحله 3: از صفحه "Web" روی دکمه "Reload" بزن
+
+مرحله 4: تست کن
+مرورگر رو باز کن و برو به:
+https://aryaabdi1850325.pythonanywhere.com/
+
+مرحله 5: ارورها رو از Chrome DevTools بگیر
+روی صفحه سایت راست‌کلیک کن → "Inspect" → تب "Application"
+از سمت چپ روی "Manifest" کلیک کن
+اگه اروری هست، اسکرین‌شات بگیر و بفرست
+
+=== نحوه تست دقیق PWA ===
+
+تست 1: Manifest
+توی Chrome DevTools → Application → Manifest
+باید نشون بده:
+- name: فروشگاه آریو شاپ
+- short_name: آریو شاپ
+- start_url: /
+- icons: 3 آیکون (192, 256, 512)
+- screenshots: 2 اسکرین‌شات
+
+تست 2: Service Worker
+توی Chrome DevTools → Application → Service Workers
+باید نشون بده:
+- Status: activated and is running
+- Source: /sw.js
+
+تست 3: فایل‌های استاتیک
+توی Chrome DevTools → Network tab
+صفحه رو رفرش کن
+باید فایل‌های زیر وضعیت 200 داشته باشن:
+- /static/assets/css/style.css
+- /static/assets/js/main.js
+- /static/assets/images/icons/site.webmanifest
+- /sw.js
+
+تست 4: نصب PWA
+اگه همه چیز درست باشه:
+- Chrome دسکتاپ: آیکون نصب (+) توی نوار آدرس ظاهر میشه
+- Chrome موبایل: منوی سه‌نقطه → "افزودن به صفحه اصلی"
+
+=== اگه بعد از اجرای دستورات بازم ارور داشتی ===
+
+1. اسکرین‌شات از تب Application → Manifest بگیر
+2. اسکرین‌شات از تب Application → Service Workers بگیر
+3. اسکرین‌شات از تب Console (ارورهای قرمز) بگیر
+4. این اسکرین‌شات‌ها رو بفرست تا مشکل رو دقیق حل کنم
+
+=== ارورهای رایج و راه حل ===
+
+ارور: "Icon failed to load"
+→ یعنی collectstatic اجرا نشده
+→ اجرا کن: python manage.py collectstatic --noinput
+
+ارور: "Manifest 'start_url' is not valid"
+→ یعنی manifest فایل قدیمیه
+→ git pull origin main رو اجرا کن
+
+ارور: "No supplied icon is at least 144 pixels square"
+→ یعنی آیکون‌ها purpose ندارن
+→ git pull origin main رو اجرا کن (توی کد جدید اصلاح شده)
+
+ارور: "molla" (اسم قدیمی)
+→ یعنی کد جدید pull نشده
+→ git pull origin main رو اجرا کن
+
+=== نکته مهم ===
+دامنه سایت شما: aryaabdi1850325.pythonanywhere.com
+نه arya0325.pythonanywhere.com
+مطمئن شو توی settings.py دامنه درست توی ALLOWED_HOSTS و CSRF_TRUSTED_ORIGINS هست.
