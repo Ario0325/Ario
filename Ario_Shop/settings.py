@@ -11,13 +11,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Load environment variables from .env file
-load_dotenv(BASE_DIR / '.env')
 
 
 # =============================================================================
@@ -211,17 +207,17 @@ DEFAULT_FROM_EMAIL = 'آریو شاپ <bardiaabdi1393@gmail.com>'
 # N8N AUTHENTICATION WEBHOOK
 # =============================================================================
 
-N8N_WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL', 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/django-auth-event')
-N8N_WEBHOOK_SECRET = os.environ.get('N8N_WEBHOOK_SECRET', 'ario-shop-secret-token')
+N8N_WEBHOOK_URL = 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/django-auth-event'
+N8N_WEBHOOK_SECRET = 'ario-shop-secret-token'
 OTP_EXPIRY_MINUTES = 15
 
 # =============================================================================
 # N8N ORDER CONFIRMATION WEBHOOK
 # =============================================================================
 
-N8N_ORDER_WEBHOOK_URL = os.environ.get('N8N_ORDER_WEBHOOK_URL', 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/order-paid')
-N8N_ORDER_WEBHOOK_SECRET = os.environ.get('N8N_ORDER_WEBHOOK_SECRET', N8N_WEBHOOK_SECRET)
-N8N_SENDER_EMAIL = os.environ.get('N8N_SENDER_EMAIL', 'bardiaabdi1393@gmail.com')
+N8N_ORDER_WEBHOOK_URL = 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/order-paid'
+N8N_ORDER_WEBHOOK_SECRET = N8N_WEBHOOK_SECRET
+N8N_SENDER_EMAIL = 'bardiaabdi1393@gmail.com'
 
 # =============================================================================
 # SECURITY SETTINGS - PRODUCTION READY
