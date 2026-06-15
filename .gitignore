@@ -40,3 +40,6 @@ n8n/*
 
 *.bak
 *.tmp
+.wrangler/
+debug_*.py
+promt.txt
