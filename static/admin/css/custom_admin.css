@@ -124,6 +124,9 @@ button:hover,
     align-items: center !important;
     justify-content: space-between !important;
     overflow: hidden !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    flex-wrap: wrap !important;
 }
 
 #header a:link,
@@ -226,9 +229,10 @@ button:hover,
     flex-direction: column !important;
     min-height: 100vh !important;
     width: 100% !important;
-    max-width: 100% !important;
+    max-width: 100vw !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow-x: hidden !important;
 }
 
 #content-wrapper {
@@ -262,6 +266,7 @@ button:hover,
     max-width: 100% !important;
     margin: 0 !important;
     box-sizing: border-box !important;
+    overflow-x: hidden !important;
 }
 
 #content-related {
@@ -303,6 +308,7 @@ button:hover,
 /* ── جدول لیست ───────────────────────────────────────────────────────────── */
 #changelist {
     background: transparent !important;
+    overflow-x: hidden !important;
 }
 
 #changelist-filter {
@@ -401,7 +407,6 @@ button:hover,
 
 #result_list tbody tr:hover {
     background: var(--ap-card-hover) !important;
-    transform: scale(1.005) !important;
 }
 
 #result_list tbody tr:focus-within {
@@ -1062,6 +1067,22 @@ a:hover {
 @media (max-width: 768px) {
     #content {
         padding: 16px 14px 32px !important;
+    }
+
+    #header {
+        padding: 0 12px !important;
+    }
+
+    .admin-brand {
+        font-size: 15px !important;
+    }
+
+    .admin-brand__badge {
+        display: none !important;
+    }
+
+    #user-tools {
+        font-size: 12px !important;
     }
 
     .change-form fieldset {
