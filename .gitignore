@@ -31,9 +31,12 @@ Thumbs.db
 session-*.md
 
 docs/
-n8n/
+n8n/*
+!n8n/proxy-setup/
 *.md
 !README.md
+!n8n/proxy-setup/Final.md
+!n8n/proxy-setup/n8n-project-context.md
 
 *.bak
 *.tmp

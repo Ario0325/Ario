@@ -199,18 +199,19 @@ if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-    EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'noreply@arioshop.local'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 465
+    EMAIL_HOST_USER = 'bardiaabdi1393@gmail.com'
+    EMAIL_HOST_PASSWORD = 'wokw kyci lswj uqqd'
+    EMAIL_USE_SSL = True
+    EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = 'آریو شاپ <bardiaabdi1393@gmail.com>'
 
 # =============================================================================
 # N8N AUTHENTICATION WEBHOOK
 # =============================================================================
 
-N8N_WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL', 'https://tjnryhbtgvrfdcs.app.n8n.cloud/webhook/django-auth-event')
+N8N_WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL', 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/django-auth-event')
 N8N_WEBHOOK_SECRET = os.environ.get('N8N_WEBHOOK_SECRET', 'ario-shop-secret-token')
 OTP_EXPIRY_MINUTES = 15
 
@@ -218,7 +219,7 @@ OTP_EXPIRY_MINUTES = 15
 # N8N ORDER CONFIRMATION WEBHOOK
 # =============================================================================
 
-N8N_ORDER_WEBHOOK_URL = os.environ.get('N8N_ORDER_WEBHOOK_URL', 'https://tjnryhbtgvrfdcs.app.n8n.cloud/webhook/order-paid')
+N8N_ORDER_WEBHOOK_URL = os.environ.get('N8N_ORDER_WEBHOOK_URL', 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/order-paid')
 N8N_ORDER_WEBHOOK_SECRET = os.environ.get('N8N_ORDER_WEBHOOK_SECRET', N8N_WEBHOOK_SECRET)
 N8N_SENDER_EMAIL = os.environ.get('N8N_SENDER_EMAIL', 'bardiaabdi1393@gmail.com')
 
