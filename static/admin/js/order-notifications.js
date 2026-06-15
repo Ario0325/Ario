@@ -277,8 +277,8 @@
                 left: 20px;
                 display: flex;
                 align-items: center;
-                gap: 6px;
-                padding: 8px 14px;
+                gap: 0;
+                padding: 0;
                 background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
                 border-radius: 50px;
                 color: white;
@@ -286,14 +286,55 @@
                 font-weight: 600;
                 box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
                 z-index: 99998;
-                cursor: pointer;
                 transition: all 0.3s ease;
                 animation: badgeBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+                overflow: hidden;
+            }
+            
+            .order-counter-badge .counter-body {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 14px;
+                cursor: pointer;
+                transition: background 0.2s ease;
+            }
+            
+            .order-counter-badge .counter-body:hover {
+                background: rgba(255,255,255,0.15);
+            }
+            
+            .order-counter-badge .counter-dismiss {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 28px;
+                height: 100%;
+                min-height: 34px;
+                background: rgba(0,0,0,0.15);
+                border: none;
+                color: white;
+                cursor: pointer;
+                transition: background 0.2s ease;
+                padding: 0;
+                flex-shrink: 0;
+            }
+            
+            .order-counter-badge .counter-dismiss:hover {
+                background: rgba(239, 68, 68, 0.6);
             }
             
             .order-counter-badge:hover {
-                transform: scale(1.05);
+                transform: scale(1.03);
                 box-shadow: 0 6px 25px rgba(34, 197, 94, 0.5);
+            }
+            
+            .order-counter-badge.removing {
+                animation: badgeDismiss 0.3s ease forwards;
+            }
+            
+            @keyframes badgeDismiss {
+                to { transform: scale(0); opacity: 0; }
             }
             
             .order-counter-badge svg {
@@ -341,6 +382,8 @@
                 .order-counter-badge {
                     left: 10px;
                     right: 10px;
+                    top: auto;
+                    bottom: 70px;
                 }
             }
         `;
@@ -496,13 +539,9 @@
                 if (newOrders.length > 0) {
                     // نمایش یک اعلان جمعی برای همه سفارش‌های جدید
                     showAggregatedNotification(newOrders.length, newOrders);
+                    // به‌روزرسانشمارنده فقط وقتی سفارش جدید واقعی وجود دارد
+                    updateOrderCounter(newOrders.length);
                 }
-                
-                // به‌روزرسانشمارنده
-                updateOrderCounter(data.total_count);
-            } else if (data.success) {
-                updateOrderCounter(data.total_count);
-            }
             
         } catch (error) {
             console.error('خطا در بررسی سفارش‌ها:', error);
@@ -624,18 +663,34 @@
                 badge.id = 'order-counter-badge';
                 badge.className = 'order-counter-badge';
                 badge.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                        <line x1="3" y1="6" x2="21" y2="6"/>
-                        <path d="M16 10a4 4 0 0 1-8 0"/>
-                    </svg>
-                    <span class="count">${count}</span>
-                    سفارش جدید
+                    <div class="counter-body" title="مشاهده سفارش‌ها">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                        <span class="count">${count}</span>
+                        سفارش جدید
+                    </div>
+                    <button class="counter-dismiss" aria-label="بستن" title="بستن">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
                 `;
                 
-                // کلیک برای رفتن به بخش سفارش‌ها
-                badge.addEventListener('click', () => {
+                // کلیک روی بدنه برای رفتن به بخش سفارش‌ها
+                const body = badge.querySelector('.counter-body');
+                body.addEventListener('click', () => {
                     window.location.href = '/admin/Cart_Module/order/';
+                });
+                
+                // کلیک روی دکمه بستن
+                const dismissBtn = badge.querySelector('.counter-dismiss');
+                dismissBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    badge.classList.add('removing');
+                    setTimeout(() => badge.remove(), 300);
                 });
                 
                 document.body.appendChild(badge);

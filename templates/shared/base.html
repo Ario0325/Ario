@@ -52,7 +52,7 @@
 
     <button id="scroll-top" title="بازگشت به بالا"><i class="icon-arrow-up"></i></button>
 
-    {% include 'shared/newsletter_popup.html' %}
+    {% if site_settings.show_newsletter_popup %}{% include 'shared/newsletter_popup.html' %}{% endif %}
 
     {% include 'shared/script.html' %}
     {% block extra_js %}{% endblock %}

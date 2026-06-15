@@ -81,6 +81,7 @@
 
 html {
     direction: rtl;
+    overflow-x: hidden;
 }
 
 body {
@@ -90,10 +91,18 @@ body {
     line-height: 1.6 !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
+    overflow-x: hidden !important;
 }
 
 /* بهبودهای مدرن - انیمیشن‌های نرم‌تر */
-*:hover {
+a:hover,
+button:hover,
+.btn:hover,
+.nav-link:hover,
+.submit-row a:hover,
+#user-tools a:hover,
+.module h2:hover,
+.change-list .results:hover {
     transition: all 0.2s ease-out !important;
 }
 
@@ -114,7 +123,7 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    overflow: visible !important;
+    overflow: hidden !important;
 }
 
 #header a:link,
@@ -226,6 +235,8 @@ body {
     display: flex !important;
     flex: 1 !important;
     width: 100% !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
 }
 
 #content {
@@ -256,7 +267,7 @@ body {
 #content-related {
     float: none !important;
     width: 280px !important;
-    min-width: 280px !important;
+    min-width: 0 !important;
     margin: 0 !important;
     box-sizing: border-box !important;
 }
@@ -352,7 +363,7 @@ body {
 /* جدول لیست */
 #result_list {
     border-radius: var(--ap-radius-md) !important;
-    overflow: hidden !important;
+    overflow-x: auto !important;
     border: 1px solid var(--ap-border) !important;
     background: var(--ap-card) !important;
 }

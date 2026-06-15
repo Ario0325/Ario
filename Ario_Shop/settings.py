@@ -95,6 +95,7 @@ TEMPLATES = [
                 'Menu_Module.context_processors.menu_items',
                 'Cart_Module.context_processors.cart_context',
                 'Products_Module.context_processors.navbar_categories',
+                'Core_Module.context_processors.site_settings',
             ],
         },
     },
@@ -144,6 +145,10 @@ CACHES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'max_similarity': 0.9,
+            'user_attributes': ('email',),
+        },
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
