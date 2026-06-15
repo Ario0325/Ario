@@ -142,10 +142,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const tbody = document.getElementById('topProductsBody');
         if (!tbody || !products.length) return;
 
+        function esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
         tbody.innerHTML = products.map((p, i) =>
             '<tr>' +
             '<td style="text-align:center;font-weight:600;">' + (i + 1) + '</td>' +
-            '<td>' + p.name + '</td>' +
+            '<td>' + esc(p.name) + '</td>' +
             '<td style="text-align:center;">' + formatNumber(p.sold) + '</td>' +
             '<td>' + formatCurrency(p.revenue) + '</td>' +
             '</tr>'

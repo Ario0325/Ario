@@ -555,6 +555,12 @@
         if (existingAggregated) {
             existingAggregated.remove();
         }
+
+        function esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
         
         // محاسبه جمع کل سفارش‌ها
         let totalAmount = 0;
@@ -578,7 +584,7 @@
         let title, message;
         if (count === 1) {
             title = 'سفارش جدید!';
-            message = `سفارش <strong>${orders[0].order_number}</strong> ثبت شد`;
+            message = `سفارش <strong>${esc(orders[0].order_number)}</strong> ثبت شد`;
         } else {
             title = `${count} سفارش جدید!`;
             message = `<strong>${count}</strong> سفارش جدید ثبت شد. برای مشاهده کلیک کنید.`;

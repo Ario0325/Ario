@@ -35,6 +35,7 @@ class ContactForm(forms.ModelForm):
                 'cols': 30,
                 'rows': 4,
                 'placeholder': 'متن پیام شما *',
-                'required': True
+                'required': True,
+                'maxlength': '5000',
             }),
         }

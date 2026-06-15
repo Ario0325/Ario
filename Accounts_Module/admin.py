@@ -34,10 +34,10 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(UserVerification)
 class UserVerificationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'code', 'is_verified', 'created_at_persian', 'expires_at_persian')
+    list_display = ('user', 'is_verified', 'created_at_persian', 'expires_at_persian')
     list_filter = ('is_verified',)
     search_fields = ('user__email',)
-    readonly_fields = ('created_at',)
+    readonly_fields = ('code', 'created_at')
 
     @admin.display(description='تاریخ ایجاد', ordering='created_at')
     def created_at_persian(self, obj):
@@ -53,10 +53,10 @@ class UserVerificationAdmin(admin.ModelAdmin):
 
 @admin.register(PasswordResetToken)
 class PasswordResetTokenAdmin(admin.ModelAdmin):
-    list_display = ('user', 'code', 'is_used', 'created_at_persian', 'expires_at_persian')
+    list_display = ('user', 'is_used', 'created_at_persian', 'expires_at_persian')
     list_filter = ('is_used',)
     search_fields = ('user__email',)
-    readonly_fields = ('created_at',)
+    readonly_fields = ('code', 'created_at')
 
     @admin.display(description='تاریخ ایجاد', ordering='created_at')
     def created_at_persian(self, obj):

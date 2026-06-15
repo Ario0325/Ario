@@ -211,7 +211,8 @@ class ResendVerificationView(View):
         else:
             messages.error(request, _('خطا در ارسال ایمیل. لطفاً دوباره تلاش کنید.'))
 
-        return redirect(f"{reverse_lazy('accounts:verify_email')}?email={email}")
+        request.session['verify_email'] = email
+        return redirect(reverse_lazy('accounts:verify_email'))
 
 
 class LogoutView(View):
@@ -418,6 +419,7 @@ def user_order_detail_view(request, order_id):
 
 
 @login_required
+@require_POST
 def user_order_cancel_view(request, order_id):
     """لغو سفارش - فقط برای سفارشاتی که ارسال نشده‌اند"""
     from Cart_Module.models import Order
@@ -437,6 +439,10 @@ def user_order_cancel_view(request, order_id):
     if request.method == 'POST':
         from django.db import transaction
         with transaction.atomic():
+            order = type(order).objects.select_for_update().get(pk=order.pk)
+            if order.status not in cancellable_statuses:
+                messages.error(request, _('این سفارش قابل لغو نیست.'))
+                return redirect('accounts:order_detail', order_id=order.id)
             for item in order.items.select_related('product').all():
                 if item.product:
                     item.product.stock += item.quantity
@@ -447,8 +453,6 @@ def user_order_cancel_view(request, order_id):
             order.save(update_fields=['status', 'updated_at'])
         messages.success(request, _('سفارش با موفقیت لغو شد.'))
         return redirect('accounts:orders')
-
-    return redirect('accounts:order_detail', order_id=order.id)
 
 
 @login_required

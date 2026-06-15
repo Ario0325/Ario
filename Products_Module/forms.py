@@ -31,6 +31,7 @@ class ProductReviewForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'متن نظر خود را بنویسید...',
                 'rows': 5,
+                'maxlength': '2000',
             }),
         }
         labels = {

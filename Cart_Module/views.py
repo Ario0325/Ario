@@ -3,6 +3,7 @@
 """
 from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_GET
@@ -161,6 +162,8 @@ def cart_add(request, product_id):
 
     messages.success(request, f'«{product.name}» به سبد خرید اضافه شد.')
     next_url = request.POST.get('next') or request.GET.get('next')
+    if next_url and not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        next_url = None
     return redirect(next_url or reverse('cart:detail'))
 
 
@@ -181,6 +184,8 @@ def cart_remove(request, product_id):
         messages.info(request, 'محصول از سبد خرید حذف شد.')
 
     next_url = request.POST.get('next') or request.GET.get('next')
+    if next_url and not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        next_url = None
     return redirect(next_url or reverse('cart:detail'))
 
 

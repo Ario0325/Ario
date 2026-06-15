@@ -108,11 +108,16 @@ function formatNumber(num) {
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `site-toast site-toast-${type}`;
-    toast.innerHTML = `
-        <span class="site-toast-icon" aria-hidden="true"></span>
-        <span class="site-toast-text">${message}</span>
-        <div class="site-toast-progress" aria-hidden="true"></div>
-    `;
+    const icon = document.createElement('span');
+    icon.className = 'site-toast-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    const text = document.createElement('span');
+    text.className = 'site-toast-text';
+    text.textContent = message;
+    const progress = document.createElement('div');
+    progress.className = 'site-toast-progress';
+    progress.setAttribute('aria-hidden', 'true');
+    toast.append(icon, text, progress);
     
     const container = document.getElementById('site-toast-container');
     if (container) {

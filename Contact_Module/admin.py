@@ -47,3 +47,6 @@ class ContactInfoAdmin(admin.ModelAdmin):
             'fields': ('is_active',)
         }),
     )
+
+    def has_add_permission(self, request):
+        return not ContactInfo.objects.exists()

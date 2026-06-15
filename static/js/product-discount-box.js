@@ -226,7 +226,7 @@
         // Create a form to remove the discount
         const removeForm = document.createElement('form');
         removeForm.method = 'POST';
-        removeForm.action = '{% url "cart:discount_remove" %}';
+        removeForm.action = document.getElementById('product-discount-box').dataset.removeUrl || '/cart/discount/remove/';
         
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
         if (csrfToken) {
