@@ -277,3 +277,57 @@ class N8nOrderService:
         }
 
         return cls._send_to_n8n(payload)
+
+
+    @classmethod
+    def send_telegram_notification(cls, order):
+        customer_name = order.full_name
+        if not customer_name and order.user:
+            customer_name = order.user.get_full_name() or order.user.username
+        customer_email = order.email
+        if not customer_email and order.user:
+            customer_email = order.user.email
+        customer_phone = order.phone or ''
+
+        items = []
+        for item in order.items.select_related('product').all():
+            items.append({
+                "name": item.product_name,
+                "quantity": item.quantity,
+                "unit_price": int(item.price),
+                "total_price": int(item.total),
+            })
+
+        payload = {
+            "secret_token": cls.WEBHOOK_SECRET,
+            "order_id": order.id,
+            "order_number": order.order_number,
+            "customer_name": customer_name or "?????",
+            "customer_email": customer_email or "",
+            "customer_phone": customer_phone,
+            "total_price": int(order.subtotal),
+            "shipping_cost": int(order.shipping_cost),
+            "discount": int(order.discount_amount),
+            "payment_method": "??????",
+            "shipping_address": order.address,
+            "items": items,
+            "created_at": order.created_at.isoformat(),
+            "status": "paid",
+        }
+
+        telegram_url = settings.N8N_TELEGRAM_WEBHOOK_URL
+        try:
+            response = requests.post(
+                telegram_url,
+                json=payload,
+                headers=cls._build_headers(),
+                timeout=cls.TIMEOUT_SECONDS,
+            )
+            response.raise_for_status()
+            logger.info(
+                f"[telegram] ??????????? ????? ????? ??: order={order.order_number}"
+            )
+            return True
+        except Exception as e:
+            logger.error(f"[telegram] ??? ?? ????? ??????????? ??????: {e}")
+            return False

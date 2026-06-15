@@ -220,6 +220,12 @@ N8N_ORDER_WEBHOOK_SECRET = N8N_WEBHOOK_SECRET
 N8N_SENDER_EMAIL = 'bardiaabdi1393@gmail.com'
 
 # =============================================================================
+# N8N TELEGRAM NOTIFICATION WEBHOOK
+# =============================================================================
+
+N8N_TELEGRAM_WEBHOOK_URL = 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/new-order-notify'
+
+# =============================================================================
 # SECURITY SETTINGS - PRODUCTION READY
 # =============================================================================
 

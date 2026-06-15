@@ -438,6 +438,11 @@ def payment_view(request, order_id):
                 except Exception:
                     pass
 
+                try:
+                    N8nOrderService.send_telegram_notification(order)
+                except Exception:
+                    pass
+
                 messages.success(request, 'پرداخت با موفقیت انجام شد. فاکتور شما آماده است.')
                 return redirect('cart:invoice', order_id=order.id)
         except Exception as e:

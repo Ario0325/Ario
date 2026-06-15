@@ -5,6 +5,8 @@
  * Django sends requests here, this worker forwards them to n8n.
  *
  * Routes:
+ *   POST /webhook/new-order-notify   -> n8n /webhook/new-order-notify
+ *
  *   POST /webhook/django-auth-event  -> n8n /webhook/django-auth-event
  *   POST /webhook/order-paid         -> n8n /webhook/order-paid
  *   GET  /                           -> health check
@@ -12,7 +14,7 @@
 
 const N8N_BASE_URL = "https://tjnryhbtgvrfdcs.app.n8n.cloud";
 
-const ALLOWED_PATHS = ["/webhook/django-auth-event", "/webhook/order-paid"];
+const ALLOWED_PATHS = ["/webhook/django-auth-event", "/webhook/order-paid", "/webhook/new-order-notify"];
 
 export default {
   async fetch(request, env, ctx) {
