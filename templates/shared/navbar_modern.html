@@ -156,7 +156,10 @@
                             <div class="az-cart-total"><span>مجموع:</span><strong>{% if cart_total %}{{ cart_total|floatformat:0 }}{% else %}0{% endif %} تومان</strong></div>
                             <div class="az-cart-btns">
                                 <a href="{% url 'cart:detail' %}" class="az-btn az-btn-outline">سبد خرید</a>
-                                <a href="{% url 'cart:checkout' %}" class="az-btn az-btn-fill">پرداخت</a>
+                                <form method="post" action="{% url 'cart:checkout' %}" style="display:inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="az-btn az-btn-fill">پرداخت</button>
+                                </form>
                             </div>
                         </div>
                         {% endif %}
