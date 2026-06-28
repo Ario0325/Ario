@@ -101,9 +101,14 @@ button:hover,
 .nav-link:hover,
 .submit-row a:hover,
 #user-tools a:hover,
-.module h2:hover,
-.change-list .results:hover {
+.module h2:hover {
     transition: all 0.2s ease-out !important;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box !important;
 }
 
 * {
@@ -190,7 +195,6 @@ button:hover,
 #user-tools a:hover {
     background: var(--ap-accent-glow) !important;
     color: #fff !important;
-    transform: translateX(-2px) !important;
 }
 
 #user-tools a:focus {
@@ -229,7 +233,7 @@ button:hover,
     flex-direction: column !important;
     min-height: 100vh !important;
     width: 100% !important;
-    max-width: 100vw !important;
+    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden !important;
@@ -250,7 +254,8 @@ button:hover,
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
 }
 
 #content h1 {
@@ -651,7 +656,6 @@ input[type="radio"] {
 }
 
 .object-tools a:hover {
-    transform: translateY(-1px) !important;
     box-shadow: 0 8px 20px var(--ap-primary-glow) !important;
     background: linear-gradient(135deg, #8b6dff, var(--ap-primary)) !important;
 }
@@ -679,7 +683,6 @@ input[type="submit"]:hover,
 input[type="button"]:hover,
 .submit-row input:hover,
 .submit-row button:hover {
-    transform: translateY(-1px) !important;
     box-shadow: 0 8px 20px var(--ap-primary-glow) !important;
 }
 
@@ -699,7 +702,6 @@ input[type="button"]:hover,
 
 .deletelink:hover,
 .submit-row a.deletelink:hover {
-    transform: translateY(-1px) !important;
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4) !important;
 }
 
@@ -784,10 +786,12 @@ input[type="button"]:hover,
     border-radius: var(--ap-radius-lg) !important;
     overflow: hidden !important;
     margin-bottom: 20px !important;
+    max-width: 100% !important;
 }
 
 .inline-group .tabular {
     background: transparent !important;
+    overflow-x: auto !important;
 }
 
 .inline-group table {
