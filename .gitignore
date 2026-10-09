@@ -35,9 +35,11 @@ n8n/*
 !n8n/proxy-setup/
 *.md
 !README.md
+!SKILL.md
 !n8n/proxy-setup/Final.md
 !n8n/proxy-setup/n8n-project-context.md
 !n8n/proxy-setup/Telegram-Setup.md
+!n8n/proxy-setup/GO-LIVE.md
 
 *.bak
 *.tmp

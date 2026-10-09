@@ -12,7 +12,7 @@
  *   GET  /                           -> health check
  */
 
-const N8N_BASE_URL = "https://tjnryhbtgvrfdcs.app.n8n.cloud";
+const N8N_BASE_URL = "https://aryashop.app.n8n.cloud";
 
 const ALLOWED_PATHS = ["/webhook/django-auth-event", "/webhook/order-paid", "/webhook/new-order-notify"];
 

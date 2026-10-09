@@ -42,11 +42,11 @@ if not SECRET_KEY:
 # Read from environment or use defaults for development
 ALLOWED_HOSTS = [
     h.strip()
-    for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,::1,arya0325.pythonanywhere.com,aryaabdi1850325.pythonanywhere.com').split(',')
+    for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,::1,arya0325.pythonanywhere.com,aryaabdi1850325.pythonanywhere.com,aryaabdi13850325.pythonanywhere.com').split(',')
     if h.strip()
 ]
 # Always ensure PythonAnywhere domains are included
-for _pa_host in ['arya0325.pythonanywhere.com', 'aryaabdi1850325.pythonanywhere.com']:
+for _pa_host in ['arya0325.pythonanywhere.com', 'aryaabdi1850325.pythonanywhere.com', 'aryaabdi13850325.pythonanywhere.com']:
     if _pa_host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(_pa_host)
 
@@ -216,7 +216,7 @@ DEFAULT_FROM_EMAIL = 'آریو شاپ <bardiaabdi1393@gmail.com>'
 # N8N AUTHENTICATION WEBHOOK
 # =============================================================================
 
-N8N_WEBHOOK_URL = 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/django-auth-event'
+N8N_WEBHOOK_URL = 'https://quiet-field-a090.aryaabdi13850325.workers.dev/webhook/django-auth-event'
 N8N_WEBHOOK_SECRET = 'ario-shop-secret-token'
 OTP_EXPIRY_MINUTES = 15
 
@@ -224,7 +224,7 @@ OTP_EXPIRY_MINUTES = 15
 # N8N ORDER CONFIRMATION WEBHOOK
 # =============================================================================
 
-N8N_ORDER_WEBHOOK_URL = 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/order-paid'
+N8N_ORDER_WEBHOOK_URL = 'https://quiet-field-a090.aryaabdi13850325.workers.dev/webhook/order-paid'
 N8N_ORDER_WEBHOOK_SECRET = N8N_WEBHOOK_SECRET
 N8N_SENDER_EMAIL = 'bardiaabdi1393@gmail.com'
 
@@ -232,7 +232,7 @@ N8N_SENDER_EMAIL = 'bardiaabdi1393@gmail.com'
 # N8N TELEGRAM NOTIFICATION WEBHOOK
 # =============================================================================
 
-N8N_TELEGRAM_WEBHOOK_URL = 'https://quiet-field-a090.mimoomim456.workers.dev/webhook/new-order-notify'
+N8N_TELEGRAM_WEBHOOK_URL = 'https://quiet-field-a090.aryaabdi13850325.workers.dev/webhook/new-order-notify'
 
 # =============================================================================
 # SECURITY SETTINGS - PRODUCTION READY
@@ -261,8 +261,9 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://[::1]',
     'http://[::1]:8000',
-    'https://arya0325.pythonanywhere.com',  # PythonAnywhere production
-    'https://aryaabdi1850325.pythonanywhere.com',  # PythonAnywhere production (2nd domain)
+    'https://arya0325.pythonanywhere.com',
+    'https://aryaabdi1850325.pythonanywhere.com',
+    'https://aryaabdi13850325.pythonanywhere.com',
 ]
 
 # Add production CSRF origins if not in debug mode
